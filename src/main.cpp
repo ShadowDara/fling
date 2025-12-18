@@ -18,11 +18,13 @@ using namespace fling::runtime;
 using namespace std;
 
 // Hilfsfunktion zum Testen von Tokens
-void assertToken(const lexer::Token &token, const std::string &expectedValue, lexer::TokenType expectedType)
+void assertToken(const lexer::Token &token,
+    const std::string &expectedValue, lexer::TokenType expectedType)
 {
     if (token.type != expectedType || token.value != expectedValue)
     {
-        std::cerr << "Token mismatch: got " << token.value << ", expected " << expectedValue << std::endl;
+        std::cerr << "Token mismatch: got " << token.value 
+            << ", expected " << expectedValue << std::endl;
         std::exit(1);
     }
 }
@@ -85,17 +87,20 @@ int main()
     std::cout << "\nNow the REPL" << std::endl;
 
     std::string source;
-    Parser *parser = new Parser();
+    Parser parser;
 
     while (true)
     {
         std::getline(std::cin, source);
 
         // Produce AST from source Code
-        Program program = parser->produceAST(source);
+        Program program = parser.produceAST(source);
         std::cout << program << std::endl;
+        
+        ast::Stmt* cprogram = &program;
 
-        RuntimeVal *result = evaluate(&program);
+        //cout << &program << endl;
+        RuntimeVal *result = evaluate(cprogram);
     }
 
     return 0;
