@@ -17,9 +17,9 @@ add_subdirectory(thirdparty/dcorelib)
 # Fügen Sie der ausführbaren Datei dieses Projekts eine Quelle hinzu.
 add_executable (
     fling-lang 
-    "src/main.cpp"
+    "main.cpp"
 
-    "src/frontend/ast.cpp"
+    
     "src/frontend/ast.hpp"
 
     "src/frontend/lexer.cpp"
@@ -29,11 +29,11 @@ add_executable (
     "src/frontend/parser.hpp"
 
     "src/runtime/values.hpp"
-    "src/runtime/values.cpp"
+    
 
     "src/runtime/interpreter.hpp"
     "src/runtime/interpreter.cpp"
-)
+ "src/runtime/envirments.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET fling-lang PROPERTY CXX_STANDARD 20)

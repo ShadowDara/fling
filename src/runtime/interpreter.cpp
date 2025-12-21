@@ -125,6 +125,7 @@ namespace fling
                     << static_cast<int>(astNode->kind)
                     << endl;
                 dcorelib::Exit(1);
+                return new RuntimeVal();
             }
             }
         }

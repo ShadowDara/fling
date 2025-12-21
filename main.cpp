@@ -1,9 +1,9 @@
 // main.cpp
 
-#include "frontend/lexer.hpp"
-#include "frontend/parser.hpp"
-#include "frontend/ast.hpp"
-#include "runtime/interpreter.hpp"
+#include "src/frontend/lexer.hpp"
+#include "src/frontend/parser.hpp"
+#include "src/frontend/ast.hpp"
+#include "src/runtime/interpreter.hpp"
 
 #include <iostream>
 #include <string>
@@ -95,12 +95,12 @@ int main()
 
         // Produce AST from source Code
         Program program = parser.produceAST(source);
-        std::cout << program << std::endl;
+        //std::cout << program << std::endl;
         
         ast::Stmt* cprogram = &program;
 
-        //cout << &program << endl;
         RuntimeVal *result = evaluate(cprogram);
+        cout << result->toString() << endl;
     }
 
     return 0;

@@ -1,5 +1,7 @@
 // Header File for the Interpreter
 
+#pragma once
+
 #ifndef INTERPRETER_HPP
 #define INTERPRETER_HPP
 

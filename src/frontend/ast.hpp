@@ -49,24 +49,22 @@ namespace fling
          *
          * @param Nodetype
          */
-        struct Stmt
-        {
+        struct Stmt {
             NodeType kind;
 
-            // toString function
-            virtual std::string toString(int indent = 0) const
-            {
+            explicit Stmt(NodeType kind) : kind(kind) {}
+            virtual ~Stmt() = default;
+
+            virtual std::string toString(int indent = 0) const {
                 return "<Stmt>";
             }
-
-            virtual ~Stmt() = default;
         };
+
 
         // Program
         struct Program : Stmt
         {
-            NodeType kind = NodeType::Program; // TypeTag
-            std::vector<Stmt *> body;          // Liste von Statements
+            std::vector<Stmt*> body;
 
             // toString function
             std::string toString(int indent = 0) const override
@@ -82,17 +80,19 @@ namespace fling
 
                 return out;
             }
+
+            Program() : Stmt(NodeType::Program) {}        // Liste von Statements
         };
 
         // Ausdruck
         struct Expr : Stmt
         {
+            explicit Expr(NodeType kind) : Stmt(kind) {}
         };
 
         // Binary Expression
         struct BinaryExpr : Expr
         {
-            NodeType kind = NodeType::BinaryExpr;
             Expr *left;
             Expr *right;
             std::string callculation_operator;
@@ -115,12 +115,13 @@ namespace fling
                 out += indentStr(indent + 4) + callculation_operator;
                 return out;
             }
+
+            BinaryExpr() : Expr(ast::NodeType::BinaryExpr) {}
         };
 
         // Identifier
         struct Identifier : Expr
         {
-            NodeType kind = NodeType::Identifier;
             std::string symbol;
 
             // toString function
@@ -128,12 +129,19 @@ namespace fling
             {
                 return indentStr(indent) + "Identifier(" + symbol + ")";
             }
+
+            // Standardkonstruktor
+            Identifier() : Expr(NodeType::Identifier), symbol("") {}
+
+            // Parameter-Konstruktor
+            Identifier(std::string s)
+                : Expr(NodeType::Identifier), symbol(std::move(s)) {
+            }
         };
 
         // Numerisches Literal
         struct NumericLiteral : Expr
         {
-            NodeType kind = NodeType::NumericLiteral;
             int value;
 
             // toString Function
@@ -141,12 +149,17 @@ namespace fling
             {
                 return indentStr(indent) + "NumericLiteral(" + std::to_string(value) + ")";
             }
+
+            // Standardkonstruktor
+            NumericLiteral() : Expr(NodeType::NumericLiteral), value(0) {}
+
+            // Parameter-Konstruktor
+            NumericLiteral(int v) : Expr(NodeType::NumericLiteral), value(v) {}
         };
 
         // Null Literal
         struct NullLiteral : Expr
         {
-            NodeType kind = NodeType::NullLiteral;
             std::string value = "null";
 
             // toString Function
@@ -154,6 +167,8 @@ namespace fling
             {
                 return indentStr(indent) + "NullLiteral";
             }
+
+            NullLiteral() : Expr(NodeType::NullLiteral) {}
         };
 
         // for toString
