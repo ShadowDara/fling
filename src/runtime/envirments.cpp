@@ -11,7 +11,13 @@ RuntimeVal Environment::declareVar(
     // Check if variable already exists in THIS environment
     if (variables.find(varName) != variables.end())
     {
-        throw std::runtime_error("Variable already declared: " + varName);
+        std::string error_msg = "Variable already declared: " + varName;
+
+        //throw std::runtime_error("Variable already declared: " + varName);
+
+        std::cout << error_msg << std::endl;
+
+        dcorelib::Exit(1);
     }
 
     variables[varName] = value;
@@ -45,8 +51,15 @@ Environment* Environment::resolve(std::string varName)
 
     if (this->parent == nullptr)
     {
-        throw std::runtime_error("Cannot resolve '" + varName +
-            "' as it does not exist.");
+        std::string error_msg = "Cannot resolve '" + varName + "' as it does not exist.";
+        
+        //throw std::runtime_error(error_msg);
+        
+        std::cout << error_msg << std::endl;
+
+        //return nullptr;
+        
+        dcorelib::Exit(1);
     }
 
     return this->parent->resolve(varName);

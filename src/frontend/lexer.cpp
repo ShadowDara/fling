@@ -88,16 +88,14 @@ namespace fling
             return Token{value, type};
         }
 
-        // Keywords
+        /*
+         * a list of Keywords and Identifiers for the Language
+         */
         std::unordered_map<std::string, TokenType> KEYWORDS = {
             {
                 "let",
                 TokenType::Let
-            },
-            {
-                "null",
-                TokenType::Null
-            },
+            }
         };
 
         // Tokenizer

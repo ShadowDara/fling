@@ -3,59 +3,64 @@
 #include "interpreter.hpp"
 
 using namespace std;
+using namespace fling;
+using namespace fling::util;
 
 namespace fling
 {
     namespace runtime
     {
         // Function to evaluate a Program
-        runtime::RuntimeVal *evaluate_program(ast::Program *program)
+        runtime::RuntimeVal evaluate_program(ast::Program *program,
+            runtime::envirment::Environment* env)
         {
 			// Store the last evaluated value, null as Default
-			runtime::RuntimeVal* lastEvaluated = new runtime::NullVal();
+            runtime::RuntimeVal last = runtime::RuntimeVal();
             
 			// loop through all statements in the program body
-            for (auto* statement : program->body)
+            for (auto* stmt : program->body)
             { 
-                lastEvaluated = evaluate(statement);
+                last = evaluate(stmt, env);
             }
 
 			// Return the last evaluated value
-            return lastEvaluated;
+            return last;
         }
 
         // Function to Evaluate / Calculate the 2 Numbers
-        fling::runtime::NumberVal* evaluate_numeric_binary_expr(
-            fling::runtime::NumberVal* lhs, fling::runtime::NumberVal *rhs,
-            std::string callculation_operator)
+        runtime::RuntimeVal evaluate_numeric_binary_expr(
+            runtime::RuntimeVal lhs,
+            runtime::RuntimeVal rhs,
+            std::string callculation_operator,
+            runtime::envirment::Environment* env)
         { 
-            int result = 0;
+            float result = 0;
 
             // Additon
             if (callculation_operator == "+")
             {
-                result = lhs->value + rhs->value;
+                result = lhs.number + rhs.number;
             }
             // Subtraction
             else if (callculation_operator == "-")
             {
-                result = lhs->value - rhs->value;
+                result = lhs.number - rhs.number;
             }
             // Multiplikation
             else if (callculation_operator == "*")
             {
-                result = lhs->value * rhs->value;
+                result = lhs.number * rhs.number;
             }
             // Division
             else if (callculation_operator == "/")
             {
                 // Division durch 0 vermeiden
-                result = (rhs->value != 0) ? lhs->value / rhs->value : 0;
+                result = (rhs.number != 0) ? lhs.number / rhs.number : 0;
             }
             // Module
             else if (callculation_operator == "%")
             {
-                result = rhs->value % lhs->value;
+                result = toInt(rhs.number) % toInt(lhs.number);
             }
             // Error
             else {
@@ -63,32 +68,37 @@ namespace fling
                 result = 0;
             }
 
-            return new NumberVal(result);
+            return runtime::RuntimeVal(result);
         }
 
         // Function to evaluate a Binary Expression
-        runtime::RuntimeVal *evaluate_binary_expr(ast::BinaryExpr *binop)
+        runtime::RuntimeVal evaluate_binary_expr(ast::BinaryExpr *binop,
+            runtime::envirment::Environment* env)
         {
-            auto lhs = evaluate(binop->left);
-            auto rhs = evaluate(binop->right);
+            auto lhs = evaluate(binop->left, env);
+            auto rhs = evaluate(binop->right, env);
 
-            if (lhs->type == runtime::ValueType::Number
-                && rhs->type == runtime::ValueType::Number)
+            if (lhs.type == runtime::RuntimeVal::Type::Number
+                && rhs.type == runtime::RuntimeVal::Type::Number)
             {
-                // Cast them from RuntimeVal to NumberVal
-                auto clhs = static_cast<runtime::NumberVal*>(lhs);
-                auto crhs = static_cast<runtime::NumberVal*>(rhs);
-
                 return evaluate_numeric_binary_expr(
-                    clhs, crhs, binop->callculation_operator);
+                    lhs, rhs, binop->callculation_operator, env);
             }
 
             // One or both are Null
-            return new runtime::NullVal();
+            return runtime::RuntimeVal();
+        }
+
+        // Function to evaluate an Identifier
+        runtime::RuntimeVal evaluate_identifier(ast::Identifier* ident,
+            runtime::envirment::Environment* env)
+        { 
+            return env->lookupVar(ident->symbol);
         }
 
         // Function to evaluate Source Code
-        runtime::RuntimeVal *evaluate(ast::Stmt *astNode)
+        runtime::RuntimeVal evaluate(ast::Stmt *astNode,
+            runtime::envirment::Environment* env)
         {
             switch (astNode->kind)
             {
@@ -97,25 +107,29 @@ namespace fling
             case ast::NodeType::NumericLiteral:
             {
                 auto numNode = static_cast<ast::NumericLiteral *>(astNode);
-                return new runtime::NumberVal(numNode->value); // korrekt: Pointer
+                return runtime::RuntimeVal(
+                    static_cast<float>(numNode->value));
             }
 
-            // Null Value
-            case ast::NodeType::NullLiteral:
+            // Identifier
+            case ast::NodeType::Identifier:
             {
-                return new runtime::NullVal(); // korrekt: Pointer
+                return evaluate_identifier(
+                    static_cast<ast::Identifier *>(astNode), env);
             }
 
             // Binary Expression
             case ast::NodeType::BinaryExpr:
             {
-                return evaluate_binary_expr(static_cast<ast::BinaryExpr *>(astNode));
+                return evaluate_binary_expr(
+                    static_cast<ast::BinaryExpr *>(astNode), env);
             }
 
             // Program Node
             case ast::NodeType::Program:
             {
-				return evaluate_program(static_cast<ast::Program*>(astNode));
+				return evaluate_program(
+                    static_cast<ast::Program*>(astNode), env);
             }
 
             // Error Fallback
@@ -125,9 +139,9 @@ namespace fling
                     << static_cast<int>(astNode->kind)
                     << endl;
                 dcorelib::Exit(1);
-                return new RuntimeVal();
+                return RuntimeVal();
             }
             }
         }
-    }
-}
+    } // namespace runtime
+} // namespace fling

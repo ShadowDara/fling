@@ -99,9 +99,7 @@ namespace fling
 
             // For Division, Multiplication and Modulo
             while (
-                this->at().value == "/" ||
-                this->at().value == "*" ||
-                this->at().value == "%")
+                this->at().value == "/" || this->at().value == "*" || this->at().value == "%")
             {
                 std::string callculation_operator = this->eat().value;
                 fling::ast::Expr *right = this->parse_multiplicitave_expr();
@@ -152,8 +150,7 @@ namespace fling
             case fling::lexer::TokenType::Number:
             {
                 auto *id = new fling::ast::NumericLiteral();
-                id->value = parse_float(this->eat().value);
-                // token.value is the Nummeric Literal value
+                id->value = parse_float(this->eat().value); // token.value is the Nummeric Literal value
 
                 return id; // implicit upcast to Expr*
             }
@@ -173,8 +170,7 @@ namespace fling
             default:
             {
                 this->eat();
-                cout << "Unexpected Token found during Parsing: "
-                     << this->at().value << endl;
+                cout << "Unexpected Token found during Parsing: " << this->at().value << endl;
                 return nullptr;
             }
             }

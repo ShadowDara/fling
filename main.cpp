@@ -4,6 +4,7 @@
 #include "src/frontend/parser.hpp"
 #include "src/frontend/ast.hpp"
 #include "src/runtime/interpreter.hpp"
+#include "src/runtime/envirments.hpp"
 
 #include <iostream>
 #include <string>
@@ -14,6 +15,7 @@ using namespace fling::ast;
 using namespace fling::lexer;
 using namespace fling::parser;
 using namespace fling::runtime;
+using namespace fling::runtime::envirment;
 
 using namespace std;
 
@@ -86,8 +88,22 @@ int main()
 
     std::cout << "\nNow the REPL" << std::endl;
 
+    // Variable for the Source Code
     std::string source;
+
+    // Parser for the source
     Parser parser;
+
+    // Define the Envirment for the Language
+    Environment* env = new Environment(nullptr);
+
+    // Standard Envirment for the Language
+    {
+        env->declareVar("x", RuntimeVal(100.f));
+        env->declareVar("true", RuntimeVal::Boolean(true));
+        env->declareVar("false", RuntimeVal::Boolean(false));
+        env->declareVar("null", RuntimeVal());
+    }
 
     while (true)
     {
@@ -99,8 +115,8 @@ int main()
         
         ast::Stmt* cprogram = &program;
 
-        RuntimeVal *result = evaluate(cprogram);
-        cout << result->toString() << endl;
+        RuntimeVal result = evaluate(cprogram, env);
+        cout << result.toString() << endl;
     }
 
     return 0;

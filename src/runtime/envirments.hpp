@@ -9,16 +9,16 @@
 #include <string>
 #include <stdexcept>
 
-#include "values.hpp";
+#include "values.hpp"
 
-using namespace fling;
+#include "dcorelib/dcorelib.h"
 
 namespace fling::runtime::envirment {
 
     class Environment {
     private:
         Environment* parent;  // optional parent (nullptr if none)
-        std::unordered_map<std::string, runtime::RuntimeVal> variables;
+        std::unordered_map<std::string, fling::runtime::RuntimeVal> variables;
 
     public:
         // Constructor with optional parent
@@ -27,13 +27,13 @@ namespace fling::runtime::envirment {
         }
 
         // Function to declare a Variable
-        runtime::RuntimeVal declareVar(std::string varName, runtime::RuntimeVal value);
+        fling::runtime::RuntimeVal declareVar(std::string varName, fling::runtime::RuntimeVal value);
 
         // Function to Assign a Variable
-        runtime::RuntimeVal assignVar(std::string varName, runtime::RuntimeVal value);
+        fling::runtime::RuntimeVal assignVar(std::string varName, fling::runtime::RuntimeVal value);
 
         // Function to get the Content of a Variable
-        runtime::RuntimeVal lookupVar(std::string);
+        fling::runtime::RuntimeVal lookupVar(std::string);
 
         // Function to check if the current Envirment has this Variable
         Environment* resolve(std::string varName);

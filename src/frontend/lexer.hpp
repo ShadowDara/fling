@@ -24,18 +24,21 @@ namespace fling
          */
         enum TokenType
         {
-            Null,
+            // Literal Types
             Number,
             Identifier,
 
+            // Keywords
             Let,
 
             Equals,
             OpenParen,
             CloseParen,
+            
+            // Calculation Operators
             BinaryOperator,
 
-            Illegal,
+            //Illegal,
             Eof, // Signal end of File
         };
 

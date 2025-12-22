@@ -36,7 +36,6 @@ namespace fling
         {
             Program,
             NumericLiteral,
-            NullLiteral,
             Identifier,
             BinaryExpr,
             // CallExpr,
@@ -155,20 +154,6 @@ namespace fling
 
             // Parameter-Konstruktor
             NumericLiteral(int v) : Expr(NodeType::NumericLiteral), value(v) {}
-        };
-
-        // Null Literal
-        struct NullLiteral : Expr
-        {
-            std::string value = "null";
-
-            // toString Function
-            std::string toString(int indent = 0) const override
-            {
-                return indentStr(indent) + "NullLiteral";
-            }
-
-            NullLiteral() : Expr(NodeType::NullLiteral) {}
         };
 
         // for toString
