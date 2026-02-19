@@ -142,7 +142,26 @@ namespace fling
         // Funktion to parse an expression
         fling::ast::Expr *Parser::parse_expr()
         {
-            return parse_additive_expr();
+			return this->parse_assignment_expr();
+        }
+
+		// Function to parse an assignment Expression
+        fling::ast::Expr* Parser::parse_assignment_expr()
+        {
+            auto left = this->parse_additive_expr();
+            // switch this out with object Expression
+
+            if (this->at().type == lexer::TokenType::Equals)
+            {
+                this->eat(); // eat the equals token
+                auto right = this->parse_assignment_expr();
+                auto assignExpr = new ast::AssignmentExpr();
+                assignExpr->assignme = left; // copy left expression
+                assignExpr->value = right;
+                return assignExpr;
+            }
+
+            return left;
         }
 
         // Function to parse an additive Expression

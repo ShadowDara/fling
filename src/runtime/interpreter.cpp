@@ -96,6 +96,22 @@ namespace fling
             return env->lookupVar(ident->symbol);
         }
 
+		// Function to evaluate an Assignment Expression
+        runtime::RuntimeVal evaluate_assignment_expr(ast::AssignmentExpr* node,
+            runtime::envirment::Environment* env)
+        {
+            if (node->assignme->kind != ast::NodeType::Identifier)
+            {
+				std::cerr <<
+                    "Left-hand side of assignment must be an identifier."
+                    << std::endl;
+            }
+
+			auto varName = static_cast<ast::Identifier*>(node->assignme)->symbol;
+
+            return env->assignVar(varName, evaluate(node->value, env));
+        }
+
 		// Function to evaluate a Variable Declaration
         runtime::RuntimeVal evaluate_var_declaration(
             ast::VarDeclaration* varDecl,
@@ -126,6 +142,13 @@ namespace fling
                 return evaluate_identifier(
                     static_cast<ast::Identifier *>(astNode), env);
             }
+
+			// Assignment Expression
+            case ast::NodeType::AssignmentExpr:
+            {
+                return evaluate_assignment_expr(
+                    static_cast<ast::AssignmentExpr *>(astNode), env);
+			}
 
             // Binary Expression
             case ast::NodeType::BinaryExpr:

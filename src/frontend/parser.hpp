@@ -76,6 +76,13 @@ namespace fling
             fling::ast::Expr *parse_expr();
 
             /**
+             * Function to parse an Assignment Expression
+             *
+             * @return Returns an Assignment Expression from the current Token
+			 */
+            fling::ast::Expr* parse_assignment_expr();
+
+            /**
              * Function to parse an additive Expression
              *
              * @return an Additive Expression from the current Token

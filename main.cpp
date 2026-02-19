@@ -99,7 +99,7 @@ int main()
 
     // Standard Envirment for the Language
     {
-        env->declareVar("x", RuntimeVal(100.f), true);
+        //env->declareVar("x", RuntimeVal(100.f), true);
         env->declareVar("true", RuntimeVal::Boolean(true), true);
         env->declareVar("false", RuntimeVal::Boolean(false), true);
         env->declareVar("null", RuntimeVal(), true);

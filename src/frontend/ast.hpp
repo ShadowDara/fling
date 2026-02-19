@@ -39,6 +39,7 @@ namespace fling
             VarDeclaration,
 
             // EXPRESSIONS
+            AssignmentExpr,
             NumericLiteral,
             Identifier,
             BinaryExpr,
@@ -91,6 +92,17 @@ namespace fling
         struct Expr : Stmt
         {
             explicit Expr(NodeType kind) : Stmt(kind) {}
+        };
+
+		// Assignment Expression
+        //
+        //
+        struct AssignmentExpr : Expr
+        {
+            ast::Expr* assignme;
+            ast::Expr* value;
+
+			AssignmentExpr() : Expr(NodeType::AssignmentExpr) {}
         };
 
         // Variable Declaration
