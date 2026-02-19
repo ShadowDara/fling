@@ -99,6 +99,7 @@ namespace fling
         {
             bool isConstant =
                 (this->eat().type == lexer::TokenType::Const);
+
             std::string identifier = this->expect(lexer::TokenType::Identifier,
                 "Expected identifier name following let | const keywords").value;
 

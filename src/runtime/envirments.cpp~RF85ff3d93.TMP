@@ -6,29 +6,21 @@ using namespace fling::runtime::envirment;
 
 // Function to declare a New Variable
 RuntimeVal Environment::declareVar(
-	std::string varName, RuntimeVal value, bool constant)
+	std::string varName, RuntimeVal value)
 {
     // Check if variable already exists in THIS environment
     if (variables.find(varName) != variables.end())
     {
-        std::string error_msg = "Can not redeclare Variable! Variable is already declared: " + varName;
+        std::string error_msg = "Variable already declared: " + varName;
 
         //throw std::runtime_error("Variable already declared: " + varName);
 
         std::cout << error_msg << std::endl;
 
-        return RuntimeVal();
+        dcorelib::Exit(1);
     }
 
     variables[varName] = value;
-
-	// Add to the set of constants if this variable is
-    // declared as constant
-    if (constant)
-    {
-        constants.insert(varName);
-	}
-
     return value;
 }
 
@@ -37,16 +29,6 @@ RuntimeVal Environment::assignVar(
     std::string varName, RuntimeVal value)
 {
     auto env = this->resolve(varName);
-
-	// Can not assign to a variable that is declared as constant
-	if (env->constants.find(varName) != env->constants.end())
-    {
-        std::string error_msg = "Cannot assign to constant variable: " + varName;
-        //throw std::runtime_error("Cannot assign to constant variable: " + varName);
-        std::cout << error_msg << std::endl;
-        return RuntimeVal();
-    }
-
     env->variables[varName] = value;
 
     return value;

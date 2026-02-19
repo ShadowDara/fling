@@ -97,10 +97,12 @@ namespace fling
         }
 
 		// Function to evaluate a Variable Declaration
-        runtime::RuntimeVal evaluate_var_declaration(ast::VarDeclaration* varDecl,
+        runtime::RuntimeVal evaluate_var_declaration(
+            ast::VarDeclaration* varDecl,
             runtime::envirment::Environment* env)
         { 
-			return RuntimeVal();
+			auto value = varDecl->value ? evaluate (varDecl->value, env) : runtime::RuntimeVal();
+			return env->declareVar(varDecl->identifier, value, varDecl->constant);
         }
 
         // Function to evaluate Source Code
