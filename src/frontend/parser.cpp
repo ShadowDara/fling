@@ -3,6 +3,7 @@
 #include "parser.hpp"
 
 using namespace std;
+using namespace fling;
 
 namespace fling
 {
@@ -15,7 +16,7 @@ namespace fling
         // Function to check if end of file is reached
         bool Parser::not_eof()
         {
-            return this->tokens[0].type != fling::lexer::TokenType::Eof;
+            return this->tokens[0].type != lexer::TokenType::Eof;
         }
 
         // Function to get the current token
@@ -45,7 +46,7 @@ namespace fling
             if (tk.type != type)
             {
                 cout << "Parser Error - Unexpected Token found: \n"
-                     << err
+                     << err << " - "
                      << tk.value << " - Expecting: "
                      << fling::lexer::tokenTypeToString(type) << endl;
                 cout << "Exiting Parser..." << endl;
@@ -58,10 +59,83 @@ namespace fling
         // Funktion to parse a Statement
         fling::ast::Stmt *Parser::parse_stmt()
         {
-            // For now, we only parse expressions (identifiers / literals)
-            // and wrap them as statements. Since Stmt is empty, you can
-            // store Expr-derived nodes as Stmt* via Node* (or later extend Stmt)
-            return reinterpret_cast<fling::ast::Stmt *>(parse_expr());
+            switch (this->at().type)
+            {
+            // Let
+            case (lexer::TokenType::Let):
+            {
+                return parse_var_declaration();
+            }
+
+            // Const
+            case (lexer::TokenType::Const):
+            {
+                return parse_var_declaration();
+            }
+
+            // Default
+            default:
+            {
+                /*if (this->at().type == lexer::TokenType::Eof)
+                {
+                    return nullptr;
+                }*/
+
+                // For now, we only parse expressions (identifiers / literals)
+                // and wrap them as statements. Since Stmt is empty, you can
+                // store Expr-derived nodes as Stmt* via Node* (or later extend Stmt)
+                return reinterpret_cast<fling::ast::Stmt*>(parse_expr());
+            }
+            }
+        }
+
+        // Function to declare a new Variable
+        // 
+        // (CONST | LET) IDENTIFIER ;
+        // 
+        // (CONST | LET) IDENTIFIER = EXPR ;
+        // 
+        fling::ast::Stmt *Parser::parse_var_declaration()
+        {
+            bool isConstant =
+                (this->eat().type == lexer::TokenType::Const);
+            std::string identifier = this->expect(lexer::TokenType::Identifier,
+                "Expected identifier name following let | const keywords").value;
+
+            if (this->at().type == lexer::TokenType::Semicolon)
+            {
+                this->eat(); // Expect the Semicolon
+                if (isConstant)
+                {
+                    std::cout <<
+                        "Must assigne value to a Constant expression. No value provided."
+                        << std::endl;
+                    dcorelib::Exit(1);
+                }
+
+                ast::VarDeclaration* var = new ast::VarDeclaration();
+
+                var->constant = isConstant;
+                var->identifier = identifier;
+                var->value = nullptr;
+
+                return var;
+            }
+
+            this->expect(lexer::TokenType::Equals,
+                "Expected equals Token following identifier in var declaration."
+            );
+
+            ast::VarDeclaration* declaration = new ast::VarDeclaration();
+
+            declaration->value = this->parse_expr();
+            declaration->constant = isConstant;
+            declaration->identifier = identifier;
+            
+            this->expect(lexer::TokenType::Semicolon,
+                "Variable declaration statement must end with semicolon.");
+
+            return declaration;
         }
 
         // Funktion to parse an expression
@@ -172,10 +246,9 @@ namespace fling
             // Default Type for Unexpected Tokens
             default:
             {
-                this->eat();
                 cout << "Unexpected Token found during Parsing: "
-                     << this->at().value << endl;
-                return nullptr;
+                     << this->at() << endl;
+                dcorelib::Exit(1);
             }
             }
         }

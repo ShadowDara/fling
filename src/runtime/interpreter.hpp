@@ -13,13 +13,15 @@
 #include "envirments.hpp"
 #include "../frontend/ast.hpp"
 #include "../util.hpp"
+#include "eval/statements.hpp"
 
 namespace fling
 {
 	namespace runtime
 	{
 		// Function to evaluate a Program Node
-		fling::runtime::RuntimeVal evaluate_program(ast::Program *program,
+		fling::runtime::RuntimeVal evaluate_program(
+			ast::Program* program,
 			fling::runtime::envirment::Environment* env);
 
 		// Function to evaluate a Numeric Binary Expression
@@ -37,6 +39,11 @@ namespace fling
 		// Function to evaluate an Identifier
 		fling::runtime::RuntimeVal evaluate_identifier(ast::Identifier* ident,
 			fling::runtime::envirment::Environment* env);
+
+		// Function to evaluate a Variable Declaration
+		fling::runtime::RuntimeVal evaluate_var_declaration(
+			ast::VarDeclaration* varDecl,
+			runtime::envirment::Environment* env);
 
 		// Function to evaluate source Code
 		fling::runtime::RuntimeVal evaluate(ast::Stmt *astNode,

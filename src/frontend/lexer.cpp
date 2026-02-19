@@ -95,6 +95,10 @@ namespace fling
             {
                 "let",
                 TokenType::Let
+            },
+            {
+                "const",
+                TokenType::Const
             }
         };
 
@@ -164,6 +168,13 @@ namespace fling
                     tokens.push_back(token("=", TokenType::Equals));
                     i++;
                     break;
+                
+                // Semicolon
+                case ';':
+                    tokens.push_back(token(";", TokenType::Semicolon));
+                    i++;
+                    break;
+
                 default:
                     // Zahl aufbauen
                     if (isInt(current))

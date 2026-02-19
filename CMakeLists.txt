@@ -33,7 +33,7 @@ add_executable (
 
     "src/runtime/interpreter.hpp"
     "src/runtime/interpreter.cpp"
- "src/runtime/envirments.cpp" "src/util.cpp" "src/runtime/values.cpp")
+ "src/runtime/envirments.cpp" "src/util.cpp" "src/runtime/values.cpp" "src/runtime/eval/statements.cpp" "src/runtime/eval/expressions.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET fling-lang PROPERTY CXX_STANDARD 20)

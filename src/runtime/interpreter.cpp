@@ -11,19 +11,19 @@ namespace fling
     namespace runtime
     {
         // Function to evaluate a Program
-        runtime::RuntimeVal evaluate_program(ast::Program *program,
+        fling::runtime::RuntimeVal fling::runtime::evaluate_program(
+            fling::ast::Program* program,
             runtime::envirment::Environment* env)
         {
-			// Store the last evaluated value, null as Default
+            // Store the last evaluated value, null as Default
             runtime::RuntimeVal last = runtime::RuntimeVal();
-            
-			// loop through all statements in the program body
+            // loop through all statements in the program body
             for (auto* stmt : program->body)
-            { 
+            {
                 last = evaluate(stmt, env);
             }
 
-			// Return the last evaluated value
+            // Return the last evaluated value
             return last;
         }
 
@@ -96,6 +96,13 @@ namespace fling
             return env->lookupVar(ident->symbol);
         }
 
+		// Function to evaluate a Variable Declaration
+        runtime::RuntimeVal evaluate_var_declaration(ast::VarDeclaration* varDecl,
+            runtime::envirment::Environment* env)
+        { 
+			return RuntimeVal();
+        }
+
         // Function to evaluate Source Code
         runtime::RuntimeVal evaluate(ast::Stmt *astNode,
             runtime::envirment::Environment* env)
@@ -128,8 +135,15 @@ namespace fling
             // Program Node
             case ast::NodeType::Program:
             {
-				return evaluate_program(
+				return runtime::evaluate_program(
                     static_cast<ast::Program*>(astNode), env);
+            }
+
+            // Handle Statement Nodes
+            case::ast::NodeType::VarDeclaration:
+            {
+                return evaluate_var_declaration(
+                    static_cast<ast::VarDeclaration*>(astNode), env);
             }
 
             // Error Fallback
@@ -141,6 +155,7 @@ namespace fling
                 dcorelib::Exit(1);
                 return RuntimeVal();
             }
+
             }
         }
     } // namespace runtime

@@ -34,7 +34,11 @@ namespace fling
          */
         enum class NodeType
         {
+            // STATEMENTS
             Program,
+            VarDeclaration,
+
+            // EXPRESSIONS
             NumericLiteral,
             Identifier,
             BinaryExpr,
@@ -87,6 +91,16 @@ namespace fling
         struct Expr : Stmt
         {
             explicit Expr(NodeType kind) : Stmt(kind) {}
+        };
+
+        // Variable Declaration
+        struct VarDeclaration : Stmt
+        {
+            bool constant;
+            std::string identifier;
+            ast::Expr* value;
+
+            VarDeclaration() : Stmt(NodeType::VarDeclaration) {}
         };
 
         // Binary Expression

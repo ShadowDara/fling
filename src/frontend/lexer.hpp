@@ -30,7 +30,9 @@ namespace fling
 
             // Keywords
             Let,
+            Const,
 
+            Semicolon,
             Equals,
             OpenParen,
             CloseParen,

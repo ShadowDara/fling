@@ -64,6 +64,11 @@ namespace fling
             fling::ast::Stmt *parse_stmt();
 
             /**
+             * Function to parse a Variable Deklaration
+             */
+            fling::ast::Stmt* parse_var_declaration();
+
+            /**
              * Function to parse an expression
              *
              * @return Returns a Expression from the current Token
