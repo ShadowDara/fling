@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <cassert> // Für assert()
+#include <fstream>
 
 using namespace fling;
 using namespace fling::ast;
@@ -18,6 +19,7 @@ using namespace fling::runtime;
 using namespace fling::runtime::envirment;
 
 using namespace std;
+
 
 // Hilfsfunktion zum Testen von Tokens
 void assertToken(const lexer::Token &token,
@@ -30,6 +32,7 @@ void assertToken(const lexer::Token &token,
         std::exit(1);
     }
 }
+
 
 // Function to run Tests
 void runTests()
@@ -52,7 +55,57 @@ void runTests()
     std::cout << "Tests 1\n";
 }
 
-// Main function for the program
+
+void runFile(const std::string& filename)
+{
+    std::ifstream file{ filename };
+    if (!file)
+    {
+        std::cerr << "Could not open file" << "\n";
+        return;
+    }
+
+    std::string content(
+        (std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>()
+    );
+
+    Parser parser;
+    envirment::Environment* env = new Environment(nullptr);
+
+    Program program = parser.produceAST(content);
+
+    auto result = evaluate(&program, env);
+    std::cout << result.toString() << "\n";
+
+    delete env;
+}
+
+
+void runREPL()
+{
+    // Variable for the Source Code
+    std::string source;
+
+    // Parser for the source
+    Parser parser;
+
+    // Define the Envirment for the Language
+    Environment* env = new Environment(nullptr);
+
+    while (true)
+    {
+        std::getline(std::cin, source);
+
+        // Produce AST from source Code
+        Program program = parser.produceAST(source);
+
+        RuntimeVal result = evaluate(&program, env);
+        cout << result.toString() << endl;
+    }
+}
+
+
+// Main function
 int main()
 {
     std::cout << "Running Fling Tests...\n"
@@ -80,44 +133,9 @@ int main()
     std::cout << "\nAll tests passed!\n"
               << std::endl;
 
-    //
-    //
-    // REPL for Test Evaluating
-    //
-    //
+    //runFile("../../../testcode.txt");
 
-    std::cout << "\nNow the REPL" << std::endl;
-
-    // Variable for the Source Code
-    std::string source;
-
-    // Parser for the source
-    Parser parser;
-
-    // Define the Envirment for the Language
-    Environment* env = new Environment(nullptr);
-
-    // Standard Envirment for the Language
-    {
-        //env->declareVar("x", RuntimeVal(100.f), true);
-        env->declareVar("true", RuntimeVal::Boolean(true), true);
-        env->declareVar("false", RuntimeVal::Boolean(false), true);
-        env->declareVar("null", RuntimeVal(), true);
-    }
-
-    while (true)
-    {
-        std::getline(std::cin, source);
-
-        // Produce AST from source Code
-        Program program = parser.produceAST(source);
-        //std::cout << program << std::endl;
-        
-        ast::Stmt* cprogram = &program;
-
-        RuntimeVal result = evaluate(cprogram, env);
-        cout << result.toString() << endl;
-    }
+	runREPL();
 
     return 0;
 }

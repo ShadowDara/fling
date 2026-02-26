@@ -4,6 +4,14 @@ using namespace fling;
 using namespace fling::runtime;
 using namespace fling::runtime::envirment;
 
+// Function to setup the Standard Envirment for the Language
+void envirment::setupStandardEnvironment(envirment::Environment* env)
+{
+    env->declareVar("true", RuntimeVal::Boolean(true), true);
+    env->declareVar("false", RuntimeVal::Boolean(false), true);
+    env->declareVar("null", RuntimeVal(), true);
+}
+
 // Function to declare a New Variable
 RuntimeVal Environment::declareVar(
 	std::string varName, RuntimeVal value, bool constant)

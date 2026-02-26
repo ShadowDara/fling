@@ -15,6 +15,10 @@
 #include "dcorelib/dcorelib.h"
 
 namespace fling::runtime::envirment {
+    class Environment;  // Forward Declaration der Klasse
+
+    // Function to setup the Standard Envirment for the Language
+    void setupStandardEnvironment(envirment::Environment* env);
 
     class Environment {
     private:
@@ -25,7 +29,15 @@ namespace fling::runtime::envirment {
     public:
         // Constructor with optional parent
         explicit Environment(Environment* parentEnv = nullptr)
-            : parent(parentEnv), variables(), constants() {
+            : parent(parentEnv), variables(), constants()
+        {
+			auto global_env = parentEnv == nullptr ? this : parentEnv;
+
+            if (global_env)
+            {
+				// Setup the standard environment only for the global environment
+                setupStandardEnvironment(this);
+			}
         }
 
         // Function to declare a Variable
