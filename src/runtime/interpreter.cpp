@@ -140,35 +140,35 @@ namespace fling
             case ast::NodeType::Identifier:
             {
                 return evaluate_identifier(
-                    std::unique_ptr<ast::Identifier>(static_cast<ast::Identifier *>(astNode.get())), env);
+                    reinterpret_cast<const std::unique_ptr<ast::Identifier>&>(astNode), env);
             }
 
 			// Assignment Expression
             case ast::NodeType::AssignmentExpr:
             {
                 return evaluate_assignment_expr(
-                    std::unique_ptr<ast::AssignmentExpr>(static_cast<ast::AssignmentExpr *>(astNode.get())), env);
+                    reinterpret_cast<const std::unique_ptr<ast::AssignmentExpr>&>(astNode), env);
             }
 
             // Binary Expression
             case ast::NodeType::BinaryExpr:
             {
                 return evaluate_binary_expr(
-                    std::unique_ptr<ast::BinaryExpr>(static_cast<ast::BinaryExpr *>(astNode.get())), env);
+                    reinterpret_cast<const std::unique_ptr<ast::BinaryExpr>&>(astNode), env);
             }
 
             // Program Node
             case ast::NodeType::Program:
             {
                 return runtime::evaluate_program(
-                    std::unique_ptr<ast::Program>(static_cast<ast::Program*>(astNode.get())), env);
+                    reinterpret_cast<const std::unique_ptr<ast::Program>&>(astNode), env);
             }
 
             // Handle Statement Nodes
             case ast::NodeType::VarDeclaration:
             {
                 return evaluate_var_declaration(
-                    std::unique_ptr<ast::VarDeclaration>(static_cast<ast::VarDeclaration*>(astNode.get())), env);
+                    reinterpret_cast<const std::unique_ptr<ast::VarDeclaration>&>(astNode), env);
             }
 
             // Error Fallback
