@@ -12,13 +12,13 @@ namespace fling
     {
         // Function to evaluate a Program
         fling::runtime::RuntimeVal fling::runtime::evaluate_program(
-            fling::ast::Program* program,
-            runtime::envirment::Environment* env)
+            const std::unique_ptr<fling::ast::Program>& program,
+            std::unique_ptr<runtime::envirment::Environment>& env)
         {
             // Store the last evaluated value, null as Default
             runtime::RuntimeVal last = runtime::RuntimeVal();
             // loop through all statements in the program body
-            for (auto* stmt : program->body)
+            for (const auto& stmt : program->body)
             {
                 last = evaluate(stmt, env);
             }
@@ -72,8 +72,8 @@ namespace fling
         }
 
         // Function to evaluate a Binary Expression
-        runtime::RuntimeVal evaluate_binary_expr(ast::BinaryExpr *binop,
-            runtime::envirment::Environment* env)
+        runtime::RuntimeVal evaluate_binary_expr(const std::unique_ptr<ast::BinaryExpr>& binop,
+            std::unique_ptr<runtime::envirment::Environment>& env)
         {
             auto lhs = evaluate(binop->left, env);
             auto rhs = evaluate(binop->right, env);
@@ -90,15 +90,15 @@ namespace fling
         }
 
         // Function to evaluate an Identifier
-        runtime::RuntimeVal evaluate_identifier(ast::Identifier* ident,
-            runtime::envirment::Environment* env)
+        runtime::RuntimeVal evaluate_identifier(const std::unique_ptr<ast::Identifier>& ident,
+            std::unique_ptr<runtime::envirment::Environment>& env)
         { 
             return env->lookupVar(ident->symbol);
         }
 
 		// Function to evaluate an Assignment Expression
-        runtime::RuntimeVal evaluate_assignment_expr(ast::AssignmentExpr* node,
-            runtime::envirment::Environment* env)
+        runtime::RuntimeVal evaluate_assignment_expr(const std::unique_ptr<ast::AssignmentExpr>& node,
+            std::unique_ptr<runtime::envirment::Environment>& env)
         {
             if (node->assignme->kind != ast::NodeType::Identifier)
             {
@@ -107,23 +107,23 @@ namespace fling
                     << std::endl;
             }
 
-			auto varName = static_cast<ast::Identifier*>(node->assignme)->symbol;
+            auto varName = static_cast<ast::Identifier*>(node->assignme.get())->symbol;
 
             return env->assignVar(varName, evaluate(node->value, env));
         }
 
 		// Function to evaluate a Variable Declaration
         runtime::RuntimeVal evaluate_var_declaration(
-            ast::VarDeclaration* varDecl,
-            runtime::envirment::Environment* env)
+            const std::unique_ptr<ast::VarDeclaration>& varDecl,
+            std::unique_ptr<runtime::envirment::Environment>& env)
         { 
-			auto value = varDecl->value ? evaluate (varDecl->value, env) : runtime::RuntimeVal();
+            auto value = varDecl->value ? evaluate(varDecl->value, env) : runtime::RuntimeVal();
 			return env->declareVar(varDecl->identifier, value, varDecl->constant);
         }
 
         // Function to evaluate Source Code
-        runtime::RuntimeVal evaluate(ast::Stmt *astNode,
-            runtime::envirment::Environment* env)
+        runtime::RuntimeVal evaluate(const std::unique_ptr<ast::Stmt>& astNode,
+            std::unique_ptr<runtime::envirment::Environment>& env)
         {
             switch (astNode->kind)
             {
@@ -131,7 +131,7 @@ namespace fling
             // Number Value
             case ast::NodeType::NumericLiteral:
             {
-                auto numNode = static_cast<ast::NumericLiteral *>(astNode);
+                auto numNode = static_cast<ast::NumericLiteral *>(astNode.get());
                 return runtime::RuntimeVal(
                     static_cast<float>(numNode->value));
             }
@@ -140,35 +140,35 @@ namespace fling
             case ast::NodeType::Identifier:
             {
                 return evaluate_identifier(
-                    static_cast<ast::Identifier *>(astNode), env);
+                    std::unique_ptr<ast::Identifier>(static_cast<ast::Identifier *>(astNode.get())), env);
             }
 
 			// Assignment Expression
             case ast::NodeType::AssignmentExpr:
             {
                 return evaluate_assignment_expr(
-                    static_cast<ast::AssignmentExpr *>(astNode), env);
-			}
+                    std::unique_ptr<ast::AssignmentExpr>(static_cast<ast::AssignmentExpr *>(astNode.get())), env);
+            }
 
             // Binary Expression
             case ast::NodeType::BinaryExpr:
             {
                 return evaluate_binary_expr(
-                    static_cast<ast::BinaryExpr *>(astNode), env);
+                    std::unique_ptr<ast::BinaryExpr>(static_cast<ast::BinaryExpr *>(astNode.get())), env);
             }
 
             // Program Node
             case ast::NodeType::Program:
             {
-				return runtime::evaluate_program(
-                    static_cast<ast::Program*>(astNode), env);
+                return runtime::evaluate_program(
+                    std::unique_ptr<ast::Program>(static_cast<ast::Program*>(astNode.get())), env);
             }
 
             // Handle Statement Nodes
-            case::ast::NodeType::VarDeclaration:
+            case ast::NodeType::VarDeclaration:
             {
                 return evaluate_var_declaration(
-                    static_cast<ast::VarDeclaration*>(astNode), env);
+                    std::unique_ptr<ast::VarDeclaration>(static_cast<ast::VarDeclaration*>(astNode.get())), env);
             }
 
             // Error Fallback

@@ -23,14 +23,14 @@ namespace fling::runtime::envirment {
 
     class Environment {
     private:
-        Environment* parent;  // optional parent (nullptr if none)
+        std::unique_ptr<Environment> parent;  // optional parent (nullptr if none)
         std::unordered_map<std::string, fling::runtime::RuntimeVal> variables;
 		std::set<std::string> constants; // Set to track constant variables
 
     public:
         // Constructor with optional parent
-        explicit Environment(Environment* parentEnv = nullptr)
-            : parent(parentEnv), variables(), constants()
+        explicit Environment(std::unique_ptr<Environment> parentEnv = nullptr)
+            : parent(std::move(parentEnv)), variables(), constants()
         {
 			auto global_env = parentEnv == nullptr ? this : parentEnv;
 
@@ -53,7 +53,7 @@ namespace fling::runtime::envirment {
         fling::runtime::RuntimeVal lookupVar(std::string);
 
         // Function to check if the current Envirment has this Variable
-        Environment* resolve(std::string varName);
+        std::unique_ptr<Environment>& resolve(std::string varName);
     };
 }
 

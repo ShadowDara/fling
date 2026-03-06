@@ -22,8 +22,8 @@ namespace fling
 	{
 		// Function to evaluate a Program Node
 		fling::runtime::RuntimeVal evaluate_program(
-			ast::Program* program,
-			fling::runtime::envirment::Environment* env);
+			const std::unique_ptr<ast::Program>& program,
+			std::unique_ptr<fling::runtime::envirment::Environment>& env);
 
 		// Function to evaluate a Numeric Binary Expression
 		// with 2 Numbers
@@ -34,21 +34,21 @@ namespace fling
 			fling::runtime::envirment::Environment* env);
 
 		// Function to evaluate a Binary Expression
-		fling::runtime::RuntimeVal evaluate_binary_expr(ast::BinaryExpr *binop,
-			fling::runtime::envirment::Environment* env);
+		fling::runtime::RuntimeVal evaluate_binary_expr(const std::unique_ptr<ast::BinaryExpr>& binop,
+			std::unique_ptr<fling::runtime::envirment::Environment>& env);
 
 		// Function to evaluate an Identifier
-		fling::runtime::RuntimeVal evaluate_identifier(ast::Identifier* ident,
-			fling::runtime::envirment::Environment* env);
+		fling::runtime::RuntimeVal evaluate_identifier(const std::unique_ptr<ast::Identifier>& ident,
+			std::unique_ptr<fling::runtime::envirment::Environment>& env);
 
 		// Function to evaluate a Variable Declaration
 		fling::runtime::RuntimeVal evaluate_var_declaration(
-			ast::VarDeclaration* varDecl,
-			runtime::envirment::Environment* env);
+			const std::unique_ptr<ast::VarDeclaration>& varDecl,
+			std::unique_ptr<runtime::envirment::Environment>& env);
 
 		// Function to evaluate source Code
-		fling::runtime::RuntimeVal evaluate(ast::Stmt *astNode,
-			fling::runtime::envirment::Environment* env);
+		fling::runtime::RuntimeVal evaluate(const std::unique_ptr<ast::Stmt>& astNode,
+			std::unique_ptr<fling::runtime::envirment::Environment>& env);
 	} // namespace fling
 } // namespace fling
 
