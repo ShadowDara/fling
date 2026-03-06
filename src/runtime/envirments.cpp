@@ -5,7 +5,7 @@ using namespace fling::runtime;
 using namespace fling::runtime::envirment;
 
 // Function to setup the Standard Envirment for the Language
-void envirment::setupStandardEnvironment(envirment::Environment* env)
+void envirment::setupStandardEnvironment(Environment* env)
 {
     env->declareVar("true", RuntimeVal::Boolean(true), true);
     env->declareVar("false", RuntimeVal::Boolean(false), true);

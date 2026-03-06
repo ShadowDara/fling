@@ -19,26 +19,24 @@ namespace fling::runtime::envirment {
     class Environment;  // Forward Declaration der Klasse
 
     // Function to setup the Standard Envirment for the Language
-    void setupStandardEnvironment(envirment::Environment* env);
+    void setupStandardEnvironment(Environment* env);
 
     class Environment {
     private:
-        std::unique_ptr<Environment> parent;  // optional parent (nullptr if none)
+        Environment* parent;  // optional parent (nullptr if none)
         std::unordered_map<std::string, fling::runtime::RuntimeVal> variables;
 		std::set<std::string> constants; // Set to track constant variables
 
     public:
         // Constructor with optional parent
-        explicit Environment(std::unique_ptr<Environment> parentEnv = nullptr)
-            : parent(std::move(parentEnv)), variables(), constants()
+        explicit Environment(Environment* parentEnv = nullptr)
+            : parent(parentEnv ? std::make_unique<Environment>() : nullptr), variables(), constants()
         {
-			auto global_env = parentEnv == nullptr ? this : parentEnv;
-
-            if (global_env)
+            if (!parent)
             {
-				// Setup the standard environment only for the global environment
+                // Setup the standard environment only for the global environment
                 setupStandardEnvironment(this);
-			}
+            }
         }
 
         // Function to declare a Variable
@@ -53,7 +51,7 @@ namespace fling::runtime::envirment {
         fling::runtime::RuntimeVal lookupVar(std::string);
 
         // Function to check if the current Envirment has this Variable
-        std::unique_ptr<Environment>& resolve(std::string varName);
+        Environment* resolve(std::string varName);
     };
 }
 

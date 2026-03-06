@@ -82,7 +82,7 @@ namespace fling
             {
                 std::string out = indentStr(indent) + "Program:\n";
 
-                for (auto *stmt : body)
+                for (const auto& stmt : body)
                 {
                     out += stmt->toString(indent + 2);
                     // Add newline After each statement

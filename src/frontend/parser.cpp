@@ -57,7 +57,7 @@ namespace fling
         }
 
         // Funktion to parse a Statement
-        fling::ast::Stmt *Parser::parse_stmt()
+        std::unique_ptr<fling::ast::Stmt> Parser::parse_stmt()
         {
             switch (this->at().type)
             {
@@ -76,15 +76,9 @@ namespace fling
             // Default
             default:
             {
-                /*if (this->at().type == lexer::TokenType::Eof)
-                {
-                    return nullptr;
-                }*/
-
                 // For now, we only parse expressions (identifiers / literals)
-                // and wrap them as statements. Since Stmt is empty, you can
-                // store Expr-derived nodes as Stmt* via Node* (or later extend Stmt)
-                return reinterpret_cast<fling::ast::Stmt*>(parse_expr());
+                // and wrap them as statements.
+                return parse_expr();
             }
             }
         }
@@ -95,7 +89,7 @@ namespace fling
         // 
         // (CONST | LET) IDENTIFIER = EXPR ;
         // 
-        fling::ast::Stmt *Parser::parse_var_declaration()
+        std::unique_ptr<fling::ast::Stmt> Parser::parse_var_declaration()
         {
             bool isConstant =
                 (this->eat().type == lexer::TokenType::Const);
