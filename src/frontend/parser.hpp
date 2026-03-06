@@ -62,40 +62,40 @@ namespace fling
              *
              * @return Returns a statement from the source Code
              */
-            fling::ast::Stmt *parse_stmt();
+            std::unique_ptr<fling::ast::Stmt> parse_stmt();
 
             /**
              * Function to parse a Variable Deklaration
              */
-            fling::ast::Stmt* parse_var_declaration();
+            std::unique_ptr<fling::ast::Stmt> parse_var_declaration();
 
             /**
              * Function to parse an expression
              *
              * @return Returns a Expression from the current Token
              */
-            fling::ast::Expr *parse_expr();
+            std::unique_ptr<fling::ast::Expr> parse_expr();
 
             /**
              * Function to parse an Assignment Expression
              *
              * @return Returns an Assignment Expression from the current Token
 			 */
-            fling::ast::Expr* parse_assignment_expr();
+            std::unique_ptr<fling::ast::Expr> parse_assignment_expr();
 
             /**
              * Function to parse an additive Expression
              *
              * @return an Additive Expression from the current Token
              */
-            fling::ast::Expr *parse_additive_expr();
+            std::unique_ptr<fling::ast::Expr> parse_additive_expr();
 
             /**
              * Function to parse a multiplicative Expression
              *
              * @return Returns a Multiplicative Expression from the current Token
              */
-            fling::ast::Expr *parse_multiplicitave_expr();
+            std::unique_ptr<fling::ast::Expr> parse_multiplicitave_expr();
 
             /**
              * Function to parse a float Value and convert it to a String
@@ -110,7 +110,7 @@ namespace fling
              *
              * @return Returns a primary Expression
              */
-            fling::ast::Expr *parse_primary_expr();
+            std::unique_ptr<fling::ast::Expr> parse_primary_expr();
 
         public:
             /**

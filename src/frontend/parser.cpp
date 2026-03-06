@@ -114,7 +114,7 @@ namespace fling
                     dcorelib::Exit(1);
                 }
 
-                ast::VarDeclaration* var = new ast::VarDeclaration();
+                auto var = std::make_unique<ast::VarDeclaration>();
 
                 var->constant = isConstant;
                 var->identifier = identifier;
@@ -127,7 +127,7 @@ namespace fling
                 "Expected equals Token following identifier in var declaration."
             );
 
-            ast::VarDeclaration* declaration = new ast::VarDeclaration();
+            auto declaration = std::make_unique<ast::VarDeclaration>();
 
             declaration->value = this->parse_expr();
             declaration->constant = isConstant;
@@ -140,13 +140,13 @@ namespace fling
         }
 
         // Funktion to parse an expression
-        fling::ast::Expr *Parser::parse_expr()
+        std::unique_ptr<fling::ast::Expr> Parser::parse_expr()
         {
 			return this->parse_assignment_expr();
         }
 
 		// Function to parse an assignment Expression
-        fling::ast::Expr* Parser::parse_assignment_expr()
+        std::unique_ptr<fling::ast::Expr> Parser::parse_assignment_expr()
         {
             auto left = this->parse_additive_expr();
             // switch this out with object Expression
@@ -155,9 +155,9 @@ namespace fling
             {
                 this->eat(); // eat the equals token
                 auto right = this->parse_assignment_expr();
-                auto assignExpr = new ast::AssignmentExpr();
-                assignExpr->assignme = left; // copy left expression
-                assignExpr->value = right;
+                auto assignExpr = std::make_unique<ast::AssignmentExpr>();
+                assignExpr->assignme = std::move(left); // copy left expression
+                assignExpr->value = std::move(right);
                 return assignExpr;
             }
 
@@ -165,31 +165,31 @@ namespace fling
         }
 
         // Function to parse an additive Expression
-        fling::ast::Expr *Parser::parse_additive_expr()
+        std::unique_ptr<fling::ast::Expr> Parser::parse_additive_expr()
         {
-            fling::ast::Expr *left = parse_multiplicitave_expr();
+            auto left = parse_multiplicitave_expr();
 
             // For Addition and Subtraction
             while (this->at().value == "+" || this->at().value == "-")
             {
                 std::string callculation_operator = this->eat().value;
-                fling::ast::Expr *right = this->parse_primary_expr();
+                auto right = this->parse_primary_expr();
 
-                auto leftnew = new fling::ast::BinaryExpr();
-                leftnew->left = left;
-                leftnew->right = right;
+                auto leftnew = std::make_unique<fling::ast::BinaryExpr>();
+                leftnew->left = std::move(left);
+                leftnew->right = std::move(right);
                 leftnew->callculation_operator = callculation_operator;
 
-                left = leftnew;
+                left = std::move(leftnew);
             }
 
             return left;
         }
 
         // Function to parse an multiplicitave Expression
-        fling::ast::Expr *Parser::parse_multiplicitave_expr()
+        std::unique_ptr<fling::ast::Expr> Parser::parse_multiplicitave_expr()
         {
-            fling::ast::Expr *left = parse_primary_expr();
+            auto left = parse_primary_expr();
 
             // For Division, Multiplication and Modulo
             while (
@@ -198,14 +198,14 @@ namespace fling
                 this->at().value == "%")
             {
                 std::string callculation_operator = this->eat().value;
-                fling::ast::Expr *right = this->parse_multiplicitave_expr();
+                auto right = this->parse_multiplicitave_expr();
 
-                auto leftnew = new fling::ast::BinaryExpr();
-                leftnew->left = left;
-                leftnew->right = right;
+                auto leftnew = std::make_unique<fling::ast::BinaryExpr>();
+                leftnew->left = std::move(left);
+                leftnew->right = std::move(right);
                 leftnew->callculation_operator = callculation_operator;
 
-                left = leftnew;
+                left = std::move(leftnew);
             }
 
             return left;
@@ -223,7 +223,7 @@ namespace fling
         }
 
         // Funktion to parse a primary Expression
-        fling::ast::Expr *Parser::parse_primary_expr()
+        std::unique_ptr<fling::ast::Expr> Parser::parse_primary_expr()
         {
             auto tk = this->at();
 
@@ -236,27 +236,24 @@ namespace fling
                 // eat() returns the actual token and removes it
                 auto token = this->eat();
 
-                auto *id = new fling::ast::Identifier();
+                auto id = std::make_unique<fling::ast::Identifier>();
                 id->symbol = token.value; // token.value is the identifier text
-
-                return id; // implicit upcast to Expr*
+                return id;
             }
 
             // Number Type
             case fling::lexer::TokenType::Number:
             {
-                auto *id = new fling::ast::NumericLiteral();
+                auto id = std::make_unique<fling::ast::NumericLiteral>();
                 id->value = parse_float(this->eat().value);
-                // token.value is the Nummeric Literal value
-
-                return id; // implicit upcast to Expr*
+                return id;
             }
 
             // Opening Parenthesis Type
             case fling::lexer::TokenType::OpenParen:
             {
                 this->eat(); // Eat the opening Token
-                auto *expr = this->parse_expr();
+                auto expr = this->parse_expr();
                 this->expect(
                     fling::lexer::TokenType::CloseParen,
                     "Unexpected Token found inside parenthesised expression. Expected closing parenthesis"); // Eat the closing Parenthesis
@@ -297,10 +294,10 @@ namespace fling
 
             while (this->not_eof())
             {
-                auto *stmt = parse_stmt();
+                auto stmt = parse_stmt();
                 if (stmt)
                 {
-                    program.body.push_back(stmt);
+                    program.body.push_back(std::move(stmt));
                 }
             }
 

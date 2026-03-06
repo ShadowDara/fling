@@ -75,7 +75,7 @@ namespace fling
         // Program
         struct Program : Stmt
         {
-            std::vector<Stmt*> body;
+            std::vector<std::unique_ptr<Stmt>> body;
 
             // toString function
             std::string toString(int indent = 0) const override
@@ -108,8 +108,8 @@ namespace fling
         //
         struct AssignmentExpr : Expr
         {
-            ast::Expr* assignme;
-            ast::Expr* value;
+            std::unique_ptr<ast::Expr> assignme;
+            std::unique_ptr<ast::Expr> value;
 
 			AssignmentExpr() : Expr(NodeType::AssignmentExpr) {}
         };
@@ -120,7 +120,7 @@ namespace fling
         {
             bool constant;
             std::string identifier;
-            ast::Expr* value;
+            std::unique_ptr<ast::Expr> value;
 
             VarDeclaration() : Stmt(NodeType::VarDeclaration) {}
         };
@@ -129,8 +129,8 @@ namespace fling
         // Binary Expression
         struct BinaryExpr : Expr
         {
-            Expr *left;
-            Expr *right;
+            std::unique_ptr<Expr> left;
+            std::unique_ptr<Expr> right;
             std::string callculation_operator;
 
             // String-Konvertierung (optional)
@@ -196,13 +196,13 @@ namespace fling
         };
 
 
-		// Property für Objektliteral
+		// Property fï¿½r Objektliteral
         struct Property : Expr
         {
             std::string key;
 
             // Optional Value!
-            ast::Expr* value;
+            std::unique_ptr<ast::Expr> value;
             
             // toString function
             std::string toString(int indent = 0) const override
