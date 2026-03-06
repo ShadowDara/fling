@@ -32,7 +32,8 @@ namespace fling
 
         std::ostream &operator<<(std::ostream &os, const Token &token)
         {
-            os << "Token(type=\"" << tokenTypeToString(token.type) << "\", value=\"" << token.value << "\")";
+            os << "Token(type=\"" << tokenTypeToString(token.type)
+                << "\", value=\"" << token.value << "\")";
             return os;
         }
 
@@ -133,39 +134,68 @@ namespace fling
                     i++;
                     break;
 
+				// Opening Squared Brace
+                case '[':
+                    tokens.push_back(token("[", TokenType::OpenSquaredBrace));
+                    i++;
+					break;
+
+				// Closing Squared Brace
+                case ']':
+                    tokens.push_back(token("]", TokenType::CloseSquaredBrace));
+					i++;
+                    break;
+
                 // Addition Operator
                 case '+':
-                    tokens.push_back(token(std::string(1, current), TokenType::BinaryOperator));
+                    tokens.push_back(token(std::string(1, current),
+                        TokenType::BinaryOperator));
                     i++;
                     break;
 
                 // Subtraction Operator
                 case '-':
-                    tokens.push_back(token(std::string(1, current), TokenType::BinaryOperator));
+                    tokens.push_back(token(std::string(1, current),
+                        TokenType::BinaryOperator));
                     i++;
                     break;
 
                 // Multiplication Operator
                 case '*':
-                    tokens.push_back(token(std::string(1, current), TokenType::BinaryOperator));
+                    tokens.push_back(token(std::string(1, current),
+                        TokenType::BinaryOperator));
                     i++;
                     break;
 
                 // Division Operator
                 case '/':
-                    tokens.push_back(token(std::string(1, current), TokenType::BinaryOperator));
+                    tokens.push_back(token(std::string(1, current),
+                        TokenType::BinaryOperator));
                     i++;
                     break;
 
                 // Modulo Operator
                 case '%':
-                    tokens.push_back(token(std::string(1, current), TokenType::BinaryOperator));
+                    tokens.push_back(token(std::string(1, current),
+                        TokenType::BinaryOperator));
                     i++;
                     break;
 
                 // Assignment Operator
                 case '=':
                     tokens.push_back(token("=", TokenType::Equals));
+                    i++;
+                    break;
+
+                // Comma
+                case ',':
+                    tokens.push_back(token(";", TokenType::Comma));
+                    i++;
+                    break;
+
+                // Colon
+                case ':':
+                    tokens.push_back(token(";", TokenType::Colon));
                     i++;
                     break;
                 
@@ -209,7 +239,8 @@ namespace fling
                     }
                     else
                     {
-                        std::cout << "Unrecognized character in source: " << current << std::endl;
+                        std::cout << "Unrecognized character in source: "
+                            << current << std::endl;
                         dcorelib::Abort();
                     }
 

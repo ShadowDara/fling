@@ -14,6 +14,7 @@
 #include <string>
 #include <ostream>
 
+
 namespace fling
 {
     namespace ast
@@ -29,6 +30,7 @@ namespace fling
             return std::string(indent, ' ');
         }
 
+
         /**
          * enum class for the NodeTypes for the Abstract Syntax Tree
          */
@@ -37,6 +39,10 @@ namespace fling
             // STATEMENTS
             Program,
             VarDeclaration,
+
+            // Literals
+            Property,
+            ObjectLiteral,
 
             // EXPRESSIONS
             AssignmentExpr,
@@ -47,6 +53,7 @@ namespace fling
             // UnaryExpr,
             // FunctionDeclaration
         };
+
 
         /**
          * Statement a Basestructure for the abstract Syntax Tree
@@ -88,11 +95,13 @@ namespace fling
             Program() : Stmt(NodeType::Program) {}        // Liste von Statements
         };
 
+
         // Ausdruck
         struct Expr : Stmt
         {
             explicit Expr(NodeType kind) : Stmt(kind) {}
         };
+
 
 		// Assignment Expression
         //
@@ -105,6 +114,7 @@ namespace fling
 			AssignmentExpr() : Expr(NodeType::AssignmentExpr) {}
         };
 
+
         // Variable Declaration
         struct VarDeclaration : Stmt
         {
@@ -114,6 +124,7 @@ namespace fling
 
             VarDeclaration() : Stmt(NodeType::VarDeclaration) {}
         };
+
 
         // Binary Expression
         struct BinaryExpr : Expr
@@ -144,6 +155,7 @@ namespace fling
             BinaryExpr() : Expr(ast::NodeType::BinaryExpr) {}
         };
 
+
         // Identifier
         struct Identifier : Expr
         {
@@ -164,6 +176,7 @@ namespace fling
             }
         };
 
+
         // Numerisches Literal
         struct NumericLiteral : Expr
         {
@@ -182,12 +195,59 @@ namespace fling
             NumericLiteral(int v) : Expr(NodeType::NumericLiteral), value(v) {}
         };
 
+
+		// Property für Objektliteral
+        struct Property : Expr
+        {
+            std::string key;
+
+            // Optional Value!
+            ast::Expr* value;
+            
+            // toString function
+            std::string toString(int indent = 0) const override
+            {
+                std::string out = indentStr(indent) + "Property:\n";
+                out += indentStr(indent + 2) + "Key: " + key + "\n";
+                out += indentStr(indent + 2) + "Value:\n";
+                out += value->toString(indent + 4);
+                return out;
+            }
+
+            // Konstruktor
+            Property() : Expr(NodeType::Property) {}
+		};
+
+
+		// Objektliteral
+        struct ObjectLiteral : Expr
+        {
+            std::vector<Property> properties;
+            
+            //// toString function
+            //std::string toString(int indent = 0) const override
+            //{
+            //    std::string out = indentStr(indent) + "ObjectLiteral:\n";
+            //    for (const auto& prop : properties)
+            //    {
+            //        out += indentStr(indent + 2) + "Property: " + prop.first + "\n";
+            //        out += prop.second->toString(indent + 4) + "\n";
+            //    }
+            //    return out;
+            //}
+            
+			// Konstruktor
+            ObjectLiteral() : Expr(NodeType::ObjectLiteral) {}
+		};
+
+
         // for toString
         inline std::ostream &operator<<(std::ostream &os, const fling::ast::Stmt &stmt)
         {
             os << stmt.toString();
             return os;
         }
+
 
         // for toString
         inline std::ostream &operator<<(std::ostream &os, const fling::ast::Program &program)

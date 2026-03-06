@@ -28,7 +28,7 @@ void assertToken(const lexer::Token &token,
     if (token.type != expectedType || token.value != expectedValue)
     {
         std::cerr << "Token mismatch: got " << token.value 
-            << ", expected " << expectedValue << std::endl;
+            << ", expected " << expectedValue << std::endl; // edwina war hier und ist nicht geil 
         std::exit(1);
     }
 }

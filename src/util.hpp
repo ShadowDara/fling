@@ -7,6 +7,7 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+
 namespace fling::util
 {
 	// Convert a float to an Integer

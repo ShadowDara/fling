@@ -15,6 +15,7 @@
 
 #include "dcorelib/dcorelib.h"
 
+
 namespace fling
 {
     namespace lexer
@@ -34,9 +35,15 @@ namespace fling
 
             Semicolon,
             Equals,
-            OpenParen,
-            CloseParen,
+            OpenParen, // (
+            CloseParen, // )
+
+            Comma, // ,
+            Colon, // :
             
+            OpenSquaredBrace, // [
+            CloseSquaredBrace, // ]
+
             // Calculation Operators
             BinaryOperator,
 
