@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <iostream>
 #include <cctype>
+#include <memory>
 
 #include "dcorelib/dcorelib.h"
 

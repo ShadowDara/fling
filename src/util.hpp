@@ -7,6 +7,7 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <memory>
 
 namespace fling::util
 {

@@ -3,6 +3,8 @@
 #define STATEMENTS_H
 #ifndef STATEMENTS_H
 
+#include <memory>
+
 #include "dcorelib/dcorelib.h"
 #include "../values.hpp"
 #include "../envirments.hpp"

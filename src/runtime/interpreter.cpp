@@ -13,7 +13,7 @@ namespace fling
         // Function to evaluate a Program
         fling::runtime::RuntimeVal fling::runtime::evaluate_program(
             const std::unique_ptr<fling::ast::Program>& program,
-            runtime::envirment::Environment* env)
+            runtime::envirment::Environment& env)
         {
             // Store the last evaluated value, null as Default
             runtime::RuntimeVal last = runtime::RuntimeVal();
@@ -32,7 +32,7 @@ namespace fling
             runtime::RuntimeVal lhs,
             runtime::RuntimeVal rhs,
             std::string callculation_operator,
-            runtime::envirment::Environment* env)
+            runtime::envirment::Environment& env)
         { 
             float result = 0;
 
@@ -72,8 +72,9 @@ namespace fling
         }
 
         // Function to evaluate a Binary Expression
-        runtime::RuntimeVal evaluate_binary_expr(const std::unique_ptr<ast::BinaryExpr>& binop,
-            runtime::envirment::Environment* env)
+        runtime::RuntimeVal evaluate_binary_expr(
+            const std::unique_ptr<ast::BinaryExpr>& binop,
+            runtime::envirment::Environment& env)
         {
             auto lhs = evaluate(binop->left, env);
             auto rhs = evaluate(binop->right, env);
@@ -90,15 +91,17 @@ namespace fling
         }
 
         // Function to evaluate an Identifier
-        runtime::RuntimeVal evaluate_identifier(const std::unique_ptr<ast::Identifier>& ident,
-            runtime::envirment::Environment* env)
+        runtime::RuntimeVal evaluate_identifier(
+            const std::unique_ptr<ast::Identifier>& ident,
+            runtime::envirment::Environment& env)
         { 
             return env->lookupVar(ident->symbol);
         }
 
 		// Function to evaluate an Assignment Expression
-        runtime::RuntimeVal evaluate_assignment_expr(const std::unique_ptr<ast::AssignmentExpr>& node,
-            runtime::envirment::Environment* env)
+        runtime::RuntimeVal evaluate_assignment_expr(
+            const std::unique_ptr<ast::AssignmentExpr>& node,
+            runtime::envirment::Environment& env)
         {
             if (node->assignme->kind != ast::NodeType::Identifier)
             {
@@ -115,15 +118,16 @@ namespace fling
 		// Function to evaluate a Variable Declaration
         runtime::RuntimeVal evaluate_var_declaration(
             const std::unique_ptr<ast::VarDeclaration>& varDecl,
-            runtime::envirment::Environment* env)
+            runtime::envirment::Environment& env)
         { 
             auto value = varDecl->value ? evaluate(varDecl->value, env) : runtime::RuntimeVal();
 			return env->declareVar(varDecl->identifier, value, varDecl->constant);
         }
 
         // Function to evaluate Source Code
-        runtime::RuntimeVal evaluate(const std::unique_ptr<ast::Stmt>& astNode,
-            runtime::envirment::Environment* env)
+        runtime::RuntimeVal evaluate(
+            const std::unique_ptr<ast::Stmt>& astNode,
+            runtime::envirment::Environment& env)
         {
             switch (astNode->kind)
             {

@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "lexer.hpp"
 #include "ast.hpp"

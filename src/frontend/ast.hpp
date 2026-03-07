@@ -13,6 +13,7 @@
 #include <vector>
 #include <string>
 #include <ostream>
+#include <memory>
 
 
 namespace fling

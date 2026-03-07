@@ -70,11 +70,11 @@ void runFile(const std::string& filename)
     );
 
     Parser parser;
-    envirment::Environment* env = new Environment(nullptr);
+    auto env = std::make_unique<Environment>(nullptr);
 
     Program program = parser.produceAST(content);
 
-    auto result = evaluate(&program, env);
+    auto result = evaluate(program, *env);
     std::cout << result.toString() << "\n";
 
     delete env;
@@ -90,7 +90,7 @@ void runREPL()
     Parser parser;
 
     // Define the Envirment for the Language
-    Environment* env = new Environment(nullptr);
+    auto env = std::make_unique<Environment>(nullptr);
 
     while (true)
     {
@@ -99,7 +99,7 @@ void runREPL()
         // Produce AST from source Code
         Program program = parser.produceAST(source);
 
-        RuntimeVal result = evaluate(&program, env);
+        RuntimeVal result = evaluate(program, *env);
         cout << result.toString() << endl;
     }
 }

@@ -6,11 +6,12 @@
 #define VALUES_HPP
 
 #include <string>
+#include <memory>
 
 
 namespace fling::runtime
 {
-    //// Einfacher Typ für Null oder Number
+    //// Einfacher Typ fï¿½r Null oder Number
     //struct RuntimeVal
     //{
     //    enum class Type {
@@ -123,7 +124,7 @@ namespace fling::runtime
 
                                //      // Boolean
             case (Type::Boolean): {
-                return_msg + "\"´boolean\"" + ", value: ";
+                return_msg + "\"ï¿½boolean\"" + ", value: ";
                 if (bvalue == 0)
                 {
                     return_msg += "false";

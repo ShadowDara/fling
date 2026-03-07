@@ -5,7 +5,7 @@ using namespace fling::runtime;
 using namespace fling::runtime::envirment;
 
 // Function to setup the Standard Envirment for the Language
-void envirment::setupStandardEnvironment(Environment* env)
+void envirment::setupStandardEnvironment(Environment& env)
 {
     env->declareVar("true", RuntimeVal::Boolean(true), true);
     env->declareVar("false", RuntimeVal::Boolean(false), true);
@@ -68,7 +68,7 @@ RuntimeVal Environment::lookupVar(std::string varName)
 }
 
 // Function to check if the Variable exists in the current scope
-Environment* Environment::resolve(std::string varName)
+std::unique_ptr<Environment> Environment::resolve(std::string varName)
 {
     if (this->variables.find(varName) != this->variables.end())
     {
