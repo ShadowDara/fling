@@ -12,15 +12,16 @@ namespace fling
     {
         // Function to evaluate a Program
         fling::runtime::RuntimeVal fling::runtime::evaluate_program(
-            const std::unique_ptr<fling::ast::Program>& program,
+            const fling::ast::Program& program,
             runtime::envirment::Environment& env)
         {
             // Store the last evaluated value, null as Default
             runtime::RuntimeVal last = runtime::RuntimeVal();
             // loop through all statements in the program body
-            for (const auto& stmt : program->body)
+            for (const auto& stmt : program.body)
             {
-                last = evaluate(stmt, env);
+                // STMT Deferenzieren to convert it to stmt&
+                last = evaluate(*stmt, env);
             }
 
             // Return the last evaluated value
@@ -73,17 +74,18 @@ namespace fling
 
         // Function to evaluate a Binary Expression
         runtime::RuntimeVal evaluate_binary_expr(
-            const std::unique_ptr<ast::BinaryExpr>& binop,
+            const ast::BinaryExpr& binop,
             runtime::envirment::Environment& env)
         {
-            auto lhs = evaluate(binop->left, env);
-            auto rhs = evaluate(binop->right, env);
+            // Referrencing them!
+            auto lhs = evaluate(*binop.left, env);
+            auto rhs = evaluate(*binop.right, env);
 
             if (lhs.type == runtime::RuntimeVal::Type::Number
                 && rhs.type == runtime::RuntimeVal::Type::Number)
             {
                 return evaluate_numeric_binary_expr(
-                    lhs, rhs, binop->callculation_operator, env);
+                    lhs, rhs, binop.callculation_operator, env);
             }
 
             // One or both are Null
@@ -92,94 +94,98 @@ namespace fling
 
         // Function to evaluate an Identifier
         runtime::RuntimeVal evaluate_identifier(
-            const std::unique_ptr<ast::Identifier>& ident,
+            const ast::Identifier& ident,
             runtime::envirment::Environment& env)
         { 
-            return env->lookupVar(ident->symbol);
+            return env.lookupVar(ident.symbol);
         }
 
 		// Function to evaluate an Assignment Expression
         runtime::RuntimeVal evaluate_assignment_expr(
-            const std::unique_ptr<ast::AssignmentExpr>& node,
+            const ast::AssignmentExpr& node,
             runtime::envirment::Environment& env)
         {
-            if (node->assignme->kind != ast::NodeType::Identifier)
+            if (node.assignme->kind != ast::NodeType::Identifier)
             {
 				std::cerr <<
                     "Left-hand side of assignment must be an identifier."
                     << std::endl;
             }
 
-            auto varName = static_cast<ast::Identifier*>(node->assignme.get())->symbol;
+            auto varName = static_cast<ast::Identifier*>(node.assignme.get())->symbol;
 
-            return env->assignVar(varName, evaluate(node->value, env));
+            // Use a Reference instead of a unique Pointer
+            return env.assignVar(varName, evaluate(*node.value, env));
         }
 
 		// Function to evaluate a Variable Declaration
         runtime::RuntimeVal evaluate_var_declaration(
-            const std::unique_ptr<ast::VarDeclaration>& varDecl,
+            const ast::VarDeclaration& varDecl,
             runtime::envirment::Environment& env)
         { 
-            auto value = varDecl->value ? evaluate(varDecl->value, env) : runtime::RuntimeVal();
-			return env->declareVar(varDecl->identifier, value, varDecl->constant);
+            // Use a Reference instead of a smart pointer
+            auto value = varDecl.value ? evaluate(*varDecl.value, env) : runtime::RuntimeVal();
+			return env.declareVar(varDecl.identifier, value, varDecl.constant);
         }
 
         // Function to evaluate Source Code
         runtime::RuntimeVal evaluate(
-            const std::unique_ptr<ast::Stmt>& astNode,
+            const ast::Stmt& astNode,
             runtime::envirment::Environment& env)
         {
-            switch (astNode->kind)
+            switch (astNode.kind)
             {
 
             // Number Value
             case ast::NodeType::NumericLiteral:
             {
-                auto numNode = static_cast<ast::NumericLiteral *>(astNode.get());
-                return runtime::RuntimeVal(
-                    static_cast<float>(numNode->value));
+                auto& numNode = static_cast<const ast::NumericLiteral&>(astNode);
+                return RuntimeVal(static_cast<float>(numNode.value));
             }
 
             // Identifier
             case ast::NodeType::Identifier:
             {
-                return evaluate_identifier(
-                    reinterpret_cast<const std::unique_ptr<ast::Identifier>&>(astNode), env);
+                auto& identNode = static_cast<const ast::Identifier&>(astNode);
+                return env.lookupVar(identNode.symbol);
             }
 
 			// Assignment Expression
             case ast::NodeType::AssignmentExpr:
             {
-                return evaluate_assignment_expr(
-                    reinterpret_cast<const std::unique_ptr<ast::AssignmentExpr>&>(astNode), env);
+                auto& assignexpr = static_cast<const ast::AssignmentExpr&>(astNode);  // ⚡ Referenz!
+                return evaluate_assignment_expr(assignexpr, env);
             }
 
             // Binary Expression
             case ast::NodeType::BinaryExpr:
             {
-                return evaluate_binary_expr(
-                    reinterpret_cast<const std::unique_ptr<ast::BinaryExpr>&>(astNode), env);
+                auto& binNode = static_cast<const ast::BinaryExpr&>(astNode);
+                auto lhs = evaluate(*binNode.left, env);  // dereferenzieren
+                auto rhs = evaluate(*binNode.right, env);
+                return evaluate_numeric_binary_expr(lhs, rhs, binNode.callculation_operator, env);
             }
 
             // Program Node
             case ast::NodeType::Program:
             {
-                return runtime::evaluate_program(
-                    reinterpret_cast<const std::unique_ptr<ast::Program>&>(astNode), env);
+                auto prog = static_cast<const ast::Program&>(astNode);
+                return runtime::evaluate_program(prog, env);
             }
 
             // Handle Statement Nodes
             case ast::NodeType::VarDeclaration:
             {
-                return evaluate_var_declaration(
-                    reinterpret_cast<const std::unique_ptr<ast::VarDeclaration>&>(astNode), env);
+                auto& declNode = static_cast<const ast::VarDeclaration&>(astNode);
+                auto value = declNode.value ? evaluate(*declNode.value, env) : RuntimeVal();
+                return env.declareVar(declNode.identifier, value, declNode.constant);
             }
 
             // Error Fallback
             default:
             {
                 cout << "Unknown AST Node Type: "
-                    << static_cast<int>(astNode->kind)
+                    << static_cast<int>(astNode.kind)
                     << endl;
                 dcorelib::Exit(1);
                 return RuntimeVal();

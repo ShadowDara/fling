@@ -3,6 +3,8 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
+set(CMAKE_COLOR_MAKEFILE ON)
+
 # Aktivieren Sie Hot Reload für MSVC-Compiler, sofern unterstützt.
 if (POLICY CMP0141)
   cmake_policy(SET CMP0141 NEW)

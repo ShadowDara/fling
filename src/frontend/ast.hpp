@@ -181,7 +181,7 @@ namespace fling
         // Numerisches Literal
         struct NumericLiteral : Expr
         {
-            int value;
+            float value;
 
             // toString Function
             std::string toString(int indent = 0) const override
@@ -223,7 +223,7 @@ namespace fling
 		// Objektliteral
         struct ObjectLiteral : Expr
         {
-            std::vector<Property> properties;
+            std::vector<std::unique_ptr<Property>> properties;
             
             //// toString function
             //std::string toString(int indent = 0) const override

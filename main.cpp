@@ -76,8 +76,6 @@ void runFile(const std::string& filename)
 
     auto result = evaluate(program, *env);
     std::cout << result.toString() << "\n";
-
-    delete env;
 }
 
 

@@ -2,13 +2,13 @@
 CXX = g++
 
 # Compiler Flags
-CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic
+CXXFLAGS = -std=c++20 -Wall -Wextra -pedantic
 
 # Zielprogramm
 TARGET = fling
 
 # Quellcode-Dateien
-SRCS = src/main.cpp src/core.cpp src/frontend/ast.cpp src/frontend/lexer.cpp src/frontend/parser.cpp src/runtime/values.cpp src/runtime/interpreter.cpp
+SRCS = main.cpp src/core.cpp src/frontend/ast.cpp src/frontend/lexer.cpp src/frontend/parser.cpp src/runtime/values.cpp src/runtime/interpreter.cpp
 
 # Objektdateien (automatisch von SRCS abgeleitet)
 OBJS = $(SRCS:.cpp=.o)

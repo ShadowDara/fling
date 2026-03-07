@@ -31,12 +31,11 @@ namespace fling::runtime::envirment {
     public:
         // Constructor with optional parent
         explicit Environment(std::unique_ptr<Environment> parentEnv = nullptr)
-            : parent(parentEnv ? std::make_unique<Environment>() : nullptr), variables(), constants()
+            : parent(std::move(parentEnv))
         {
             if (!parent)
             {
-                // Setup the standard environment only for the global environment
-                setupStandardEnvironment(this);
+                setupStandardEnvironment(*this);
             }
         }
 
@@ -49,10 +48,10 @@ namespace fling::runtime::envirment {
             fling::runtime::RuntimeVal value);
 
         // Function to get the Content of a Variable
-        fling::runtime::RuntimeVal lookupVar(std::string);
+        fling::runtime::RuntimeVal lookupVar(std::string varName);
 
         // Function to check if the current Envirment has this Variable
-        std::unique_ptr<Environment> resolve(std::string varName);
+        Environment* resolve(const std::string& varName);
     };
 }
 
