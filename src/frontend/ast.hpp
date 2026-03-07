@@ -94,6 +94,10 @@ namespace fling
             }
 
             Program() : Stmt(NodeType::Program) {}        // Liste von Statements
+            Program(Program&&) = default;
+            Program& operator=(Program&&) = default;
+            Program(const Program&) = delete;
+            Program& operator=(const Program&) = delete;
         };
 
 
@@ -113,6 +117,10 @@ namespace fling
             std::unique_ptr<ast::Expr> value;
 
 			AssignmentExpr() : Expr(NodeType::AssignmentExpr) {}
+            AssignmentExpr(AssignmentExpr&&) = default;
+            AssignmentExpr& operator=(AssignmentExpr&&) = default;
+            AssignmentExpr(const AssignmentExpr&) = delete;
+            AssignmentExpr& operator=(const AssignmentExpr&) = delete;
         };
 
 
@@ -124,6 +132,10 @@ namespace fling
             std::unique_ptr<ast::Expr> value;
 
             VarDeclaration() : Stmt(NodeType::VarDeclaration) {}
+            VarDeclaration(VarDeclaration&&) = default;
+            VarDeclaration& operator=(VarDeclaration&&) = default;
+            VarDeclaration(const VarDeclaration&) = delete;
+            VarDeclaration& operator=(const VarDeclaration&) = delete;
         };
 
 
@@ -154,6 +166,10 @@ namespace fling
             }
 
             BinaryExpr() : Expr(ast::NodeType::BinaryExpr) {}
+            BinaryExpr(BinaryExpr&&) = default;
+            BinaryExpr& operator=(BinaryExpr&&) = default;
+            BinaryExpr(const BinaryExpr&) = delete;
+            BinaryExpr& operator=(const BinaryExpr&) = delete;
         };
 
 
@@ -217,6 +233,10 @@ namespace fling
 
             // Konstruktor
             Property() : Expr(NodeType::Property) {}
+            Property(Property&&) = default;
+            Property& operator=(Property&&) = default;
+            Property(const Property&) = delete;
+            Property& operator=(const Property&) = delete;
 		};
 
 

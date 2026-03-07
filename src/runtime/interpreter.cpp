@@ -35,7 +35,7 @@ namespace fling
             std::string callculation_operator,
             runtime::envirment::Environment& env)
         { 
-            float result = 0;
+            float result = 0.0f;
 
             // Additon
             if (callculation_operator == "+")
@@ -56,17 +56,17 @@ namespace fling
             else if (callculation_operator == "/")
             {
                 // Division durch 0 vermeiden
-                result = (rhs.number != 0) ? lhs.number / rhs.number : 0;
+                result = (rhs.number != 0) ? lhs.number / rhs.number : 0.0f;
             }
             // Module
             else if (callculation_operator == "%")
             {
-                result = toInt(rhs.number) % toInt(lhs.number);
+                result = static_cast<float>(toInt(rhs.number) % toInt(lhs.number));
             }
             // Error
             else {
                 // Unbekannter Operator, Fehlerbehandlung
-                result = 0;
+                result = 0.0f;
             }
 
             return runtime::RuntimeVal(result);
@@ -169,7 +169,7 @@ namespace fling
             // Program Node
             case ast::NodeType::Program:
             {
-                auto prog = static_cast<const ast::Program&>(astNode);
+                auto& prog = static_cast<const ast::Program&>(astNode); // Reference
                 return runtime::evaluate_program(prog, env);
             }
 
