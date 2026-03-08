@@ -1,8 +1,10 @@
+const foo = 3;
+
 const obj = {
-	x: 100,
-	y: 32,
-	foo,
-	complex: {
-		bar: true,
-	},
-}
+  x: 100,
+  y: 32,
+  foo: foo,
+  complex: {
+    bar: true,
+  },
+};

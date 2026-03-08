@@ -118,6 +118,24 @@ namespace fling
             return env.assignVar(varName, evaluate(*node.value, env));
         }
 
+		// Function to evaluate an Object Literal
+        runtime::RuntimeVal evaluate_object_expr(
+            const ast::ObjectLiteral& node,
+            runtime::envirment::Environment& env)
+        {
+            auto objectValue = runtime::RuntimeVal::Object();
+
+            for (const auto& prop : node.properties)
+            {
+                auto key = prop->key;
+                auto value = prop->value ? evaluate(*prop->value, env) : env.lookupVar(key);
+
+                objectValue.properties[key] = value;
+			}
+
+            return objectValue;
+        }
+
 		// Function to evaluate a Variable Declaration
         runtime::RuntimeVal evaluate_var_declaration(
             const ast::VarDeclaration& varDecl,
@@ -149,6 +167,13 @@ namespace fling
                 auto& identNode = static_cast<const ast::Identifier&>(astNode);
                 return env.lookupVar(identNode.symbol);
             }
+
+			// Object Literal
+            case ast::NodeType::ObjectLiteral:
+            {
+                auto& objNode = static_cast<const ast::ObjectLiteral&>(astNode);
+                return evaluate_object_expr(objNode, env);
+			}
 
 			// Assignment Expression
             case ast::NodeType::AssignmentExpr:

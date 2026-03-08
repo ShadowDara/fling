@@ -77,16 +77,22 @@ namespace fling
             return std::isdigit(static_cast<unsigned char>(c));
         }
 
+        // Check for Newline
+        bool isNewline(char c)
+        {
+            return c == '\n' || c == '\r';
+		}
+
         // Whitespace check
         bool isSkippable(char c)
         {
-            return c == ' ' || c == '\n' || c == '\t';
+            return c == ' ' || c == '\t';
         }
 
         // Token-Erzeuger
-        Token token(const std::string &value, TokenType type)
+        Token token(const std::string &value, TokenType type, int line, int colum)
         {
-            return Token{value, type};
+            return Token{value, type, line, colum};
         }
 
         /*
@@ -109,9 +115,22 @@ namespace fling
             std::vector<Token> tokens;
             std::vector<char> src(sourceCode.begin(), sourceCode.end());
 
+            int line = 1;
+            int column = 1;
+
             for (size_t i = 0; i < src.size();)
             {
                 char current = src[i];
+
+                column++;
+
+                if (isNewline(current))
+                {
+                    column = 1;
+                    line++;
+                    i++;
+                    continue;
+                }
 
                 if (isSkippable(current))
                 {
@@ -124,84 +143,84 @@ namespace fling
 
                 // Opening Parenthesis
                 case '(':
-                    tokens.push_back(token("(", TokenType::OpenParen));
+                    tokens.push_back(token("(", TokenType::OpenParen, line, column));
                     i++;
                     break;
 
                 // Closing Parenthesis
                 case ')':
-                    tokens.push_back(token(")", TokenType::CloseParen));
+                    tokens.push_back(token(")", TokenType::CloseParen, line, column));
                     i++;
                     break;
 
-				// Opening Squared Brace
-                case '[':
-                    tokens.push_back(token("[", TokenType::OpenSquaredBrace));
+				// Opening Curly Brace
+                case '{':
+                    tokens.push_back(token("{", TokenType::OpenCurlyBrace, line, column));
                     i++;
 					break;
 
-				// Closing Squared Brace
-                case ']':
-                    tokens.push_back(token("]", TokenType::CloseSquaredBrace));
+				// Closing Curly Brace
+                case '}':
+                    tokens.push_back(token("}", TokenType::CloseCurlyBrace, line, column));
 					i++;
                     break;
 
                 // Addition Operator
                 case '+':
                     tokens.push_back(token(std::string(1, current),
-                        TokenType::BinaryOperator));
+                        TokenType::BinaryOperator, line, column));
                     i++;
                     break;
 
                 // Subtraction Operator
                 case '-':
                     tokens.push_back(token(std::string(1, current),
-                        TokenType::BinaryOperator));
+                        TokenType::BinaryOperator, line, column));
                     i++;
                     break;
 
                 // Multiplication Operator
                 case '*':
                     tokens.push_back(token(std::string(1, current),
-                        TokenType::BinaryOperator));
+                        TokenType::BinaryOperator, line, column));
                     i++;
                     break;
 
                 // Division Operator
                 case '/':
                     tokens.push_back(token(std::string(1, current),
-                        TokenType::BinaryOperator));
+                        TokenType::BinaryOperator, line, column));
                     i++;
                     break;
 
                 // Modulo Operator
                 case '%':
                     tokens.push_back(token(std::string(1, current),
-                        TokenType::BinaryOperator));
+                        TokenType::BinaryOperator, line, column));
                     i++;
                     break;
 
                 // Assignment Operator
                 case '=':
-                    tokens.push_back(token("=", TokenType::Equals));
+                    tokens.push_back(token("=", TokenType::Equals, line, column));
                     i++;
                     break;
 
                 // Comma
                 case ',':
-                    tokens.push_back(token(";", TokenType::Comma));
+                    tokens.push_back(token(",", TokenType::Comma, line, column));
                     i++;
                     break;
 
                 // Colon
                 case ':':
-                    tokens.push_back(token(";", TokenType::Colon));
+                    tokens.push_back(token(":", TokenType::Colon, line, column));
                     i++;
                     break;
                 
                 // Semicolon
                 case ';':
-                    tokens.push_back(token(";", TokenType::Semicolon));
+                    tokens.push_back(token(";", TokenType::Semicolon, line, column));
                     i++;
                     break;
 
@@ -215,7 +234,7 @@ namespace fling
                             num += src[i];
                             i++;
                         }
-                        tokens.push_back(token(num, TokenType::Number));
+                        tokens.push_back(token(num, TokenType::Number, line, column));
                     }
                     // Identifier aufbauen
                     else if (isAlpha(current))
@@ -230,17 +249,17 @@ namespace fling
                         // Check if its in the Keyword List
                         if (KEYWORDS.find(ident) != KEYWORDS.end())
                         {
-                            tokens.push_back(token(ident, KEYWORDS[ident]));
+                            tokens.push_back(token(ident, KEYWORDS[ident], line, column));
                         }
                         else
                         {
-                            tokens.push_back(token(ident, TokenType::Identifier));
+                            tokens.push_back(token(ident, TokenType::Identifier, line, column));
                         }
                     }
                     else
                     {
                         std::cout << "Unrecognized character in source: "
-                            << current << std::endl;
+                            << current << " ASCII: " << (int)current << std::endl;
                         dcorelib::Abort();
                     }
 
@@ -248,7 +267,7 @@ namespace fling
                 }
             }
 
-            tokens.push_back(token("EndOfFile", TokenType::Eof));
+            tokens.push_back(token("EndOfFile", TokenType::Eof, line, column));
 
             // // Debug Output
             // std::cout << "Debug Tokens:" << std::endl;

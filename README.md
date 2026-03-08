@@ -21,3 +21,10 @@ range of applications, but mainly be used for file
 manipulation and scripting.
 
 **BUT The language is still in the early stages of development.**
+
+## TODO
+
+Index Parser
+- Parser gets slower over with big lists because O(n) lookup time,
+need to implement a hash map for faster lookups.
+ 

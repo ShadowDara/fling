@@ -56,7 +56,7 @@ namespace fling
              * @param string for any additional Error Message
              * @return Returns the expected Token
              */
-            fling::lexer::Token expect(fling::lexer::TokenType type, std::string any);
+            fling::lexer::Token expect(fling::lexer::TokenType type, const std::string& context);
 
             /**
              * Function to parse a statement
@@ -84,6 +84,9 @@ namespace fling
 			 */
             std::unique_ptr<fling::ast::Expr> parse_assignment_expr();
 
+            // Function to parse an Object Expression
+            std::unique_ptr<fling::ast::Expr> parse_object_expr();
+
             /**
              * Function to parse an additive Expression
              *
@@ -104,7 +107,7 @@ namespace fling
              * @param std::string as a Float Value or Basic Number
              * @return Returns an Integer from the input string
              */
-            int parse_float(const std::string &value);
+            float parse_float(const std::string &value);
 
             /**
              * Function to parse a primary expression from the current Token

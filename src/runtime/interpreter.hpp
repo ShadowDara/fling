@@ -52,6 +52,16 @@ namespace fling
 			const ast::Identifier& ident,
 			fling::runtime::envirment::Environment& env);
 
+		// Function to evaluate an Assignment Expression
+		fling::runtime::RuntimeVal evaluate_assignment_expr(
+			const ast::AssignmentExpr& node,
+			fling::runtime::envirment::Environment& env);
+
+		// Function to evaluate an Object Literal
+		fling::runtime::RuntimeVal evaluate_object_expr(
+			const ast::ObjectLiteral& node,
+			fling::runtime::envirment::Environment& env);
+
 		// Function to evaluate a Variable Declaration
 		fling::runtime::RuntimeVal evaluate_var_declaration(
 			const ast::VarDeclaration& varDecl,

@@ -16,7 +16,8 @@ namespace fling
         // Function to check if end of file is reached
         bool Parser::not_eof()
         {
-            return this->tokens[0].type != lexer::TokenType::Eof;
+            return !tokens.empty() &&
+                tokens[0].type != lexer::TokenType::Eof;
         }
 
         // Function to get the current token
@@ -38,22 +39,36 @@ namespace fling
         }
 
         // Function to expect a specific Token Type
-        fling::lexer::Token Parser::expect(fling::lexer::TokenType type, string err)
+        fling::lexer::Token Parser::expect(fling::lexer::TokenType type, const std::string& context)
         {
-            fling::lexer::Token tk = this->eat();
+            lexer::Token tk = at();
 
-            // Exit the program if the expected Token Type is not found
             if (tk.type != type)
             {
-                cout << "Parser Error - Unexpected Token found: \n"
-                     << err << " - "
-                     << tk.value << " - Expecting: "
-                     << fling::lexer::tokenTypeToString(type) << endl;
-                cout << "Exiting Parser..." << endl;
-                dcorelib::Exit(1);
+                std::cerr << "\n=== PARSER ERROR ===\n";
+                
+                std::cerr << "Context: " << context << "\n";
+                
+                std::cerr << "Expected: " << tokenTypeToString(type)
+                    << " ASCII: "
+                    << (tokenTypeToString(type).empty() ? 0 : int(tokenTypeToString(type)[0]))
+                    << "\n";
+                
+                std::cerr << "Found: " << tokenTypeToString(tk.type)
+                    << " (\"" << tk.value << "\") ASCII: ";
+                for (char c : tk.value)
+                    std::cerr << int(c) << " ";
+                std::cerr << "\n";
+                
+                std::cerr << "Location: line " << tk.line
+                    << ", column " << tk.column << "\n";
+                
+                std::cerr << "====================\n";
+
+                std::exit(1);
             }
 
-            return tk;
+            return eat();
         }
 
         // Funktion to parse a Statement
@@ -142,7 +157,7 @@ namespace fling
 		// Function to parse an assignment Expression
         std::unique_ptr<fling::ast::Expr> Parser::parse_assignment_expr()
         {
-            auto left = this->parse_additive_expr();
+            auto left = this->parse_object_expr();
             // switch this out with object Expression
 
             if (this->at().type == lexer::TokenType::Equals)
@@ -158,6 +173,86 @@ namespace fling
             return left;
         }
 
+        // Function to parse an Object Expression
+        std::unique_ptr<fling::ast::Expr> Parser::parse_object_expr()
+        {
+            if (this->at().type != lexer::TokenType::OpenCurlyBrace)
+            {
+                /*cout << "Expected opening parenthesis '[' for object literal, found: "
+                     << this->at().value << endl;
+                dcorelib::Exit(1);*/
+                return parse_additive_expr();
+            }
+
+            // Eat the [
+            this->eat();
+            std::vector<std::unique_ptr<ast::Property>> properties;
+
+            while (this->not_eof() && this->at().type != lexer::TokenType::CloseCurlyBrace)
+            {
+                // { key }
+
+                // Wenn das nächste Token ein Komma ist, überspringen wir es (optional trailing comma)
+                if (this->at().type == lexer::TokenType::Comma)
+                {
+                    this->eat();
+                    // Wenn nach dem Komma direkt CloseCurlyBrace kommt -> Ende
+                    if (this->at().type == lexer::TokenType::CloseCurlyBrace)
+                    {
+                        break;
+                    }
+                }
+
+                std::string key = this->expect(lexer::TokenType::Identifier,
+					"Expected identifier as key in object literal").value;
+
+				if (this->at().type == lexer::TokenType::Colon)
+                {
+                    this->eat(); // eat the colon
+                    auto value = this->parse_expr();
+                    auto property = std::make_unique<ast::Property>();
+                    property->key = key;
+                    property->value = std::move(value);
+                    properties.push_back(std::move(property));
+                    continue;
+                }
+				else if (this->at().type == lexer::TokenType::Comma)
+                {
+					this->eat(); // eat the comma
+                    // Shorthand Property: { key }
+                    auto property = std::make_unique<ast::Property>();
+                    property->key = key;
+                    property->value = std::make_unique<ast::Identifier>(key); // value is the identifier itself
+                    properties.push_back(std::move(property));
+                    continue;
+                }
+
+                // { key: value }
+				this->expect(lexer::TokenType::Colon,
+                    "Missing colon ':' after key in object literal");
+				auto value = this->parse_expr();
+
+                auto property = std::make_unique<ast::Property>();
+                property->key = key;
+                property->value = std::move(value);
+                properties.push_back(std::move(property));
+
+                if (this->at().type != lexer::TokenType::CloseCurlyBrace)
+                {
+                    this->expect(lexer::TokenType::Comma,
+                        "Expected Comma or Closing Bracket following property");
+                }
+            }
+
+            this->expect(lexer::TokenType::CloseCurlyBrace,
+                "Object Literal Closing Brace { missing!");
+
+			auto objLiteral = std::make_unique<ast::ObjectLiteral>();
+			objLiteral->properties = std::move(properties);
+
+            return objLiteral;
+        }
+
         // Function to parse an additive Expression
         std::unique_ptr<fling::ast::Expr> Parser::parse_additive_expr()
         {
@@ -167,7 +262,7 @@ namespace fling
             while (this->at().value == "+" || this->at().value == "-")
             {
                 std::string callculation_operator = this->eat().value;
-                auto right = this->parse_primary_expr();
+                auto right = this->parse_multiplicitave_expr();
 
                 auto leftnew = std::make_unique<fling::ast::BinaryExpr>();
                 leftnew->left = std::move(left);
@@ -192,7 +287,7 @@ namespace fling
                 this->at().value == "%")
             {
                 std::string callculation_operator = this->eat().value;
-                auto right = this->parse_multiplicitave_expr();
+                auto right = this->parse_primary_expr();
 
                 auto leftnew = std::make_unique<fling::ast::BinaryExpr>();
                 leftnew->left = std::move(left);
@@ -206,14 +301,16 @@ namespace fling
         }
 
         // Function to parse a float Value
-        int Parser::parse_float(const std::string &value)
+        float Parser::parse_float(const std::string &value)
         {
-            if (fling::lexer::isInt(value))
+            try
             {
-                return std::stoi(value);
+                return std::stof(value);
             }
-            // Bei Fehler kannst du z.B. 0 oder einen speziellen Wert zurückgeben
-            return 0;
+            catch (...)
+            {
+                return 0;
+            }
         }
 
         // Funktion to parse a primary Expression

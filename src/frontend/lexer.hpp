@@ -42,8 +42,11 @@ namespace fling
             Comma, // ,
             Colon, // :
             
-            OpenSquaredBrace, // [
-            CloseSquaredBrace, // ]
+            //OpenSquaredBrace, // [
+            //CloseSquaredBrace, // ]
+
+			OpenCurlyBrace, // {
+            CloseCurlyBrace, // }
 
             // Calculation Operators
             BinaryOperator,
@@ -62,6 +65,10 @@ namespace fling
         {
             std::string value;
             TokenType type;
+
+			// For Debugging and Error Reporting
+            int line = 0;
+            int column = 0;
         };
 
         /**
@@ -110,6 +117,9 @@ namespace fling
          */
         bool isInt(char c);
 
+        // Check for Newline
+        bool isNewline(char c);
+
         /**
          * Check if a character is valid Whitespace
          *
@@ -125,7 +135,7 @@ namespace fling
          * @param TokenType
          * @return A Token with both values
          */
-        Token token(const std::string &value, TokenType type);
+        Token token(const std::string& value, TokenType type, int line, int colum);
 
         /**
          * Tokenize Function which tokenises the source Code to an Array of Tokens

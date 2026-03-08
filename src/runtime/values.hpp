@@ -7,6 +7,7 @@
 
 #include <string>
 #include <memory>
+#include <unordered_map>
 
 
 namespace fling::runtime
@@ -68,37 +69,54 @@ namespace fling::runtime
         enum class Type {
             Null,
             Number,
-            Boolean
+            Boolean,
+            Object
         };
 
         Type type;
-        float number;
-        bool bvalue;
+        float number = 0;
+        bool bvalue = false;
+        std::unordered_map<std::string, RuntimeVal> properties;
 
         // to make a Number Value
-        static RuntimeVal Null() {
+        static RuntimeVal Null()
+        {
             return RuntimeVal{};
         }
 
         // to Make a Number Value
-        static RuntimeVal Number(float n) {
+        static RuntimeVal Number(float n)
+        {
             return RuntimeVal(static_cast<float>(n));
         }
 
         // to Make a Boolean Value
-        static RuntimeVal Boolean(bool b) {
+        static RuntimeVal Boolean(bool b)
+        {
             return RuntimeVal(static_cast<bool>(b));
         }
 
+		// Make an Object Value
+        static RuntimeVal Object()
+        {
+            std::unordered_map<std::string, RuntimeVal> properties;
+            auto val = RuntimeVal(properties);
+            return val;
+        }
+
         // Null Konstruktor
-        RuntimeVal() : type(Type::Null), number(0), bvalue(false) {}
+        RuntimeVal() : type(Type::Null) {}
 
         // float Kontruktor
-        RuntimeVal(float n) : type(Type::Number), number(n), bvalue(false) {}
+        RuntimeVal(float n) : type(Type::Number), number(n) {}
 
         // Boolean Constuctor
         // This could mabybe lead to errors
-        RuntimeVal(bool b) : type(Type::Boolean), number(0), bvalue(b) {}
+        RuntimeVal(bool b) : type(Type::Boolean), bvalue(b) {}
+
+        // Object Construktor
+        RuntimeVal(std::unordered_map<std::string,
+            RuntimeVal> p) : type(Type::Object), properties(p) {};
 
         // Convert to String
         std::string toString() const

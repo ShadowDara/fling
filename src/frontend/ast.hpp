@@ -233,9 +233,13 @@ namespace fling
 
             // Konstruktor
             Property() : Expr(NodeType::Property) {}
+            
             Property(Property&&) = default;
+            
             Property& operator=(Property&&) = default;
+            
             Property(const Property&) = delete;
+            
             Property& operator=(const Property&) = delete;
 		};
 
@@ -245,17 +249,32 @@ namespace fling
         {
             std::vector<std::unique_ptr<Property>> properties;
             
-            //// toString function
-            //std::string toString(int indent = 0) const override
-            //{
-            //    std::string out = indentStr(indent) + "ObjectLiteral:\n";
-            //    for (const auto& prop : properties)
-            //    {
-            //        out += indentStr(indent + 2) + "Property: " + prop.first + "\n";
-            //        out += prop.second->toString(indent + 4) + "\n";
-            //    }
-            //    return out;
-            //}
+            std::string toString(int indent = 0) const override
+            {
+                std::string out = "{\n";
+
+                for (size_t i = 0; i < properties.size(); ++i)
+                {
+                    const auto& prop = properties[i];
+
+                    out += indentStr(indent + 2);
+                    out += prop->key + ": ";
+
+                    if (prop->value)
+                        out += prop->value->toString(indent + 2);
+                    else
+                        out += "null";
+
+                    if (i < properties.size() - 1)
+                        out += ",";
+
+                    out += "\n";
+                }
+
+                out += indentStr(indent) + "}";
+
+                return out;
+            }
             
 			// Konstruktor
             ObjectLiteral() : Expr(NodeType::ObjectLiteral) {}

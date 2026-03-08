@@ -1,7 +1,7 @@
 ﻿# CMakeList.txt: CMake-Projekt für "fling-lang". Schließen Sie die Quelle ein, und definieren Sie
 # projektspezifische Logik hier.
 #
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.16)
 
 set(CMAKE_COLOR_MAKEFILE ON)
 
@@ -35,7 +35,11 @@ add_executable (
 
     "src/runtime/interpreter.hpp"
     "src/runtime/interpreter.cpp"
- "src/runtime/envirments.cpp" "src/util.cpp" "src/runtime/values.cpp" "src/runtime/eval/statements.cpp" "src/runtime/eval/expressions.cpp")
+    "src/runtime/envirments.cpp"
+    "src/util.cpp"
+    "src/runtime/eval/statements.cpp"
+    "src/runtime/eval/expressions.cpp"
+)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET fling-lang PROPERTY CXX_STANDARD 20)
