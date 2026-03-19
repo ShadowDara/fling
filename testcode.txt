@@ -10,4 +10,4 @@ const obj = {
 };
 
 let f = object.complex.bar;
-foo = 4;
+foo = 4

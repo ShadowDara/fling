@@ -33,7 +33,8 @@ namespace fling
         std::ostream &operator<<(std::ostream &os, const Token &token)
         {
             os << "Token(type=\"" << tokenTypeToString(token.type)
-                << "\", value=\"" << token.value << "\")";
+                << "\", value=\"" << token.value << "\") Line: " << token.line
+                << " Column: " << token.column;
             return os;
         }
 
