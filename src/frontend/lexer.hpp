@@ -36,15 +36,15 @@ namespace fling
 
             Semicolon,
             Equals,
+
+            Comma,   // ,
+            Colon,   // :
+            Dot,     // .
+
             OpenParen, // (
             CloseParen, // )
-
-            Comma, // ,
-            Colon, // :
-            
-            //OpenSquaredBrace, // [
-            //CloseSquaredBrace, // ]
-
+            OpenSquaredBrace, // [
+            CloseSquaredBrace, // ]
 			OpenCurlyBrace, // {
             CloseCurlyBrace, // }
 

@@ -165,6 +165,18 @@ namespace fling
 					i++;
                     break;
 
+                // Opening Squared Brace
+                case '[':
+                    tokens.push_back(token("[", TokenType::CloseSquaredBrace, line, column));
+                    i++;
+                    break;
+
+                    // Closing Squared Brace
+                case ']':
+                    tokens.push_back(token("]", TokenType::CloseSquaredBrace, line, column));
+                    i++;
+                    break;
+
                 // Addition Operator
                 case '+':
                     tokens.push_back(token(std::string(1, current),
@@ -209,6 +221,12 @@ namespace fling
                 // Comma
                 case ',':
                     tokens.push_back(token(",", TokenType::Comma, line, column));
+                    i++;
+                    break;
+
+                // Dot
+                case '.':
+                    tokens.push_back(token(".", TokenType::Dot, line, column));
                     i++;
                     break;
 

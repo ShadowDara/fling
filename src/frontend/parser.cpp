@@ -278,7 +278,7 @@ namespace fling
         // Function to parse an multiplicitave Expression
         std::unique_ptr<fling::ast::Expr> Parser::parse_multiplicitave_expr()
         {
-            auto left = parse_primary_expr();
+            auto left = parse_call_member_expr();
 
             // For Division, Multiplication and Modulo
             while (
@@ -287,7 +287,7 @@ namespace fling
                 this->at().value == "%")
             {
                 std::string callculation_operator = this->eat().value;
-                auto right = this->parse_primary_expr();
+                auto right = this->parse_call_member_expr();
 
                 auto leftnew = std::make_unique<fling::ast::BinaryExpr>();
                 leftnew->left = std::move(left);
@@ -298,6 +298,108 @@ namespace fling
             }
 
             return left;
+        }
+
+        // Function to parse a Call Member Expression
+        std::unique_ptr<fling::ast::Expr> Parser::parse_call_member_expr()
+        {
+			auto member = parse_member_expr();
+
+            if (this->at().type == lexer::TokenType::OpenParen)
+            {
+                return parse_call_expr(std::move(member));
+            }
+
+			return member;
+        }
+
+        // Function to parse a Call Expression
+        std::unique_ptr<fling::ast::Expr> Parser::parse_call_expr(
+            std::unique_ptr<fling::ast::Expr> caller)
+        {
+            auto callExpr = std::make_unique<ast::CallExpr>(std::move(caller), parse_agrs());
+
+			if (at().type == lexer::TokenType::OpenParen)
+            {
+                auto callExpr2 = std::move(parse_call_expr(std::move(callExpr)));
+				return callExpr2;
+            }
+
+            return callExpr;
+        }
+
+        // Function to parse arguments for a Call Expression
+        std::vector<fling::ast::Expr> Parser::parse_agrs()
+        {
+            // This call is not required to tbh
+			expect(lexer::TokenType::OpenParen,
+                "Expected opening parenthesis for function call arguments");
+
+            auto agrs = std::vector<ast::Expr>();
+
+            if (this->at().type != lexer::TokenType::CloseParen)
+            {
+                agrs = parse_argument_list();
+            }
+
+            expect(lexer::TokenType::CloseParen,
+				"Expected closing parenthesis after function call arguments");
+
+            return agrs;
+        }
+
+        // Function to parse the Argument List
+        std::vector<fling::ast::Expr> Parser::parse_argument_list()
+        {
+			std::vector<ast::Expr> agrs;
+			agrs.push_back(*parse_assignment_expr());
+
+			while (this->at().type == lexer::TokenType::Comma)
+            {
+                this->eat(); // eat the comma
+                agrs.push_back(*parse_assignment_expr());
+            }
+
+            return agrs;
+        }
+
+        // Function to parse a Member Expression
+        std::unique_ptr<fling::ast::Expr> Parser::parse_member_expr()
+        {
+			auto object = parse_primary_expr();
+
+            while (at().type == lexer::TokenType::Dot || at().type == lexer::TokenType::OpenSquaredBrace)
+            {
+				auto theoperator = eat();
+				auto property = std::make_unique<ast::Expr>();
+                bool computed;
+
+                // non-computed Properties 
+                if (theoperator.type == lexer::TokenType::Dot)
+                {
+                    computed = false;
+                    property = std::move(parse_primary_expr());
+
+                    if ((*property).kind != ast::NodeType::Identifier)
+                    {
+                        std::cerr
+                            << "Can not use dot operator without right hand side beeing a identifier"
+                            << std::endl;
+                        std::exit(1);
+                    }
+                }
+                else
+                {
+                    // this allows obs[computedValue]
+                    computed = true;
+                    property = std::move(parse_expr());
+                    expect(lexer::TokenType::CloseSquaredBrace,
+                        "Missing closing Squared Brace in computed value");
+                }
+            }
+
+            auto object2 = std::make_unique<ast::MemberExpr>(std::move(object), std::move(property), computed);
+            return object2;  // Rückgabe nicht vergessen!
         }
 
         // Function to parse a float Value

@@ -41,12 +41,14 @@ namespace fling
             Program,
             VarDeclaration,
 
+            // EXPRESSIONS
+            AssignmentExpr,
+            MemberExpr,
+			CallExpr,
+
             // Literals
             Property,
             ObjectLiteral,
-
-            // EXPRESSIONS
-            AssignmentExpr,
             NumericLiteral,
             Identifier,
             BinaryExpr,
@@ -170,6 +172,79 @@ namespace fling
             BinaryExpr& operator=(BinaryExpr&&) = default;
             BinaryExpr(const BinaryExpr&) = delete;
             BinaryExpr& operator=(const BinaryExpr&) = delete;
+        };
+
+
+        // Call Expression
+        struct CallExpr : Expr
+        {
+            std::vector<Expr> agrs;
+            std::unique_ptr<Expr> caller;
+
+            //// String-Konvertierung (optional)
+            //operator std::string() const
+            //{
+            //    return "BinaryExpr";
+            //}
+
+            //// toString function
+            //std::string toString(int indent = 0) const override
+            //{
+            //    std::string out = indentStr(indent) + "BinaryExpr:\n";
+            //    out += indentStr(indent + 2) + "Left:\n";
+            //    out += left->toString(indent + 4) + "\n";
+            //    out += indentStr(indent + 2) + "Right:\n";
+            //    out += right->toString(indent + 4) + "\n";
+            //    out += indentStr(indent + 2) + "Binary Operator:\n";
+            //    out += indentStr(indent + 4) + callculation_operator;
+            //    return out;
+            //}
+
+            CallExpr(std::unique_ptr<Expr> c, std::unique_ptr<std::vector<fling::ast::Expr>> args
+                ) : Expr(ast::NodeType::CallExpr), caller(std::move(c)), agrs(args) {}
+            
+            /*BinaryExpr(BinaryExpr&&) = default;
+            BinaryExpr& operator=(BinaryExpr&&) = default;
+            BinaryExpr(const BinaryExpr&) = delete;
+            BinaryExpr& operator=(const BinaryExpr&) = delete;*/
+        };
+
+
+        // Member Expression
+        struct MemberExpr : Expr
+        {
+            std::unique_ptr<Expr> object;
+            std::unique_ptr<Expr> property;
+			bool computed; // true for obj[prop], false for obj.prop
+
+            //// String-Konvertierung (optional)
+            //operator std::string() const
+            //{
+            //    return "BinaryExpr";
+            //}
+
+            //// toString function
+            //std::string toString(int indent = 0) const override
+            //{
+            //    std::string out = indentStr(indent) + "BinaryExpr:\n";
+            //    out += indentStr(indent + 2) + "Left:\n";
+            //    out += left->toString(indent + 4) + "\n";
+            //    out += indentStr(indent + 2) + "Right:\n";
+            //    out += right->toString(indent + 4) + "\n";
+            //    out += indentStr(indent + 2) + "Binary Operator:\n";
+            //    out += indentStr(indent + 4) + callculation_operator;
+            //    return out;
+            //}
+
+            MemberExpr(std::unique_ptr<Expr> o,
+                std::unique_ptr<Expr> p,
+                bool c) : Expr(ast::NodeType::MemberExpr),
+                object(std::move(o)), property(std::move(p)),
+                computed(c) {}
+            /*BinaryExpr(BinaryExpr&&) = default;
+            BinaryExpr& operator=(BinaryExpr&&) = default;
+            BinaryExpr(const BinaryExpr&) = delete;
+            BinaryExpr& operator=(const BinaryExpr&) = delete;*/
         };
 
 
