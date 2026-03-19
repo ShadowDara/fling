@@ -200,7 +200,7 @@ namespace fling
             //    return out;
             //}
 
-            CallExpr(std::unique_ptr<Expr> c, std::unique_ptr<std::vector<fling::ast::Expr>> args
+            CallExpr(std::unique_ptr<Expr> c, std::vector<fling::ast::Expr> args
                 ) : Expr(ast::NodeType::CallExpr), caller(std::move(c)), agrs(args) {}
             
             /*BinaryExpr(BinaryExpr&&) = default;

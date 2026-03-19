@@ -367,12 +367,12 @@ namespace fling
         std::unique_ptr<fling::ast::Expr> Parser::parse_member_expr()
         {
 			auto object = parse_primary_expr();
+            auto property = std::make_unique<ast::Expr>();
+            bool computed;
 
             while (at().type == lexer::TokenType::Dot || at().type == lexer::TokenType::OpenSquaredBrace)
             {
 				auto theoperator = eat();
-				auto property = std::make_unique<ast::Expr>();
-                bool computed;
 
                 // non-computed Properties 
                 if (theoperator.type == lexer::TokenType::Dot)
