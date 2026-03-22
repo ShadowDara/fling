@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <memory>
+#include <cassert>
 
 #include "dcorelib/dcorelib.h"
 

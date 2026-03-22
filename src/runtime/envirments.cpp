@@ -12,7 +12,20 @@ void envirment::setupStandardEnvironment(Environment& env)
     env.declareVar("null", RuntimeVal::Null(), true);
 
     // Define a Native Build in Function
-    env.declareVar("print", RuntimeVal::NativeFN(nullptr), true);
+    env.declareVar(
+        "print",
+        RuntimeVal::NativeFN([](std::vector<RuntimeVal> agrs, fling::runtime::envirment::Environment& scope) -> RuntimeVal {
+            // Ausgabe aller Argumente
+            for (const auto& arg : agrs) {
+                std::cout << arg.toString() << " ";
+            }
+            std::cout << std::endl;
+
+            // Rückgabe von null
+            return RuntimeVal::Null();
+        }),
+        true
+    );
 }
 
 // Function to declare a New Variable

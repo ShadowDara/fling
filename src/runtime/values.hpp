@@ -146,40 +146,51 @@ namespace fling::runtime
 
             switch (type)
             {
-
-                //      // Null
-            case (Type::Null): {
-                return_msg += "\"null\"";
-                return_msg += ", value: null";
-                break;
-            }
-
-                             //      // Number
-            case (Type::Number): {
-                return_msg += "\"number\"";
-                return_msg += ", value: " + std::to_string(number);
-                break;
-            }
-
-                               //      // Boolean
-            case (Type::Boolean): {
-                return_msg + "\"�boolean\"" + ", value: ";
-                if (bvalue == 0)
-                {
-                    return_msg += "false";
+                case Type::Null: {
+                    return_msg += "\"null\"";
+                    return_msg += ", value: null";
+                    break;
                 }
-                else
-                {
-                    return_msg += "true";
+
+                case Type::Number: {
+                    return_msg += "\"number\"";
+                    return_msg += ", value: " + std::to_string(number);
+                    break;
                 }
-                break;
+
+                case Type::Boolean: {
+                    return_msg += "\"boolean\"";
+                    return_msg += ", value: ";
+                    return_msg += (bvalue ? "true" : "false");
+                    break;
+                }
+
+                case Type::Object: {
+                    return_msg += "\"object\"";
+                    return_msg += ", properties: { ";
+
+                    bool first = true;
+                    for (const auto& [key, val] : properties)
+                    {
+                        if (!first) return_msg += ", ";
+                        return_msg += key + ": " + val.toString();
+                        first = false;
+                    }
+
+                    return_msg += " }";
+                    break;
+                }
+
+                case Type::Native_FnValue: {
+                    return_msg += "\"native-fn\"";
+                    return_msg += ", value: <function>";
+                    break;
+                }
             }
-            };
 
             return_msg += " }";
-
             return return_msg;
-        };
+        }
     };
 } // namespace fling::runtime
 

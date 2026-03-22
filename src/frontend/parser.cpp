@@ -329,13 +329,13 @@ namespace fling
         }
 
         // Function to parse arguments for a Call Expression
-        std::vector<fling::ast::Expr> Parser::parse_agrs()
+        std::vector<std::unique_ptr<fling::ast::Expr>> Parser::parse_agrs()
         {
             // This call is not required to tbh
 			expect(lexer::TokenType::OpenParen,
                 "Expected opening parenthesis for function call arguments");
 
-            auto agrs = std::vector<ast::Expr>();
+            auto agrs = std::vector<std::unique_ptr<ast::Expr>>();
 
             if (this->at().type != lexer::TokenType::CloseParen)
             {
@@ -349,15 +349,16 @@ namespace fling
         }
 
         // Function to parse the Argument List
-        std::vector<fling::ast::Expr> Parser::parse_argument_list()
+        std::vector<std::unique_ptr<fling::ast::Expr>> Parser::parse_argument_list()
         {
-			std::vector<ast::Expr> agrs;
-			agrs.push_back(*parse_assignment_expr());
+			std::vector<std::unique_ptr<ast::Expr>> agrs;
+			agrs.push_back(std::move(parse_assignment_expr()));
 
 			while (this->at().type == lexer::TokenType::Comma)
             {
                 this->eat(); // eat the comma
-                agrs.push_back(*parse_assignment_expr());
+                auto expr = parse_assignment_expr();
+                agrs.push_back(std::move(expr));
             }
 
             return agrs;
@@ -462,6 +463,9 @@ namespace fling
                 dcorelib::Exit(1);
             }
             }
+
+            // End
+            return nullptr;
         }
 
         //

@@ -70,7 +70,7 @@ namespace fling
             virtual ~Stmt() = default;
 
             virtual std::string toString(int indent = 0) const {
-                return "<Stmt>";
+                return "";
             }
         };
 
@@ -123,6 +123,19 @@ namespace fling
             AssignmentExpr& operator=(AssignmentExpr&&) = default;
             AssignmentExpr(const AssignmentExpr&) = delete;
             AssignmentExpr& operator=(const AssignmentExpr&) = delete;
+
+            std::string toString(int indent = 0) const override
+            {
+                std::string out = indentStr(indent) + "AssignmentExpr:\n";
+
+                out += indentStr(indent + 2) + "Target:\n";
+                out += assignme->toString(indent + 4) + "\n";
+
+                out += indentStr(indent + 2) + "Value:\n";
+                out += value->toString(indent + 4);
+
+                return out;
+            }
         };
 
 
@@ -138,6 +151,21 @@ namespace fling
             VarDeclaration& operator=(VarDeclaration&&) = default;
             VarDeclaration(const VarDeclaration&) = delete;
             VarDeclaration& operator=(const VarDeclaration&) = delete;
+
+            std::string toString(int indent = 0) const override
+            {
+                std::string out = indentStr(indent) + "VarDeclaration:\n";
+                out += indentStr(indent + 2) + "Identifier: " + identifier + "\n";
+                out += indentStr(indent + 2) + "Constant: " + std::string(constant ? "true" : "false") + "\n";
+
+                if (value)
+                {
+                    out += indentStr(indent + 2) + "Value:\n";
+                    out += value->toString(indent + 4);
+                }
+
+                return out;
+            }
         };
 
 
@@ -178,7 +206,7 @@ namespace fling
         // Call Expression
         struct CallExpr : Expr
         {
-            std::vector<Expr> agrs;
+            std::vector<std::unique_ptr<Expr>> agrs;
             std::unique_ptr<Expr> caller;
 
             //// String-Konvertierung (optional)
@@ -200,13 +228,31 @@ namespace fling
             //    return out;
             //}
 
-            CallExpr(std::unique_ptr<Expr> c, std::vector<fling::ast::Expr> args
-                ) : Expr(ast::NodeType::CallExpr), caller(std::move(c)), agrs(args) {}
+            CallExpr(std::unique_ptr<Expr> c,
+                std::vector<std::unique_ptr<fling::ast::Expr>> args
+                ) : Expr(ast::NodeType::CallExpr), caller(std::move(c)),
+                agrs(std::move(args)) {}
             
             /*BinaryExpr(BinaryExpr&&) = default;
             BinaryExpr& operator=(BinaryExpr&&) = default;
             BinaryExpr(const BinaryExpr&) = delete;
             BinaryExpr& operator=(const BinaryExpr&) = delete;*/
+
+            std::string toString(int indent = 0) const override
+            {
+                std::string out = indentStr(indent) + "CallExpr:\n";
+
+                out += indentStr(indent + 2) + "Caller:\n";
+                out += caller->toString(indent + 4) + "\n";
+
+                out += indentStr(indent + 2) + "Args:\n";
+                for (const auto& arg : agrs)
+                {
+                    out += arg->toString(indent + 4) + "\n"; // <- Use '->'
+                }
+
+                return out;
+            }
         };
 
 
@@ -245,6 +291,22 @@ namespace fling
             BinaryExpr& operator=(BinaryExpr&&) = default;
             BinaryExpr(const BinaryExpr&) = delete;
             BinaryExpr& operator=(const BinaryExpr&) = delete;*/
+
+            std::string toString(int indent = 0) const override
+            {
+                std::string out = indentStr(indent) + "MemberExpr:\n";
+
+                out += indentStr(indent + 2) + "Object:\n";
+                out += object->toString(indent + 4) + "\n";
+
+                out += indentStr(indent + 2) + "Property:\n";
+                out += property->toString(indent + 4) + "\n";
+
+                out += indentStr(indent + 2) + "Computed: ";
+                out += (computed ? "true" : "false");
+
+                return out;
+            }
         };
 
 

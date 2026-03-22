@@ -5,6 +5,8 @@
 using namespace std;
 using namespace fling;
 using namespace fling::util;
+using namespace fling::ast;
+
 
 namespace fling
 {
@@ -140,8 +142,24 @@ namespace fling
             const ast::CallExpr& expr,
             runtime::envirment::Environment& env)
         {
-            
-            return RuntimeVal::Null();
+            std::vector<RuntimeVal> evaluatedArgs;
+            evaluatedArgs.reserve(expr.agrs.size()); // optional, spart Reallocs
+
+            for (const auto& arg : expr.agrs) {
+                evaluatedArgs.push_back(evaluate(*arg, env)); // *arg, weil unique_ptr
+            }
+
+            auto fn = evaluate(*expr.caller, env);
+
+            if (fn.type != RuntimeVal::Type::Native_FnValue)
+            {
+                std::cerr << "Can not call value that is not a Native Function: "
+                    << fn.toString() << std::endl;
+                assert(false);
+            }
+
+            auto result = fn.call(evaluatedArgs, env);
+            return result;
         }
 
 		// Function to evaluate a Variable Declaration
@@ -182,6 +200,22 @@ namespace fling
                 auto& objNode = static_cast<const ast::ObjectLiteral&>(astNode);
                 return evaluate_object_expr(objNode, env);
 			}
+
+            // // Member Expression
+            // case ast::NodeType::MemberExpr:
+            // {
+            //     auto& memExpr = static_cast<const ast::MemberExpr&>(astNode);
+
+            //     auto objVal = evaluate(*memExpr.object, env);
+
+            //     if (memExpr.computed) {
+            //         auto propVal = evaluate(*memExpr.property, env);
+            //         return objVal.properties[propVal.toString()];
+            //     } else {
+            //         auto propIdent = static_cast<ast::Identifier*>(memExpr.property.get());
+            //         return objVal.properties[propIdent->symbol];
+            //     }
+            // }
 
             // Call Expression
             case ast::NodeType::CallExpr:

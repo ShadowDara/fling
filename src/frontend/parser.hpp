@@ -109,10 +109,10 @@ namespace fling
                 std::unique_ptr<fling::ast::Expr> caller);
 
 			// Function to parse arguments for a Call Expression
-			std::vector<fling::ast::Expr> parse_agrs();
+			std::vector<std::unique_ptr<fling::ast::Expr>> parse_agrs();
 
             // Function to parse the Argument List
-            std::vector<fling::ast::Expr> parse_argument_list();
+            std::vector<std::unique_ptr<fling::ast::Expr>> parse_argument_list();
 
 			// Function to parse a Member Expression
 			std::unique_ptr<fling::ast::Expr> parse_member_expr();
