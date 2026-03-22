@@ -61,6 +61,11 @@ namespace fling
 		fling::runtime::RuntimeVal evaluate_object_expr(
 			const ast::ObjectLiteral& node,
 			fling::runtime::envirment::Environment& env);
+		
+		// Function to evaluate a Call Expression
+		fling::runtime::RuntimeVal evaluate_call_expr(
+            const ast::CallExpr& expr,
+            fling::runtime::envirment::Environment& env);
 
 		// Function to evaluate a Variable Declaration
 		fling::runtime::RuntimeVal evaluate_var_declaration(

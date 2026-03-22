@@ -12,7 +12,7 @@ void envirment::setupStandardEnvironment(Environment& env)
     env.declareVar("null", RuntimeVal::Null(), true);
 
     // Define a Native Build in Function
-    //env.declareVar("print", RuntimeVal::NativeFN(nullptr), true);
+    env.declareVar("print", RuntimeVal::NativeFN(nullptr), true);
 }
 
 // Function to declare a New Variable

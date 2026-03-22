@@ -12,4 +12,4 @@ const obj = {
 print
 println(obj.foo)
 let f = object.complex.bar;
-foo = obj.foo() + 5;
+foo = obj.foo() + 5

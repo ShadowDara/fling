@@ -11,7 +11,7 @@ namespace fling
     namespace runtime
     {
         // Function to evaluate a Program
-        fling::runtime::RuntimeVal fling::runtime::evaluate_program(
+        fling::runtime::RuntimeVal evaluate_program(
             const fling::ast::Program& program,
             runtime::envirment::Environment& env)
         {
@@ -136,6 +136,14 @@ namespace fling
             return objectValue;
         }
 
+        runtime::RuntimeVal evaluate_call_expr(
+            const ast::CallExpr& expr,
+            runtime::envirment::Environment& env)
+        {
+            
+            return RuntimeVal::Null();
+        }
+
 		// Function to evaluate a Variable Declaration
         runtime::RuntimeVal evaluate_var_declaration(
             const ast::VarDeclaration& varDecl,
@@ -173,6 +181,13 @@ namespace fling
             {
                 auto& objNode = static_cast<const ast::ObjectLiteral&>(astNode);
                 return evaluate_object_expr(objNode, env);
+			}
+
+            // Call Expression
+            case ast::NodeType::CallExpr:
+            {
+                auto& objNode = static_cast<const ast::CallExpr&>(astNode);
+                return evaluate_call_expr(objNode, env);
 			}
 
 			// Assignment Expression

@@ -11,6 +11,17 @@ if (POLICY CMP0141)
   set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
 
+# Options for MSVC to use UTF-8 encoding for source files
+if (MSVC)
+  add_compile_options(/utf-8)		# add UTF-8
+  add_compile_options(/arch:AVX2)	# make sure SIMD optimizations take place
+  add_compile_options(/Gy)   # function-level linking
+  add_link_options(/OPT:REF) # remove unused functions
+endif()
+
+# Link Time Optimization (LTO) aktivieren für Release-Builds
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
+
 project ("fling-lang")
 
 # add my Corelib
@@ -20,7 +31,6 @@ add_subdirectory(thirdparty/dcorelib)
 add_executable (
     fling-lang 
     "main.cpp"
-
     
     "src/frontend/ast.hpp"
 

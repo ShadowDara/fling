@@ -12,4 +12,6 @@
 #include "../../util.hpp"
 
 
+namespace fling::runtime::eval {}
+
 #endif // STATEMENTS_HPP
