@@ -14,14 +14,27 @@ void envirment::setupStandardEnvironment(Environment& env)
     // Define a Native Build in Function
     env.declareVar(
         "print",
-        RuntimeVal::NativeFN([](std::vector<RuntimeVal> agrs, fling::runtime::envirment::Environment& scope) -> RuntimeVal {
-            // Ausgabe aller Argumente
-            for (const auto& arg : agrs) {
-                std::cout << arg.toString() << " ";
+        RuntimeVal::NativeFN([](std::vector<RuntimeVal> args, fling::runtime::envirment::Environment&) -> RuntimeVal {
+            for (const auto& arg : args) {
+                switch (arg.type) {
+                    case RuntimeVal::Type::Number:
+                        std::cout << arg.number << " ";
+                        break;
+                    case RuntimeVal::Type::Boolean:
+                        std::cout << (arg.bvalue ? "true" : "false") << " ";
+                        break;
+                    case RuntimeVal::Type::Null:
+                        std::cout << "null ";
+                        break;
+                    case RuntimeVal::Type::Object:
+                        std::cout << "<object> ";
+                        break;
+                    default:
+                        std::cout << "<unknown> ";
+                        break;
+                }
             }
             std::cout << std::endl;
-
-            // Rückgabe von null
             return RuntimeVal::Null();
         }),
         true
