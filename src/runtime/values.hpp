@@ -8,6 +8,14 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
+#include <functional>
+
+#include "envirments.hpp"
+
+
+namespace fling::runtime::envirment {
+    class Environment;
+}
 
 
 namespace fling::runtime
@@ -70,13 +78,15 @@ namespace fling::runtime
             Null,
             Number,
             Boolean,
-            Object
+            Object,
+            Native_FnValue
         };
 
         Type type;
         float number = 0;
         bool bvalue = false;
         std::unordered_map<std::string, RuntimeVal> properties;
+        std::function <RuntimeVal(std::vector<RuntimeVal>, Environment)> call;
 
         // to make a Number Value
         static RuntimeVal Null()
@@ -104,6 +114,14 @@ namespace fling::runtime
             return val;
         }
 
+        // Make a Native Function
+        static RuntimeVal NativeFN(
+            std::function <RuntimeVal(std::vector<RuntimeVal>, Environment)> call)
+        {
+            auto val = RuntimeVal(call);
+            return val;
+        }
+
         // Null Konstruktor
         RuntimeVal() : type(Type::Null) {}
 
@@ -117,6 +135,11 @@ namespace fling::runtime
         // Object Construktor
         RuntimeVal(std::unordered_map<std::string,
             RuntimeVal> p) : type(Type::Object), properties(p) {};
+
+        // Native Function Construktor
+        RuntimeVal(
+            std::function <RuntimeVal(std::vector<RuntimeVal>, Environment)> c)
+            : type(Type::Native_FnValue), call(c) {};
 
         // Convert to String
         std::string toString() const

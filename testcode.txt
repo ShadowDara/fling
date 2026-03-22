@@ -9,5 +9,7 @@ const obj = {
   },
 };
 
+print
+println(obj.foo)
 let f = object.complex.bar;
-foo = 4
+foo = obj.foo() + 5;
