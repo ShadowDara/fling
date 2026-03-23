@@ -22,11 +22,6 @@ namespace fling
 {
 	namespace runtime
 	{
-		// Function to evaluate a Program Node
-		fling::runtime::RuntimeVal evaluate_program(
-			const ast::Program& program,
-            fling::runtime::envirment::Environment& env);
-		
 		// WHY DOES THIS FUNCTION EXISTS WTF???
 		//
 		// inline RuntimeVal evaluate(
@@ -67,11 +62,6 @@ namespace fling
 		fling::runtime::RuntimeVal evaluate_call_expr(
             const ast::CallExpr& expr,
             fling::runtime::envirment::Environment& env);
-
-		// Function to evaluate a Variable Declaration
-		fling::runtime::RuntimeVal evaluate_var_declaration(
-			const ast::VarDeclaration& varDecl,
-			runtime::envirment::Environment& env);
 
 		// Function to evaluate source Code
 		fling::runtime::RuntimeVal evaluate(

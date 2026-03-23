@@ -12,6 +12,16 @@
 #include "../../util.hpp"
 
 
-namespace fling::runtime::eval {}
+namespace fling::runtime::eval {
+    // Function to evaluate a Program Node
+	fling::runtime::RuntimeVal evaluate_program(
+		const ast::Program& program,
+        fling::runtime::envirment::Environment& env);
 
-#endif // STATEMENTS_HPP
+    // Function to evaluate a Variable Declaration
+	fling::runtime::RuntimeVal evaluate_var_declaration(
+		const ast::VarDeclaration& varDecl,
+		runtime::envirment::Environment& env);
+}
+
+#endif // STATEMENTS_H

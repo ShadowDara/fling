@@ -12,24 +12,6 @@ namespace fling
 {
     namespace runtime
     {
-        // Function to evaluate a Program
-        fling::runtime::RuntimeVal evaluate_program(
-            const fling::ast::Program& program,
-            runtime::envirment::Environment& env)
-        {
-            // Store the last evaluated value, null as Default
-            runtime::RuntimeVal last = runtime::RuntimeVal();
-            // loop through all statements in the program body
-            for (const auto& stmt : program.body)
-            {
-                // STMT Deferenzieren to convert it to stmt&
-                last = evaluate(*stmt, env);
-            }
-
-            // Return the last evaluated value
-            return last;
-        }
-
         // Function to Evaluate / Calculate the 2 Numbers
         runtime::RuntimeVal evaluate_numeric_binary_expr(
             runtime::RuntimeVal lhs,
@@ -160,16 +142,6 @@ namespace fling
 
             auto result = fn.call(evaluatedArgs, env);
             return result;
-        }
-
-		// Function to evaluate a Variable Declaration
-        runtime::RuntimeVal evaluate_var_declaration(
-            const ast::VarDeclaration& varDecl,
-            runtime::envirment::Environment& env)
-        { 
-            // Use a Reference instead of a smart pointer
-            auto value = varDecl.value ? evaluate(*varDecl.value, env) : runtime::RuntimeVal();
-			return env.declareVar(varDecl.identifier, value, varDecl.constant);
         }
 
         // Function to evaluate Source Code
