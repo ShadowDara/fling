@@ -146,26 +146,30 @@ namespace fling::runtime
 
             switch (type)
             {
-                case Type::Null: {
+                case Type::Null:
+                {
                     return_msg += "\"null\"";
                     return_msg += ", value: null";
                     break;
                 }
 
-                case Type::Number: {
+                case Type::Number:
+                {
                     return_msg += "\"number\"";
                     return_msg += ", value: " + std::to_string(number);
                     break;
                 }
 
-                case Type::Boolean: {
+                case Type::Boolean:
+                {
                     return_msg += "\"boolean\"";
                     return_msg += ", value: ";
                     return_msg += (bvalue ? "true" : "false");
                     break;
                 }
 
-                case Type::Object: {
+                case Type::Object:
+                {
                     return_msg += "\"object\"";
                     return_msg += ", properties: { ";
 
@@ -181,10 +185,17 @@ namespace fling::runtime
                     break;
                 }
 
-                case Type::Native_FnValue: {
+                case Type::Native_FnValue:
+                {
                     return_msg += "\"native-fn\"";
                     return_msg += ", value: <function>";
                     break;
+                }
+
+                default:
+                {
+                    return_msg += "\"unknown\"";
+                    return_msg += ", value: ?";
                 }
             }
 

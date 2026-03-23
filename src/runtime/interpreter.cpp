@@ -201,30 +201,30 @@ namespace fling
                 return evaluate_object_expr(objNode, env);
 			}
 
-            // Member Expression
-            case ast::NodeType::MemberExpr:
-            {
-                auto& memExpr = static_cast<const ast::MemberExpr&>(astNode);
-                auto objVal = evaluate(*memExpr.object, env);
+            //// Member Expression
+            //case ast::NodeType::MemberExpr:
+            //{
+            //    auto& memExpr = static_cast<const ast::MemberExpr&>(astNode);
+            //    auto objVal = evaluate(*memExpr.object, env);
 
-                if (memExpr.computed) {
-                    if (memExpr.property) {
-                        auto propVal = evaluate(*memExpr.property, env);
-                        return objVal.properties[propVal.toString()];
-                    } else {
-                        // fallback, nichts zu berechnen
-                        return RuntimeVal::Null();
-                    }
-                } else {
-                    if (memExpr.property) {
-                        auto propIdent = static_cast<ast::Identifier*>(memExpr.property.get());
-                        return objVal.properties[propIdent->symbol];
-                    } else {
-                        // property ist nullptr → Objekt selbst zurückgeben
-                        return objVal;
-                    }
-                }
-            }
+            //    if (memExpr.computed) {
+            //        if (memExpr.property) {
+            //            auto propVal = evaluate(*memExpr.property, env);
+            //            return objVal.properties[propVal.toString()];
+            //        } else {
+            //            // fallback, nichts zu berechnen
+            //            return RuntimeVal::Null();
+            //        }
+            //    } else {
+            //        if (memExpr.property) {
+            //            auto propIdent = static_cast<ast::Identifier*>(memExpr.property.get());
+            //            return objVal.properties[propIdent->symbol];
+            //        } else {
+            //            // property ist nullptr → Objekt selbst zurückgeben
+            //            return objVal;
+            //        }
+            //    }
+            //}
 
             // Call Expression
             case ast::NodeType::CallExpr:

@@ -74,7 +74,7 @@ void runFile(const std::string& filename)
     auto env = std::make_unique<Environment>(nullptr);
 
     Program program = parser.produceAST(content);
-	std::cout << "Print Program: " << program.toString() << "\n";
+	//std::cout << "Print Program: " << program.toString() << "\n";
 
     auto result = evaluate(program, *env);
     std::cout << result.toString() << "\n";
@@ -133,7 +133,7 @@ int main()
     std::cout << "\nAll tests passed!\n"
               << std::endl;
 
-    // runFile("../../../testcode.txt");#
+    runFile("../../../testcode.txt");
     runFile("testcode.txt");
 
 	//runREPL();
