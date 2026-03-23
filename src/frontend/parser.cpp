@@ -367,19 +367,19 @@ namespace fling
         // Function to parse a Member Expression
         std::unique_ptr<fling::ast::Expr> Parser::parse_member_expr()
         {
-			auto object = parse_primary_expr();
-            auto property = std::make_unique<ast::Expr>(ast::NodeType::Property);
-            bool computed;
+            auto object = parse_primary_expr();
 
             while (at().type == lexer::TokenType::Dot
                 || at().type == lexer::TokenType::OpenSquaredBrace)
             {
-				auto theoperator = eat();
-
-                // non-computed Properties 
+                auto theoperator = eat();
+                auto property = std::make_unique<ast::Expr>(ast::NodeType::Property);
+                bool computed = false;
+                
                 if (theoperator.type == lexer::TokenType::Dot)
                 {
                     computed = false;
+                    // get identifier after dot
                     property = std::move(parse_primary_expr());
 
                     if ((*property).kind != ast::NodeType::Identifier)
@@ -398,10 +398,11 @@ namespace fling
                     expect(lexer::TokenType::CloseSquaredBrace,
                         "Missing closing Squared Brace in computed value");
                 }
+
+                object = std::make_unique<ast::MemberExpr>(std::move(object), std::move(property), computed);
             }
 
-            auto object2 = std::make_unique<ast::MemberExpr>(std::move(object), std::move(property), computed);
-            return object2;  // Rückgabe nicht vergessen!
+            return object;  // Rückgabe nicht vergessen!
         }
 
         // Function to parse a float Value

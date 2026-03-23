@@ -1,11 +1,13 @@
 #pragma once
 
-#define STATEMENTS_H
 #ifndef STATEMENTS_H
+#define STATEMENTS_H
 
 #include <memory>
 
 #include "dcorelib/dcorelib.h"
+
+#include "../interpreter.hpp"
 #include "../values.hpp"
 #include "../envirments.hpp"
 #include "../../frontend/ast.hpp"

@@ -1,2 +1,3 @@
-print(45)
+print(45) 
 print(true)
+print(66, 420, 13)

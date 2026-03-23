@@ -1,5 +1,8 @@
 #include "statements.hpp"
 
+using namespace fling;
+using namespace fling::runtime;
+
 
 // Function to evaluate a Program
 fling::runtime::RuntimeVal fling::runtime::eval::evaluate_program(
@@ -7,7 +10,7 @@ fling::runtime::RuntimeVal fling::runtime::eval::evaluate_program(
     runtime::envirment::Environment &env)
 {
     // Store the last evaluated value, null as Default
-    runtime::RuntimeVal last = runtime::RuntimeVal();
+    runtime::RuntimeVal last = runtime::RuntimeVal::Null();
     // loop through all statements in the program body
     for (const auto &stmt : program.body)
     {
