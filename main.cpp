@@ -28,7 +28,8 @@ void assertToken(const lexer::Token &token,
     if (token.type != expectedType || token.value != expectedValue)
     {
         std::cerr << "Token mismatch: got " << token.value 
-            << ", expected " << expectedValue << std::endl; // edwina war hier und ist nicht geil 
+            << ", expected " << expectedValue << std::endl;
+        // edwina war hier und ist nicht geil 
         std::exit(1);
     }
 }
@@ -78,7 +79,7 @@ void runFile(const std::string& filename)
 	//std::cout << "Print Program: " << program.toString() << "\n";
 
     auto result = evaluate(program, *env);
-    std::cout << result.toString() << "\n";
+    //std::cout << result.toString() << "\n";
 }
 
 
