@@ -1,3 +1,10 @@
 print(45) 
 print(true)
 print(66, 420, 13)
+
+fn add(x, y) {
+	let result = x + y;
+	print(result)
+
+	return result
+}

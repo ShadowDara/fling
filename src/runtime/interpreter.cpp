@@ -102,8 +102,16 @@ namespace fling
             case ast::NodeType::VarDeclaration:
             {
                 auto& declNode = static_cast<const ast::VarDeclaration&>(astNode);
-                auto value = declNode.value ? evaluate(*declNode.value, env) : RuntimeVal();
-                return env.declareVar(declNode.identifier, value, declNode.constant);
+                //auto value = declNode.value ? evaluate(*declNode.value, env) : RuntimeVal();
+                //return env.declareVar(declNode.identifier, value, declNode.constant);
+                return eval::evaluate_var_declaration(declNode, env);
+            }
+
+            // Handle Function Declaration
+            case ast::NodeType::FunctionDeckaration:
+            {
+                auto& declNode = static_cast<const ast::FunctionDeclaration&>(astNode);
+                return eval::evaluate_fn_declaration(declNode, env);
             }
 
             // Error Fallback

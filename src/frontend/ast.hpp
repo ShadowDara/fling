@@ -40,6 +40,7 @@ namespace fling
             // STATEMENTS
             Program,
             VarDeclaration,
+            FunctionDeckaration,
 
             // EXPRESSIONS
             AssignmentExpr,
@@ -163,6 +164,35 @@ namespace fling
                     out += indentStr(indent + 2) + "Value:\n";
                     out += value->toString(indent + 4);
                 }
+
+                return out;
+            }
+        };
+
+
+        // Function Declaration
+        struct FunctionDeclaration : Stmt
+        {
+            std::vector<std::string> parameters;
+            std::string name;
+            std::vector<std::unique_ptr<ast::Stmt>> body;
+
+            FunctionDeclaration(std::string n, std::vector<std::unique_ptr<ast::Stmt>> b,
+                std::vector<std::string> p) : Stmt(NodeType::FunctionDeckaration),
+                name(n), body(std::move(b)), parameters(p) {}
+
+            std::string toString(int indent = 0) const override
+            {
+                /*std::string out = indentStr(indent) + "VarDeclaration:\n";
+                out += indentStr(indent + 2) + "Identifier: " + identifier + "\n";
+                out += indentStr(indent + 2) + "Constant: " + std::string(constant ? "true" : "false") + "\n";
+
+                if (value)
+                {
+                    out += indentStr(indent + 2) + "Value:\n";
+                    out += value->toString(indent + 4);
+                }*/
+                std::string out = "Function to string has not been set up :(";
 
                 return out;
             }

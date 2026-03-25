@@ -33,6 +33,7 @@ namespace fling
             // Keywords
             Let,
             Const,
+            Fn,
 
             Semicolon,
             Equals,

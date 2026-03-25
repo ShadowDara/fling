@@ -107,6 +107,10 @@ namespace fling
             {
                 "const",
                 TokenType::Const
+            },
+            {
+                "fn",
+                TokenType::Fn
             }
         };
 

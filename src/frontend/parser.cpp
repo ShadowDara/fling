@@ -76,26 +76,77 @@ namespace fling
         {
             switch (this->at().type)
             {
-            // Let
-            case (lexer::TokenType::Let):
+                // Let
+                case (lexer::TokenType::Let):
+                {
+                    return parse_var_declaration();
+                }
+
+                // Const
+                case (lexer::TokenType::Const):
+                {
+                    return parse_var_declaration();
+                }
+
+                // Function
+                case (lexer::TokenType::Fn):
+                {
+                    return parse_fn_declaration();
+                }
+
+                // Default
+                default:
+                {
+                    // For now, we only parse expressions (identifiers / literals)
+                    // and wrap them as statements.
+                    return parse_expr();
+                }
+            }
+        }
+
+        // Function to parse a Function Declaration
+        std::unique_ptr<fling::ast::Stmt> Parser::parse_fn_declaration()
+        {
+            this->eat(); // eat the fn keyword
+            auto name = this->expect(lexer::TokenType::Identifier,
+                "Expected Function name following fn keyword").value;
+
+            auto args = this->parse_agrs();
+            std::vector<std::string> params;
+            for (const auto& arg : args)
             {
-                return parse_var_declaration();
+                if (arg->kind != ast::NodeType::Identifier)
+                {
+                    std::cout << arg << "\n";
+                    std::cerr
+                        << "Inside function declaration expected parameters to be of type string."
+                        << std::endl;
+                    return nullptr;
+                }
+
+                auto* ident = static_cast<ast::Identifier*>(arg.get());
+                params.push_back(ident->symbol);
             }
 
-            // Const
-            case (lexer::TokenType::Const):
+            this->expect(lexer::TokenType::OpenCurlyBrace,
+                "Expected function body following declaration");
+
+            std::vector<std::unique_ptr<ast::Stmt>> body = std::vector<std::unique_ptr<ast::Stmt>>();
+            while (this->at().type != lexer::TokenType::Eof &&
+                this->at().type != lexer::TokenType::CloseCurlyBrace)
             {
-                return parse_var_declaration();
+                body.push_back(std::move(this->parse_stmt()));
             }
 
-            // Default
-            default:
-            {
-                // For now, we only parse expressions (identifiers / literals)
-                // and wrap them as statements.
-                return parse_expr();
-            }
-            }
+            // End of function Body
+            this->expect(lexer::TokenType::CloseCurlyBrace,
+                "Cloaing Brace expected inside function declaration");
+
+            auto fn = ast::FunctionDeclaration(name, std::move(body), params);
+            std::unique_ptr<ast::FunctionDeclaration> fnr =
+                std::make_unique<ast::FunctionDeclaration>(std::move(fn));
+
+            return fnr;
         }
 
         // Function to declare a new Variable

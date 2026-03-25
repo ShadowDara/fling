@@ -24,6 +24,11 @@ namespace fling::runtime::eval {
 	fling::runtime::RuntimeVal evaluate_var_declaration(
 		const ast::VarDeclaration& varDecl,
 		runtime::envirment::Environment& env);
+
+	// Function to evalua a Function Declaration
+	fling::runtime::RuntimeVal evaluate_fn_declaration(
+		const ast::FunctionDeclaration& fnDecl,
+		runtime::envirment::Environment& env);
 }
 
 #endif // STATEMENTS_H

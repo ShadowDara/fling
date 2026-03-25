@@ -32,3 +32,12 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_var_declaration(
     auto value = varDecl.value ? evaluate(*varDecl.value, env) : runtime::RuntimeVal();
     return env.declareVar(varDecl.identifier, value, varDecl.constant);
 }
+
+
+// Function to evalua a Function Declaration
+runtime::RuntimeVal fling::runtime::eval::evaluate_fn_declaration(
+    const ast::FunctionDeclaration& fnDecl,
+    runtime::envirment::Environment& env)
+{
+    return RuntimeVal::Null();
+}
