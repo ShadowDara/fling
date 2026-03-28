@@ -100,7 +100,7 @@ namespace fling::runtime
         // for Function Type
         std::string name;
         std::vector<std::string> parameters;
-        envirment::Environment& declaration;
+        envirment::Environment* declaration = nullptr;
         std::vector<std::unique_ptr<ast::Stmt>> body;
 
         // to make a Number Value
@@ -138,10 +138,19 @@ namespace fling::runtime
         }
 
         // Make a Function Value
-        /*static RuntimeVal Function()
-        {
-
-        }*/
+        static RuntimeVal Function(
+            std::string name,
+            std::vector<std::string> params,
+            envirment::Environment* decl,
+            std::vector<std::unique_ptr<ast::Stmt>> body
+        ) {
+            return RuntimeVal(
+                std::move(name),
+                std::move(params),
+                decl,
+                std::move(body)
+            );
+        }
 
         // Null Konstruktor
         RuntimeVal() : type(Type::Null) {}
@@ -162,10 +171,19 @@ namespace fling::runtime
             std::function <RuntimeVal(std::vector<RuntimeVal>, envirment::Environment&)> c)
             : type(Type::Native_FnValue), call(c) {};
 
-        //// Function Construktor
-        //RuntimeVal(
-        //    
-        //)
+        // Function Construktor
+        RuntimeVal(
+            std::string name,
+            std::vector<std::string> params,
+            envirment::Environment* decl,
+            std::vector<std::unique_ptr<ast::Stmt>> body
+        )
+            : type(Type::FnValue),
+            name(std::move(name)),
+            parameters(std::move(params)),
+            declaration(decl),
+            body(std::move(body)) {
+        }
 
         // Convert to String
         std::string toString() const
