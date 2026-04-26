@@ -48,6 +48,7 @@ namespace fling
             // Literals
             Property,
             ObjectLiteral,
+            ArrayLiteral,
             NumericLiteral,
             Identifier,
             BinaryExpr,
@@ -531,6 +532,47 @@ namespace fling
                                        static_cast<Expr *>(value->clone().release()))
                                  : nullptr;
                 return p;
+            }
+        };
+
+        // Array literal
+        struct ArrayLiteral : Expr
+        {
+            std::vector<std::unique_ptr<Expr>> elements;
+
+            std::string toString(int indent = 0) const override
+            {
+                std::string out = "[\n";
+
+                for (size_t i = 0; i < elements.size(); ++i)
+                {
+                    out += indentStr(indent + 2);
+                    out += elements[i]->toString(indent + 2);
+                    if (i < elements.size() - 1)
+                        out += ",";
+                    out += "\n";
+                }
+
+                out += indentStr(indent) + "]";
+                return out;
+            }
+
+            // Konstruktor
+            ArrayLiteral() : Expr(NodeType::ArrayLiteral) {}
+
+            // Clone Function
+            std::unique_ptr<Stmt> clone() const override
+            {
+                auto arr = std::make_unique<ArrayLiteral>();
+
+                for (const auto &element : elements)
+                {
+                    arr->elements.push_back(
+                        std::unique_ptr<Expr>(
+                            static_cast<Expr *>(element->clone().release())));
+                }
+
+                return arr;
             }
         };
 

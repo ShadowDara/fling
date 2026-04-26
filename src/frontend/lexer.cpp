@@ -172,7 +172,7 @@ namespace fling
 
                 // Opening Squared Brace
                 case '[':
-                    tokens.push_back(token("[", TokenType::CloseSquaredBrace, line, column));
+                    tokens.push_back(token("[", TokenType::OpenSquaredBrace, line, column));
                     i++;
                     break;
 

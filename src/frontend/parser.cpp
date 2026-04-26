@@ -496,6 +496,32 @@ namespace fling
                 return id;
             }
 
+            // Array Literal
+            case fling::lexer::TokenType::OpenSquaredBrace:
+            {
+                this->eat();
+                auto arr = std::make_unique<fling::ast::ArrayLiteral>();
+
+                while (this->at().type != lexer::TokenType::CloseSquaredBrace)
+                {
+                    arr->elements.push_back(std::move(parse_expr()));
+
+                    if (this->at().type == lexer::TokenType::Comma)
+                    {
+                        this->eat();
+                        continue;
+                    }
+
+                    break;
+                }
+
+                this->expect(
+                    fling::lexer::TokenType::CloseSquaredBrace,
+                    "Expected closing square brace after array literal");
+
+                return arr;
+            }
+
             // Opening Parenthesis Type
             case fling::lexer::TokenType::OpenParen:
             {

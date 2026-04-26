@@ -79,6 +79,7 @@ namespace fling::runtime
             Number,
             Boolean,
             Object,
+            Array,
             Native_FnValue,
             FnValue
         };
@@ -93,6 +94,9 @@ namespace fling::runtime
         
         // Object Type
         std::unordered_map<std::string, std::unique_ptr<RuntimeVal>> properties;
+
+        // Array Type
+        std::vector<RuntimeVal> elements;
         
         // Native Function Type
         std::function <RuntimeVal(const std::vector<RuntimeVal>&, envirment::Environment&)> call;
@@ -121,12 +125,18 @@ namespace fling::runtime
             return RuntimeVal(static_cast<bool>(b));
         }
 
-		// Make an Object Value
+        // Make an Object Value
         static RuntimeVal Object()
         {
             std::unordered_map<std::string, std::unique_ptr<RuntimeVal>> properties;
             auto val = RuntimeVal(std::move(properties));
             return val;
+        }
+
+        // Make an Array Value
+        static RuntimeVal Array(std::vector<RuntimeVal> elements)
+        {
+            return RuntimeVal(std::move(elements));
         }
 
         // Make a Native Function
@@ -165,6 +175,11 @@ namespace fling::runtime
         // Object Construktor
         RuntimeVal(std::unordered_map<std::string,
             std::unique_ptr<RuntimeVal>> p) : type(Type::Object), properties(std::move(p)) {};
+
+        // Array Constructor
+        RuntimeVal(std::vector<RuntimeVal> elems)
+            : type(Type::Array),
+              elements(std::move(elems)) {}
 
         // Native Function Construktor
         RuntimeVal(
@@ -231,6 +246,21 @@ namespace fling::runtime
                     break;
                 }
 
+                case Type::Array:
+                {
+                    return_msg += "\"array\"";
+                    return_msg += ", values: [";
+
+                    for (size_t i = 0; i < elements.size(); ++i)
+                    {
+                        if (i > 0) return_msg += ", ";
+                        return_msg += elements[i].toString();
+                    }
+
+                    return_msg += "]";
+                    break;
+                }
+
                 case Type::Native_FnValue:
                 {
                     return_msg += "\"native-fn\"";
@@ -276,6 +306,8 @@ namespace fling::runtime
                     body.push_back(stmt->clone());
                 }
             }
+
+            elements = other.elements;
         }
 
         RuntimeVal& operator=(const RuntimeVal& other)
@@ -312,6 +344,8 @@ namespace fling::runtime
                     body.push_back(stmt->clone());
                 }
             }
+
+            elements = other.elements;
 
             return *this;
         }

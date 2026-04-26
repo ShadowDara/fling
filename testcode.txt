@@ -42,3 +42,6 @@ foo = obj.foo + 5
 
 print(f)
 print(foo)
+
+let arr = [1, 2, 3];
+print(arr)
