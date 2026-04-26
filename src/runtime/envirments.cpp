@@ -20,6 +20,9 @@ void envirment::setupStandardEnvironment(Environment& env)
                     case RuntimeVal::Type::Number:
                         std::cout << arg.number << " ";
                         break;
+                    case RuntimeVal::Type::String:
+                        std::cout << arg.str << " ";
+                        break;
                     case RuntimeVal::Type::Boolean:
                         std::cout << (arg.bvalue ? "true" : "false") << " ";
                         break;

@@ -247,6 +247,26 @@ namespace fling
                     i++;
                     break;
 
+                // String Literal
+                case '"':
+                {
+                    std::string str = "";
+                    i++; // Skip opening quote
+                    while (i < src.size() && src[i] != '"')
+                    {
+                        str += src[i];
+                        i++;
+                        column++;
+                    }
+                    if (i < src.size())
+                    {
+                        i++; // Skip closing quote
+                        column++;
+                    }
+                    tokens.push_back(token(str, TokenType::String, line, column));
+                    break;
+                }
+
                 default:
                     // Zahl aufbauen
                     if (isInt(current))

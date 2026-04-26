@@ -45,3 +45,8 @@ print(foo)
 
 let arr = [1, 2, 3];
 print(arr[0])
+
+let hallo = "Hallo";
+print(hallo)
+
+print(8)

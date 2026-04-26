@@ -28,6 +28,7 @@ namespace fling
         {
             // Literal Types
             Number,
+            String,
             Identifier,
 
             // Keywords

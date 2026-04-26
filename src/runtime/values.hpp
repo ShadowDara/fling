@@ -77,6 +77,7 @@ namespace fling::runtime
         enum class Type {
             Null,
             Number,
+            String,
             Boolean,
             Object,
             Array,
@@ -88,6 +89,9 @@ namespace fling::runtime
 
         // Number Type
         float number = 0;
+
+        // String Type
+        std::string str = "";
         
         // Boolean Type
         bool bvalue = false;
@@ -117,6 +121,15 @@ namespace fling::runtime
         static RuntimeVal Number(float n)
         {
             return RuntimeVal(static_cast<float>(n));
+        }
+
+        // to Make a String Value
+        static RuntimeVal String(const std::string& s)
+        {
+            RuntimeVal val;
+            val.type = Type::String;
+            val.str = s;
+            return val;
         }
 
         // to Make a Boolean Value
@@ -221,6 +234,13 @@ namespace fling::runtime
                     break;
                 }
 
+                case Type::String:
+                {
+                    return_msg += "\"string\"";
+                    return_msg += ", value: \"" + str + "\"";
+                    break;
+                }
+
                 case Type::Boolean:
                 {
                     return_msg += "\"boolean\"";
@@ -283,6 +303,7 @@ namespace fling::runtime
         RuntimeVal(const RuntimeVal& other)
             : type(other.type),
               number(other.number),
+              str(other.str),
               bvalue(other.bvalue),
               call(other.call),
               name(other.name),
@@ -319,6 +340,7 @@ namespace fling::runtime
 
             type = other.type;
             number = other.number;
+            str = other.str;
             bvalue = other.bvalue;
             call = other.call;
             name = other.name;

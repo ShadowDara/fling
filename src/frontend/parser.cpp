@@ -496,6 +496,13 @@ namespace fling
                 return id;
             }
 
+            // String Type
+            case fling::lexer::TokenType::String:
+            {
+                auto str = std::make_unique<fling::ast::StringLiteral>(this->eat().value);
+                return str;
+            }
+
             // Array Literal
             case fling::lexer::TokenType::OpenSquaredBrace:
             {

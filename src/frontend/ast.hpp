@@ -49,6 +49,7 @@ namespace fling
             Property,
             ObjectLiteral,
             ArrayLiteral,
+            StringLiteral,
             NumericLiteral,
             Identifier,
             BinaryExpr,
@@ -573,6 +574,26 @@ namespace fling
                 }
 
                 return arr;
+            }
+        };
+
+        // String literal
+        struct StringLiteral : Expr
+        {
+            std::string value;
+
+            std::string toString(int indent = 0) const override
+            {
+                return "\"" + value + "\"";
+            }
+
+            // Konstruktor
+            StringLiteral(std::string val) : Expr(NodeType::StringLiteral), value(std::move(val)) {}
+
+            // Clone Function
+            std::unique_ptr<Stmt> clone() const override
+            {
+                return std::make_unique<StringLiteral>(value);
             }
         };
 
