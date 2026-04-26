@@ -14,8 +14,8 @@
 
 namespace fling::runtime::eval {
     fling::runtime::RuntimeVal evaluate_numeric_binary_expr(
-		fling::runtime::RuntimeVal lhs,
-		fling::runtime::RuntimeVal rhs,
+		const fling::runtime::RuntimeVal &lhs,
+		const fling::runtime::RuntimeVal &rhs,
 		std::string callculation_operator,
 		fling::runtime::envirment::Environment& env
 	);

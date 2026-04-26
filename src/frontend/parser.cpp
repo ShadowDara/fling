@@ -117,7 +117,7 @@ namespace fling
             {
                 if (arg->kind != ast::NodeType::Identifier)
                 {
-                    std::cout << arg << "\n";
+                    std::cout << arg->toString() << "\n";
                     std::cerr
                         << "Inside function declaration expected parameters to be of type string."
                         << std::endl;

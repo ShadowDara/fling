@@ -6,8 +6,8 @@ using namespace fling::util;
 
 // Function to Evaluate / Calculate the 2 Numbers
 runtime::RuntimeVal fling::runtime::eval::evaluate_numeric_binary_expr(
-    runtime::RuntimeVal lhs,
-    runtime::RuntimeVal rhs,
+    const RuntimeVal& lhs,
+    const RuntimeVal& rhs,
     std::string callculation_operator,
     runtime::envirment::Environment &env)
 {
@@ -105,7 +105,7 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_object_expr(
         auto key = prop->key;
         auto value = prop->value ? evaluate(*prop->value, env) : env.lookupVar(key);
 
-        objectValue.properties[key] = std::make_shared(value);
+        objectValue.properties[key] = std::make_unique<RuntimeVal>(std::move(value));
     }
 
     return objectValue;

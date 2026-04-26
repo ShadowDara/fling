@@ -24,7 +24,7 @@ namespace fling
         /**
          * @brief Enum for TokenTypes
          */
-        enum TokenType
+        enum class TokenType
         {
             // Literal Types
             Number,
@@ -136,7 +136,7 @@ namespace fling
          * @param TokenType
          * @return A Token with both values
          */
-        Token token(const std::string& value, TokenType type, int line, int colum);
+        Token token(const std::string& value, TokenType type, int line, int column);
 
         /**
          * Tokenize Function which tokenises the source Code to an Array of Tokens

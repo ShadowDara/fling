@@ -92,7 +92,7 @@ namespace fling::runtime
         bool bvalue = false;
         
         // Object Type
-        std::unordered_map<std::string, std::shared_ptr<RuntimeVal>> properties;
+        std::unordered_map<std::string, std::unique_ptr<RuntimeVal>> properties;
         
         // Native Function Type
         std::function <RuntimeVal(std::vector<RuntimeVal>, envirment::Environment&)> call;
@@ -101,7 +101,7 @@ namespace fling::runtime
         std::string name;
         std::vector<std::string> parameters;
         envirment::Environment* declaration = nullptr;
-        std::vector<std::shared_ptr<ast::Stmt>> body;
+        std::vector<std::unique_ptr<ast::Stmt>> body;
 
         // to make a Number Value
         static RuntimeVal Null()
@@ -124,8 +124,8 @@ namespace fling::runtime
 		// Make an Object Value
         static RuntimeVal Object()
         {
-            std::unordered_map<std::string, std::shared_ptr<RuntimeVal>> properties;
-            auto val = RuntimeVal(properties);
+            std::unordered_map<std::string, std::unique_ptr<RuntimeVal>> properties;
+            auto val = RuntimeVal(std::move(properties));
             return val;
         }
 
@@ -142,7 +142,7 @@ namespace fling::runtime
             std::string name,
             std::vector<std::string> params,
             envirment::Environment* decl,
-            std::vector<std::shared_ptr<ast::Stmt>> body
+            std::vector<std::unique_ptr<ast::Stmt>> body
         ) {
             return RuntimeVal(
                 std::move(name),
@@ -164,7 +164,7 @@ namespace fling::runtime
 
         // Object Construktor
         RuntimeVal(std::unordered_map<std::string,
-            std::shared_ptr<RuntimeVal>> p) : type(Type::Object), properties(std::move(p)) {};
+            std::unique_ptr<RuntimeVal>> p) : type(Type::Object), properties(std::move(p)) {};
 
         // Native Function Construktor
         RuntimeVal(
@@ -176,7 +176,7 @@ namespace fling::runtime
             std::string name,
             std::vector<std::string> params,
             envirment::Environment* decl,
-            std::vector<std::shared_ptr<ast::Stmt>> body
+            std::vector<std::unique_ptr<ast::Stmt>> body
         )
             : type(Type::FnValue),
             name(std::move(name)),
@@ -249,9 +249,12 @@ namespace fling::runtime
             return return_msg;
         }
 
-        RuntimeVal(RuntimeVal&) = default;
-        //RuntimeVal& operator=(RuntimeVal&) = default;
-        RuntimeVal& operator=(const RuntimeVal&) = default;
+        // Move Assignment Operator
+        RuntimeVal(const RuntimeVal&) = delete;
+        RuntimeVal& operator=(const RuntimeVal&) = delete;
+
+        RuntimeVal(RuntimeVal&&) = default;
+        RuntimeVal& operator=(RuntimeVal&&) = default;
     };
 } // namespace fling::runtime
 

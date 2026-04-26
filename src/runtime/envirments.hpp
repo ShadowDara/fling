@@ -52,6 +52,14 @@ namespace fling::runtime::envirment {
 
         // Function to check if the current Envirment has this Variable
         Environment* resolve(const std::string& varName);
+
+
+        // Delete Copy Constructor and Assignment Operator
+        Environment(const Environment&) = delete;
+        Environment& operator=(const Environment&) = delete;
+
+        Environment(Environment&&) = default;
+        Environment& operator=(Environment&&) = default;
     };
 }
 

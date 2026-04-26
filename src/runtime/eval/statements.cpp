@@ -30,7 +30,7 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_var_declaration(
 {
     // Use a Reference instead of a smart pointer
     auto value = varDecl.value ? evaluate(*varDecl.value, env) : runtime::RuntimeVal();
-    return env.declareVar(varDecl.identifier, value, varDecl.constant);
+    return env.declareVar(varDecl.identifier, std::move(value), varDecl.constant);
 }
 
 
@@ -39,7 +39,23 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_fn_declaration(
     const ast::FunctionDeclaration& fnDecl,
     runtime::envirment::Environment& env)
 {
+    // // Clone the Body
+    // std::vector<std::unique_ptr<ast::Stmt>> body;
+    // body.reserve(fnDecl.body.size());
 
+    // for (const auto& stmt : fnDecl.body)
+    // {
+    //     body.push_back(stmt->clone()); // du brauchst clone()
+    // }
 
-    return RuntimeVal::Null();
+    // RuntimeVal fn = RuntimeVal::Function(
+    //     fnDecl.name,
+    //     fnDecl.parameters,
+    //     &env,
+    //     std::move(body)
+    // );
+
+    // return env.declareVar(fnDecl.name, std::move(fn), true);
+
+    return RuntimeVal::Null(); // Placeholder, implement the actual logic as needed
 }

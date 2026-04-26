@@ -57,7 +57,7 @@ RuntimeVal Environment::declareVar(
         return RuntimeVal();
     }
 
-    variables[varName] = value;
+    variables[varName] = std::move(value);
 
 	// Add to the set of constants if this variable is
     // declared as constant
@@ -84,7 +84,7 @@ RuntimeVal Environment::assignVar(
         return RuntimeVal();
     }
 
-    env->variables[varName] = value;
+    env->variables[varName] = std::move(value);
 
     return value;
 }
@@ -93,7 +93,7 @@ RuntimeVal Environment::assignVar(
 RuntimeVal Environment::lookupVar(std::string varName)
 {
     auto env = this->resolve(varName);
-    return env->variables[varName];
+    return std::move(env->variables[varName]);
 }
 
 // Function to check if the Variable exists in the current scope
