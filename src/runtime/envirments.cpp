@@ -11,7 +11,7 @@ void envirment::setupStandardEnvironment(Environment& env)
     env.declareVar("false", RuntimeVal::Boolean(false), true);
     env.declareVar("null", RuntimeVal::Null(), true);
 
-    // Define a Native Build in Function
+    // Define Print Function
     env.declareVar(
         "print",
         RuntimeVal::NativeFN([](const std::vector<RuntimeVal>& args, fling::runtime::envirment::Environment&) -> RuntimeVal {

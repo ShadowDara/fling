@@ -134,7 +134,7 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_call_expr(
     if (fn.type == RuntimeVal::Type::FnValue)
     {
         auto func = std::move(fn);
-        envirment::Environment scope(func.declaration);
+        auto scope = std::make_shared<envirment::Environment>(func.declaration);
         // Create a new scope for the function call
         
         // Create the Variables for the Parameters
@@ -142,18 +142,18 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_call_expr(
         {
             auto paramName = func.parameters[i];
             RuntimeVal argValue = (i < evaluatedArgs.size()) ? std::move(evaluatedArgs[i]) : RuntimeVal::Null();
-            scope.declareVar(paramName, std::move(argValue), false);
+            scope->declareVar(paramName, std::move(argValue), false);
         }
 
         RuntimeVal returnValue = RuntimeVal::Null();
         for (const auto& stmt : func.body)
         {
-            returnValue = evaluate(*stmt, scope);
+            returnValue = evaluate(*stmt, *scope);
         }
 
-        if (returnValue.type == RuntimeVal::Type::Null && scope.hasVar("result"))
+        if (returnValue.type == RuntimeVal::Type::Null && scope->hasVar("result"))
         {
-            return scope.lookupVar("result");
+            return scope->lookupVar("result");
         }
 
         return returnValue;

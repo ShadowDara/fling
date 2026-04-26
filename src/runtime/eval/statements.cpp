@@ -53,7 +53,7 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_fn_declaration(
     RuntimeVal fn = RuntimeVal::Function(
         fnDecl.name,
         fnDecl.parameters,
-        &env,
+        env.shared_from_this(),
         std::move(body)
     );
 

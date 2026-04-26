@@ -100,7 +100,7 @@ namespace fling::runtime
         // for Function Type
         std::string name;
         std::vector<std::string> parameters;
-        envirment::Environment* declaration = nullptr;
+        std::shared_ptr<envirment::Environment> declaration = nullptr;
         std::vector<std::unique_ptr<ast::Stmt>> body;
 
         // to make a Number Value
@@ -141,13 +141,13 @@ namespace fling::runtime
         static RuntimeVal Function(
             std::string name,
             std::vector<std::string> params,
-            envirment::Environment* decl,
+            std::shared_ptr<envirment::Environment> decl,
             std::vector<std::unique_ptr<ast::Stmt>> body
         ) {
             return RuntimeVal(
                 std::move(name),
                 std::move(params),
-                decl,
+                std::move(decl),
                 std::move(body)
             );
         }
@@ -175,13 +175,13 @@ namespace fling::runtime
         RuntimeVal(
             std::string name,
             std::vector<std::string> params,
-            envirment::Environment* decl,
+            std::shared_ptr<envirment::Environment> decl,
             std::vector<std::unique_ptr<ast::Stmt>> body
         )
             : type(Type::FnValue),
             name(std::move(name)),
             parameters(std::move(params)),
-            declaration(decl),
+            declaration(std::move(decl)),
             body(std::move(body)) {
         }
 
