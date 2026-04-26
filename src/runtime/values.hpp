@@ -249,9 +249,72 @@ namespace fling::runtime
             return return_msg;
         }
 
-        // Move Assignment Operator
-        RuntimeVal(const RuntimeVal&) = delete;
-        RuntimeVal& operator=(const RuntimeVal&) = delete;
+        // Copy Constructor
+        RuntimeVal(const RuntimeVal& other)
+            : type(other.type),
+              number(other.number),
+              bvalue(other.bvalue),
+              call(other.call),
+              name(other.name),
+              parameters(other.parameters),
+              declaration(other.declaration)
+        {
+            properties.reserve(other.properties.size());
+            for (const auto& [key, value] : other.properties)
+            {
+                if (value)
+                {
+                    properties.emplace(key, std::make_unique<RuntimeVal>(*value));
+                }
+            }
+
+            body.reserve(other.body.size());
+            for (const auto& stmt : other.body)
+            {
+                if (stmt)
+                {
+                    body.push_back(stmt->clone());
+                }
+            }
+        }
+
+        RuntimeVal& operator=(const RuntimeVal& other)
+        {
+            if (this == &other)
+            {
+                return *this;
+            }
+
+            type = other.type;
+            number = other.number;
+            bvalue = other.bvalue;
+            call = other.call;
+            name = other.name;
+            parameters = other.parameters;
+            declaration = other.declaration;
+
+            properties.clear();
+            properties.reserve(other.properties.size());
+            for (const auto& [key, value] : other.properties)
+            {
+                if (value)
+                {
+                    properties.emplace(key, std::make_unique<RuntimeVal>(*value));
+                }
+            }
+
+            body.clear();
+            body.reserve(other.body.size());
+            for (const auto& stmt : other.body)
+            {
+                if (stmt)
+                {
+                    body.push_back(stmt->clone());
+                }
+            }
+
+            return *this;
+        }
 
         RuntimeVal(RuntimeVal&&) = default;
         RuntimeVal& operator=(RuntimeVal&&) = default;

@@ -9,6 +9,8 @@ fn add(x, y) {
 	return result
 }
 
+print(add(10, 10))
+
 fn makeAdder (offset) {
 
   fn add (x, y)  {

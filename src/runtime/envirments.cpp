@@ -93,7 +93,7 @@ RuntimeVal Environment::assignVar(
 RuntimeVal Environment::lookupVar(std::string varName)
 {
     auto env = this->resolve(varName);
-    return std::move(env->variables[varName]);
+    return env->variables[varName];
 }
 
 // Function to check if the Variable exists in the current scope

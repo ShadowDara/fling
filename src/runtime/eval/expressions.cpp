@@ -134,7 +134,7 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_call_expr(
     if (fn.type == RuntimeVal::Type::FnValue)
     {
         auto func = std::move(fn);
-        auto scope = envirment::Environment(std::move(func.declaration));
+        envirment::Environment scope(func.declaration);
         // Create a new scope for the function call
         
         // Create the Variables for the Parameters
@@ -145,10 +145,10 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_call_expr(
             scope.declareVar(paramName, std::move(argValue), false);
         }
 
-        std::vector<std::unique_ptr<RuntimeVal>> returnValue = std::make_unique<std::vector<std::unique_ptr<RuntimeVal>>>();
+        RuntimeVal returnValue = RuntimeVal::Null();
         for (const auto& stmt : func.body)
         {
-            returnValue = std::move(evaluate(*stmt, scope));
+            returnValue = evaluate(*stmt, scope);
         }
 
         return returnValue;
