@@ -11,10 +11,10 @@ void envirment::setupStandardEnvironment(Environment& env)
     env.declareVar("false", RuntimeVal::Boolean(false), true);
     env.declareVar("null", RuntimeVal::Null(), true);
 
-    // Define a Native Build in Function
+    // Define Print Function
     env.declareVar(
         "print",
-        RuntimeVal::NativeFN([](std::vector<RuntimeVal> args, fling::runtime::envirment::Environment&) -> RuntimeVal {
+        RuntimeVal::NativeFN([](const std::vector<RuntimeVal>& args, fling::runtime::envirment::Environment&) -> RuntimeVal {
             for (const auto& arg : args) {
                 switch (arg.type) {
                     case RuntimeVal::Type::Number:
@@ -57,7 +57,7 @@ RuntimeVal Environment::declareVar(
         return RuntimeVal();
     }
 
-    variables[varName] = value;
+    variables[varName] = std::move(value);
 
 	// Add to the set of constants if this variable is
     // declared as constant
@@ -84,7 +84,7 @@ RuntimeVal Environment::assignVar(
         return RuntimeVal();
     }
 
-    env->variables[varName] = value;
+    env->variables[varName] = std::move(value);
 
     return value;
 }
@@ -118,4 +118,19 @@ Environment* Environment::resolve(const std::string& varName)
     }
 
     return this->parent->resolve(varName);
+}
+
+bool Environment::hasVar(const std::string& varName) const
+{
+    if (this->variables.find(varName) != this->variables.end())
+    {
+        return true;
+    }
+
+    if (this->parent == nullptr)
+    {
+        return false;
+    }
+
+    return this->parent->hasVar(varName);
 }

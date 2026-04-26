@@ -117,7 +117,7 @@ namespace fling
             {
                 if (arg->kind != ast::NodeType::Identifier)
                 {
-                    std::cout << arg << "\n";
+                    std::cout << arg->toString() << "\n";
                     std::cerr
                         << "Inside function declaration expected parameters to be of type string."
                         << std::endl;
@@ -424,7 +424,7 @@ namespace fling
                 || at().type == lexer::TokenType::OpenSquaredBrace)
             {
                 auto theoperator = eat();
-                auto property = std::make_unique<ast::Expr>(ast::NodeType::Property);
+                std::unique_ptr<ast::Expr> property;
                 bool computed = false;
                 
                 if (theoperator.type == lexer::TokenType::Dot)

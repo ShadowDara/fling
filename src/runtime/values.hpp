@@ -92,16 +92,16 @@ namespace fling::runtime
         bool bvalue = false;
         
         // Object Type
-        std::unordered_map<std::string, std::shared_ptr<RuntimeVal>> properties;
+        std::unordered_map<std::string, std::unique_ptr<RuntimeVal>> properties;
         
         // Native Function Type
-        std::function <RuntimeVal(std::vector<RuntimeVal>, envirment::Environment&)> call;
+        std::function <RuntimeVal(const std::vector<RuntimeVal>&, envirment::Environment&)> call;
 
         // for Function Type
         std::string name;
         std::vector<std::string> parameters;
-        envirment::Environment* declaration = nullptr;
-        std::vector<std::shared_ptr<ast::Stmt>> body;
+        std::shared_ptr<envirment::Environment> declaration = nullptr;
+        std::vector<std::unique_ptr<ast::Stmt>> body;
 
         // to make a Number Value
         static RuntimeVal Null()
@@ -124,14 +124,14 @@ namespace fling::runtime
 		// Make an Object Value
         static RuntimeVal Object()
         {
-            std::unordered_map<std::string, std::shared_ptr<RuntimeVal>> properties;
-            auto val = RuntimeVal(properties);
+            std::unordered_map<std::string, std::unique_ptr<RuntimeVal>> properties;
+            auto val = RuntimeVal(std::move(properties));
             return val;
         }
 
         // Make a Native Function
         static RuntimeVal NativeFN(
-            std::function <RuntimeVal(std::vector<RuntimeVal>, envirment::Environment&)> call)
+            std::function <RuntimeVal(const std::vector<RuntimeVal>&, envirment::Environment&)> call)
         {
             auto val = RuntimeVal(call);
             return val;
@@ -141,13 +141,13 @@ namespace fling::runtime
         static RuntimeVal Function(
             std::string name,
             std::vector<std::string> params,
-            envirment::Environment* decl,
-            std::vector<std::shared_ptr<ast::Stmt>> body
+            std::shared_ptr<envirment::Environment> decl,
+            std::vector<std::unique_ptr<ast::Stmt>> body
         ) {
             return RuntimeVal(
                 std::move(name),
                 std::move(params),
-                decl,
+                std::move(decl),
                 std::move(body)
             );
         }
@@ -164,24 +164,24 @@ namespace fling::runtime
 
         // Object Construktor
         RuntimeVal(std::unordered_map<std::string,
-            std::shared_ptr<RuntimeVal>> p) : type(Type::Object), properties(std::move(p)) {};
+            std::unique_ptr<RuntimeVal>> p) : type(Type::Object), properties(std::move(p)) {};
 
         // Native Function Construktor
         RuntimeVal(
-            std::function <RuntimeVal(std::vector<RuntimeVal>, envirment::Environment&)> c)
+            std::function <RuntimeVal(const std::vector<RuntimeVal>&, envirment::Environment&)> c)
             : type(Type::Native_FnValue), call(c) {};
 
         // Function Construktor
         RuntimeVal(
             std::string name,
             std::vector<std::string> params,
-            envirment::Environment* decl,
-            std::vector<std::shared_ptr<ast::Stmt>> body
+            std::shared_ptr<envirment::Environment> decl,
+            std::vector<std::unique_ptr<ast::Stmt>> body
         )
             : type(Type::FnValue),
             name(std::move(name)),
             parameters(std::move(params)),
-            declaration(decl),
+            declaration(std::move(decl)),
             body(std::move(body)) {
         }
 
@@ -249,9 +249,75 @@ namespace fling::runtime
             return return_msg;
         }
 
-        RuntimeVal(RuntimeVal&) = default;
-        //RuntimeVal& operator=(RuntimeVal&) = default;
-        RuntimeVal& operator=(const RuntimeVal&) = default;
+        // Copy Constructor
+        RuntimeVal(const RuntimeVal& other)
+            : type(other.type),
+              number(other.number),
+              bvalue(other.bvalue),
+              call(other.call),
+              name(other.name),
+              parameters(other.parameters),
+              declaration(other.declaration)
+        {
+            properties.reserve(other.properties.size());
+            for (const auto& [key, value] : other.properties)
+            {
+                if (value)
+                {
+                    properties.emplace(key, std::make_unique<RuntimeVal>(*value));
+                }
+            }
+
+            body.reserve(other.body.size());
+            for (const auto& stmt : other.body)
+            {
+                if (stmt)
+                {
+                    body.push_back(stmt->clone());
+                }
+            }
+        }
+
+        RuntimeVal& operator=(const RuntimeVal& other)
+        {
+            if (this == &other)
+            {
+                return *this;
+            }
+
+            type = other.type;
+            number = other.number;
+            bvalue = other.bvalue;
+            call = other.call;
+            name = other.name;
+            parameters = other.parameters;
+            declaration = other.declaration;
+
+            properties.clear();
+            properties.reserve(other.properties.size());
+            for (const auto& [key, value] : other.properties)
+            {
+                if (value)
+                {
+                    properties.emplace(key, std::make_unique<RuntimeVal>(*value));
+                }
+            }
+
+            body.clear();
+            body.reserve(other.body.size());
+            for (const auto& stmt : other.body)
+            {
+                if (stmt)
+                {
+                    body.push_back(stmt->clone());
+                }
+            }
+
+            return *this;
+        }
+
+        RuntimeVal(RuntimeVal&&) = default;
+        RuntimeVal& operator=(RuntimeVal&&) = default;
     };
 } // namespace fling::runtime
 

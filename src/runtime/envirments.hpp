@@ -22,15 +22,15 @@ namespace fling::runtime::envirment {
     // Function to setup the Standard Envirment for the Language
     void setupStandardEnvironment(Environment& env);
 
-    class Environment {
+    class Environment : public std::enable_shared_from_this<Environment> {
     private:
-        std::unique_ptr<Environment> parent;  // optional parent (nullptr if none)
+        std::shared_ptr<Environment> parent;  // optional parent (nullptr if none)
         std::unordered_map<std::string, fling::runtime::RuntimeVal> variables;
 		std::set<std::string> constants; // Set to track constant variables
 
     public:
         // Constructor with optional parent
-        explicit Environment(std::unique_ptr<Environment> parentEnv = nullptr)
+        explicit Environment(std::shared_ptr<Environment> parentEnv = nullptr)
             : parent(std::move(parentEnv))
         {
             if (!parent)
@@ -52,6 +52,17 @@ namespace fling::runtime::envirment {
 
         // Function to check if the current Envirment has this Variable
         Environment* resolve(const std::string& varName);
+
+        // Function to check whether a variable exists in this scope or any parent
+        bool hasVar(const std::string& varName) const;
+
+
+        // Delete Copy Constructor and Assignment Operator
+        Environment(const Environment&) = delete;
+        Environment& operator=(const Environment&) = delete;
+
+        Environment(Environment&&) = default;
+        Environment& operator=(Environment&&) = default;
     };
 }
 

@@ -15,7 +15,6 @@
 #include <ostream>
 #include <memory>
 
-
 namespace fling
 {
     namespace ast
@@ -31,7 +30,6 @@ namespace fling
             return std::string(indent, ' ');
         }
 
-
         /**
          * enum class for the NodeTypes for the Abstract Syntax Tree
          */
@@ -45,7 +43,7 @@ namespace fling
             // EXPRESSIONS
             AssignmentExpr,
             MemberExpr,
-			CallExpr,
+            CallExpr,
 
             // Literals
             Property,
@@ -58,23 +56,26 @@ namespace fling
             // FunctionDeclaration
         };
 
-
         /**
          * Statement a Basestructure for the abstract Syntax Tree
          *
          * @param Nodetype
          */
-        struct Stmt {
+        struct Stmt
+        {
             NodeType kind;
 
             explicit Stmt(NodeType kind) : kind(kind) {}
             virtual ~Stmt() = default;
 
-            virtual std::string toString(int indent = 0) const {
+            virtual std::string toString(int indent = 0) const
+            {
                 return "";
             }
-        };
 
+            // Clone Function
+            virtual std::unique_ptr<Stmt> clone() const = 0;
+        };
 
         // Program
         struct Program : Stmt
@@ -86,7 +87,7 @@ namespace fling
             {
                 std::string out = indentStr(indent) + "Program:\n";
 
-                for (const auto& stmt : body)
+                for (const auto &stmt : body)
                 {
                     out += stmt->toString(indent + 2);
                     // Add newline After each statement
@@ -96,22 +97,38 @@ namespace fling
                 return out;
             }
 
-            Program() : Stmt(NodeType::Program) {}        // Liste von Statements
-            Program(Program&&) = default;
-            Program& operator=(Program&&) = default;
-            Program(const Program&) = delete;
-            Program& operator=(const Program&) = delete;
-        };
+            Program() : Stmt(NodeType::Program) {} // Liste von Statements
+            Program(Program &&) = default;
+            Program &operator=(Program &&) = default;
+            Program(const Program &) = delete;
+            Program &operator=(const Program &) = delete;
 
+            // Clone Function
+            std::unique_ptr<Stmt> clone() const override
+            {
+                auto p = std::make_unique<Program>();
+
+                for (const auto &stmt : body)
+                {
+                    p->body.push_back(stmt->clone());
+                }
+
+                return p;
+            }
+        };
 
         // Ausdruck
         struct Expr : Stmt
         {
             explicit Expr(NodeType kind) : Stmt(kind) {}
+
+            virtual ~Expr() = default;
+
+            // wichtig: kein clone hier implementieren
+            std::unique_ptr<Stmt> clone() const override = 0;
         };
 
-
-		// Assignment Expression
+        // Assignment Expression
         //
         //
         struct AssignmentExpr : Expr
@@ -119,11 +136,11 @@ namespace fling
             std::unique_ptr<ast::Expr> assignme;
             std::unique_ptr<ast::Expr> value;
 
-			AssignmentExpr() : Expr(NodeType::AssignmentExpr) {}
-            AssignmentExpr(AssignmentExpr&&) = default;
-            AssignmentExpr& operator=(AssignmentExpr&&) = default;
-            AssignmentExpr(const AssignmentExpr&) = delete;
-            AssignmentExpr& operator=(const AssignmentExpr&) = delete;
+            AssignmentExpr() : Expr(NodeType::AssignmentExpr) {}
+            AssignmentExpr(AssignmentExpr &&) = default;
+            AssignmentExpr &operator=(AssignmentExpr &&) = default;
+            AssignmentExpr(const AssignmentExpr &) = delete;
+            AssignmentExpr &operator=(const AssignmentExpr &) = delete;
 
             std::string toString(int indent = 0) const override
             {
@@ -137,8 +154,23 @@ namespace fling
 
                 return out;
             }
-        };
 
+            // Clone Function
+            std::unique_ptr<Stmt> clone() const override
+            {
+                auto a = std::make_unique<AssignmentExpr>();
+
+                a->assignme = assignme ? std::unique_ptr<Expr>(
+                                             static_cast<Expr *>(assignme->clone().release()))
+                                       : nullptr;
+
+                a->value = value ? std::unique_ptr<Expr>(
+                                       static_cast<Expr *>(value->clone().release()))
+                                 : nullptr;
+
+                return a;
+            }
+        };
 
         // Variable Declaration
         struct VarDeclaration : Stmt
@@ -148,10 +180,10 @@ namespace fling
             std::unique_ptr<ast::Expr> value;
 
             VarDeclaration() : Stmt(NodeType::VarDeclaration) {}
-            VarDeclaration(VarDeclaration&&) = default;
-            VarDeclaration& operator=(VarDeclaration&&) = default;
-            VarDeclaration(const VarDeclaration&) = delete;
-            VarDeclaration& operator=(const VarDeclaration&) = delete;
+            VarDeclaration(VarDeclaration &&) = default;
+            VarDeclaration &operator=(VarDeclaration &&) = default;
+            VarDeclaration(const VarDeclaration &) = delete;
+            VarDeclaration &operator=(const VarDeclaration &) = delete;
 
             std::string toString(int indent = 0) const override
             {
@@ -167,8 +199,22 @@ namespace fling
 
                 return out;
             }
-        };
 
+            // Clone Function
+            std::unique_ptr<Stmt> clone() const override
+            {
+                auto v = std::make_unique<VarDeclaration>();
+
+                v->constant = constant;
+                v->identifier = identifier;
+
+                if (value)
+                    v->value = std::unique_ptr<Expr>(
+                        static_cast<Expr *>(value->clone().release()));
+
+                return v;
+            }
+        };
 
         // Function Declaration
         struct FunctionDeclaration : Stmt
@@ -178,8 +224,8 @@ namespace fling
             std::vector<std::unique_ptr<ast::Stmt>> body;
 
             FunctionDeclaration(std::string n, std::vector<std::unique_ptr<ast::Stmt>> b,
-                std::vector<std::string> p) : Stmt(NodeType::FunctionDeckaration),
-                name(n), body(std::move(b)), parameters(p) {}
+                                std::vector<std::string> p) : Stmt(NodeType::FunctionDeckaration),
+                                                              name(n), body(std::move(b)), parameters(p) {}
 
             std::string toString(int indent = 0) const override
             {
@@ -196,8 +242,20 @@ namespace fling
 
                 return out;
             }
-        };
 
+            // Clone Function
+            std::unique_ptr<Stmt> clone() const override
+            {
+                auto f = std::make_unique<FunctionDeclaration>(name, std::vector<std::unique_ptr<Stmt>>{}, parameters);
+
+                for (const auto &stmt : body)
+                {
+                    f->body.push_back(stmt->clone());
+                }
+
+                return f;
+            }
+        };
 
         // Binary Expression
         struct BinaryExpr : Expr
@@ -226,12 +284,29 @@ namespace fling
             }
 
             BinaryExpr() : Expr(ast::NodeType::BinaryExpr) {}
-            BinaryExpr(BinaryExpr&&) = default;
-            BinaryExpr& operator=(BinaryExpr&&) = default;
-            BinaryExpr(const BinaryExpr&) = delete;
-            BinaryExpr& operator=(const BinaryExpr&) = delete;
-        };
+            BinaryExpr(BinaryExpr &&) = default;
+            BinaryExpr &operator=(BinaryExpr &&) = default;
+            BinaryExpr(const BinaryExpr &) = delete;
+            BinaryExpr &operator=(const BinaryExpr &) = delete;
 
+            // Clone Function
+            std::unique_ptr<Stmt> clone() const override
+            {
+                auto b = std::make_unique<BinaryExpr>();
+
+                b->callculation_operator = callculation_operator;
+
+                if (left)
+                    b->left = std::unique_ptr<Expr>(
+                        static_cast<Expr*>(left->clone().release()));
+
+                if (right)
+                    b->right = std::unique_ptr<Expr>(
+                        static_cast<Expr*>(right->clone().release()));
+
+                return b;
+            }
+        };
 
         // Call Expression
         struct CallExpr : Expr
@@ -240,33 +315,32 @@ namespace fling
             std::unique_ptr<Expr> caller;
 
             //// String-Konvertierung (optional)
-            //operator std::string() const
+            // operator std::string() const
             //{
-            //    return "BinaryExpr";
-            //}
+            //     return "BinaryExpr";
+            // }
 
             //// toString function
-            //std::string toString(int indent = 0) const override
+            // std::string toString(int indent = 0) const override
             //{
-            //    std::string out = indentStr(indent) + "BinaryExpr:\n";
-            //    out += indentStr(indent + 2) + "Left:\n";
-            //    out += left->toString(indent + 4) + "\n";
-            //    out += indentStr(indent + 2) + "Right:\n";
-            //    out += right->toString(indent + 4) + "\n";
-            //    out += indentStr(indent + 2) + "Binary Operator:\n";
-            //    out += indentStr(indent + 4) + callculation_operator;
-            //    return out;
-            //}
+            //     std::string out = indentStr(indent) + "BinaryExpr:\n";
+            //     out += indentStr(indent + 2) + "Left:\n";
+            //     out += left->toString(indent + 4) + "\n";
+            //     out += indentStr(indent + 2) + "Right:\n";
+            //     out += right->toString(indent + 4) + "\n";
+            //     out += indentStr(indent + 2) + "Binary Operator:\n";
+            //     out += indentStr(indent + 4) + callculation_operator;
+            //     return out;
+            // }
 
             CallExpr(std::unique_ptr<Expr> c,
-                std::vector<std::unique_ptr<fling::ast::Expr>> args
-                ) : Expr(ast::NodeType::CallExpr), caller(std::move(c)),
-                agrs(std::move(args)) {}
-            
-            /*BinaryExpr(BinaryExpr&&) = default;
-            BinaryExpr& operator=(BinaryExpr&&) = default;
-            BinaryExpr(const BinaryExpr&) = delete;
-            BinaryExpr& operator=(const BinaryExpr&) = delete;*/
+                     std::vector<std::unique_ptr<fling::ast::Expr>> args) : Expr(ast::NodeType::CallExpr), caller(std::move(c)),
+                                                                            agrs(std::move(args)) {}
+
+            CallExpr(CallExpr &&) = default;
+            CallExpr &operator=(CallExpr &&) = default;
+            CallExpr(const CallExpr &) = delete;
+            CallExpr &operator=(const CallExpr &) = delete;
 
             std::string toString(int indent = 0) const override
             {
@@ -276,51 +350,67 @@ namespace fling
                 out += caller->toString(indent + 4) + "\n";
 
                 out += indentStr(indent + 2) + "Args:\n";
-                for (const auto& arg : agrs)
+                for (const auto &arg : agrs)
                 {
                     out += arg->toString(indent + 4) + "\n"; // <- Use '->'
                 }
 
                 return out;
             }
-        };
 
+            // Clone Function
+            std::unique_ptr<Stmt> clone() const override
+            {
+                std::vector<std::unique_ptr<Expr>> cloned_args;
+                for (const auto &arg : agrs)
+                {
+                    cloned_args.push_back(std::unique_ptr<Expr>(
+                        static_cast<Expr *>(arg->clone().release())));
+                }
+                return std::make_unique<CallExpr>(
+                    caller ? std::unique_ptr<Expr>(
+                                 static_cast<Expr *>(caller->clone().release()))
+                           : nullptr,
+                    std::move(cloned_args));
+            }
+        };
 
         // Member Expression
         struct MemberExpr : Expr
         {
             std::unique_ptr<Expr> object;
             std::unique_ptr<Expr> property;
-			bool computed; // true for obj[prop], false for obj.prop
+            bool computed; // true for obj[prop], false for obj.prop
 
             //// String-Konvertierung (optional)
-            //operator std::string() const
+            // operator std::string() const
             //{
-            //    return "BinaryExpr";
-            //}
+            //     return "BinaryExpr";
+            // }
 
             //// toString function
-            //std::string toString(int indent = 0) const override
+            // std::string toString(int indent = 0) const override
             //{
-            //    std::string out = indentStr(indent) + "BinaryExpr:\n";
-            //    out += indentStr(indent + 2) + "Left:\n";
-            //    out += left->toString(indent + 4) + "\n";
-            //    out += indentStr(indent + 2) + "Right:\n";
-            //    out += right->toString(indent + 4) + "\n";
-            //    out += indentStr(indent + 2) + "Binary Operator:\n";
-            //    out += indentStr(indent + 4) + callculation_operator;
-            //    return out;
-            //}
+            //     std::string out = indentStr(indent) + "BinaryExpr:\n";
+            //     out += indentStr(indent + 2) + "Left:\n";
+            //     out += left->toString(indent + 4) + "\n";
+            //     out += indentStr(indent + 2) + "Right:\n";
+            //     out += right->toString(indent + 4) + "\n";
+            //     out += indentStr(indent + 2) + "Binary Operator:\n";
+            //     out += indentStr(indent + 4) + callculation_operator;
+            //     return out;
+            // }
 
             MemberExpr(std::unique_ptr<Expr> o,
-                std::unique_ptr<Expr> p,
-                bool c) : Expr(ast::NodeType::MemberExpr),
-                object(std::move(o)), property(std::move(p)),
-                computed(c) {}
-            /*BinaryExpr(BinaryExpr&&) = default;
-            BinaryExpr& operator=(BinaryExpr&&) = default;
-            BinaryExpr(const BinaryExpr&) = delete;
-            BinaryExpr& operator=(const BinaryExpr&) = delete;*/
+                       std::unique_ptr<Expr> p,
+                       bool c) : Expr(ast::NodeType::MemberExpr),
+                                 object(std::move(o)), property(std::move(p)),
+                                 computed(c) {}
+
+            MemberExpr(MemberExpr &&) = default;
+            MemberExpr &operator=(MemberExpr &&) = default;
+            MemberExpr(const MemberExpr &) = delete;
+            MemberExpr &operator=(const MemberExpr &) = delete;
 
             std::string toString(int indent = 0) const override
             {
@@ -337,8 +427,20 @@ namespace fling
 
                 return out;
             }
-        };
 
+            // Clone Function
+            std::unique_ptr<Stmt> clone() const override
+            {
+                return std::make_unique<MemberExpr>(
+                    object ? std::unique_ptr<Expr>(
+                                 static_cast<Expr *>(object->clone().release()))
+                           : nullptr,
+                    property ? std::unique_ptr<Expr>(
+                                   static_cast<Expr *>(property->clone().release()))
+                             : nullptr,
+                    computed);
+            }
+        };
 
         // Identifier
         struct Identifier : Expr
@@ -356,10 +458,16 @@ namespace fling
 
             // Parameter-Konstruktor
             Identifier(std::string s)
-                : Expr(NodeType::Identifier), symbol(std::move(s)) {
+                : Expr(NodeType::Identifier), symbol(std::move(s))
+            {
+            }
+
+            // Clone Function
+            std::unique_ptr<Stmt> clone() const override
+            {
+                return std::make_unique<Identifier>(*this);
             }
         };
-
 
         // Numerisches Literal
         struct NumericLiteral : Expr
@@ -377,17 +485,22 @@ namespace fling
 
             // Parameter-Konstruktor
             NumericLiteral(int v) : Expr(NodeType::NumericLiteral), value(v) {}
+
+            // Clone Function
+            std::unique_ptr<Stmt> clone() const override
+            {
+                return std::make_unique<NumericLiteral>(*this);
+            }
         };
 
-
-		// Property f�r Objektliteral
+        // Property für Objektliteral
         struct Property : Expr
         {
             std::string key;
 
             // Optional Value!
             std::unique_ptr<ast::Expr> value;
-            
+
             // toString function
             std::string toString(int indent = 0) const override
             {
@@ -400,29 +513,39 @@ namespace fling
 
             // Konstruktor
             Property() : Expr(NodeType::Property) {}
-            
-            Property(Property&&) = default;
-            
-            Property& operator=(Property&&) = default;
-            
-            Property(const Property&) = delete;
-            
-            Property& operator=(const Property&) = delete;
-		};
 
+            Property(Property &&) = default;
 
-		// Objektliteral
+            Property &operator=(Property &&) = default;
+
+            Property(const Property &) = delete;
+
+            Property &operator=(const Property &) = delete;
+
+            // Clone Function
+            std::unique_ptr<Stmt> clone() const override
+            {
+                auto p = std::make_unique<Property>();
+                p->key = key;
+                p->value = value ? std::unique_ptr<Expr>(
+                                       static_cast<Expr *>(value->clone().release()))
+                                 : nullptr;
+                return p;
+            }
+        };
+
+        // Objektliteral
         struct ObjectLiteral : Expr
         {
             std::vector<std::unique_ptr<Property>> properties;
-            
+
             std::string toString(int indent = 0) const override
             {
                 std::string out = "{\n";
 
                 for (size_t i = 0; i < properties.size(); ++i)
                 {
-                    const auto& prop = properties[i];
+                    const auto &prop = properties[i];
 
                     out += indentStr(indent + 2);
                     out += prop->key + ": ";
@@ -442,11 +565,25 @@ namespace fling
 
                 return out;
             }
-            
-			// Konstruktor
-            ObjectLiteral() : Expr(NodeType::ObjectLiteral) {}
-		};
 
+            // Konstruktor
+            ObjectLiteral() : Expr(NodeType::ObjectLiteral) {}
+
+            // Clone Function
+            std::unique_ptr<Stmt> clone() const override
+            {
+                auto obj = std::make_unique<ObjectLiteral>();
+
+                for (const auto &prop : properties)
+                {
+                    obj->properties.push_back(
+                        std::unique_ptr<Property>(
+                            static_cast<Property *>(prop->clone().release())));
+                }
+
+                return obj;
+            }
+        };
 
         // for toString
         inline std::ostream &operator<<(std::ostream &os, const fling::ast::Stmt &stmt)
@@ -454,7 +591,6 @@ namespace fling
             os << stmt.toString();
             return os;
         }
-
 
         // for toString
         inline std::ostream &operator<<(std::ostream &os, const fling::ast::Program &program)

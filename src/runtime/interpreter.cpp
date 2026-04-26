@@ -43,30 +43,46 @@ namespace fling
                 return eval::evaluate_object_expr(objNode, env);
 			}
 
-            //// Member Expression
-            //case ast::NodeType::MemberExpr:
-            //{
-            //    auto& memExpr = static_cast<const ast::MemberExpr&>(astNode);
-            //    auto objVal = evaluate(*memExpr.object, env);
+            // Member Expression
+            case ast::NodeType::MemberExpr:
+            {
+                auto& memExpr = static_cast<const ast::MemberExpr&>(astNode);
+                auto objVal = evaluate(*memExpr.object, env);
 
-            //    if (memExpr.computed) {
-            //        if (memExpr.property) {
-            //            auto propVal = evaluate(*memExpr.property, env);
-            //            return objVal.properties[propVal.toString()];
-            //        } else {
-            //            // fallback, nichts zu berechnen
-            //            return RuntimeVal::Null();
-            //        }
-            //    } else {
-            //        if (memExpr.property) {
-            //            auto propIdent = static_cast<ast::Identifier*>(memExpr.property.get());
-            //            return objVal.properties[propIdent->symbol];
-            //        } else {
-            //            // property ist nullptr → Objekt selbst zurückgeben
-            //            return objVal;
-            //        }
-            //    }
-            //}
+                if (objVal.type != RuntimeVal::Type::Object)
+                {
+                    return RuntimeVal::Null();
+                }
+
+                std::string propertyKey;
+                if (memExpr.computed)
+                {
+                    if (!memExpr.property)
+                    {
+                        return RuntimeVal::Null();
+                    }
+
+                    auto propVal = evaluate(*memExpr.property, env);
+                    propertyKey = propVal.toString();
+                }
+                else
+                {
+                    auto propIdent = static_cast<ast::Identifier*>(memExpr.property.get());
+                    if (!propIdent)
+                    {
+                        return RuntimeVal::Null();
+                    }
+                    propertyKey = propIdent->symbol;
+                }
+
+                auto it = objVal.properties.find(propertyKey);
+                if (it == objVal.properties.end() || !it->second)
+                {
+                    return RuntimeVal::Null();
+                }
+
+                return *it->second;
+            }
 
             // Call Expression
             case ast::NodeType::CallExpr:
@@ -86,9 +102,7 @@ namespace fling
             case ast::NodeType::BinaryExpr:
             {
                 auto& binNode = static_cast<const ast::BinaryExpr&>(astNode);
-                auto lhs = evaluate(*binNode.left, env);  // dereferenzieren
-                auto rhs = evaluate(*binNode.right, env);
-                return eval::evaluate_numeric_binary_expr(lhs, rhs, binNode.callculation_operator, env);
+                return eval::evaluate_binary_expr(binNode, env);
             }
 
             // Program Node

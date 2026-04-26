@@ -6,8 +6,8 @@ using namespace fling::util;
 
 // Function to Evaluate / Calculate the 2 Numbers
 runtime::RuntimeVal fling::runtime::eval::evaluate_numeric_binary_expr(
-    runtime::RuntimeVal lhs,
-    runtime::RuntimeVal rhs,
+    const RuntimeVal& lhs,
+    const RuntimeVal& rhs,
     std::string callculation_operator,
     runtime::envirment::Environment &env)
 {
@@ -105,7 +105,7 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_object_expr(
         auto key = prop->key;
         auto value = prop->value ? evaluate(*prop->value, env) : env.lookupVar(key);
 
-        objectValue.properties[key] = std::make_shared(value);
+        objectValue.properties[key] = std::make_unique<RuntimeVal>(std::move(value));
     }
 
     return objectValue;
@@ -125,13 +125,42 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_call_expr(
 
     auto fn = evaluate(*expr.caller, env);
 
-    if (fn.type != RuntimeVal::Type::Native_FnValue)
+    if (fn.type == RuntimeVal::Type::Native_FnValue)
     {
-        std::cerr << "Can not call value that is not a Native Function: "
-                  << fn.toString() << std::endl;
-        assert(false);
+        auto result = fn.call(evaluatedArgs, env);
+        return result;
+    }
+    
+    if (fn.type == RuntimeVal::Type::FnValue)
+    {
+        auto func = std::move(fn);
+        auto scope = std::make_shared<envirment::Environment>(func.declaration);
+        // Create a new scope for the function call
+        
+        // Create the Variables for the Parameters
+        for (size_t i = 0; i < func.parameters.size(); ++i)
+        {
+            auto paramName = func.parameters[i];
+            RuntimeVal argValue = (i < evaluatedArgs.size()) ? std::move(evaluatedArgs[i]) : RuntimeVal::Null();
+            scope->declareVar(paramName, std::move(argValue), false);
+        }
+
+        RuntimeVal returnValue = RuntimeVal::Null();
+        for (const auto& stmt : func.body)
+        {
+            returnValue = evaluate(*stmt, *scope);
+        }
+
+        if (returnValue.type == RuntimeVal::Type::Null && scope->hasVar("result"))
+        {
+            return scope->lookupVar("result");
+        }
+
+        return returnValue;
     }
 
-    auto result = fn.call(evaluatedArgs, env);
-    return result;
+    std::cerr << "Can not call value that is not a Native Function: "
+                  << fn.toString() << std::endl;
+    assert(false);
+    return RuntimeVal::Null();
 }

@@ -11,19 +11,19 @@ namespace fling
         {
             switch (type)
             {
-            case Number:
+            case TokenType::Number:
                 return "Number";
-            case Identifier:
+            case TokenType::Identifier:
                 return "Identifier";
-            case Equals:
+            case TokenType::Equals:
                 return "Equals";
-            case OpenParen:
+            case TokenType::OpenParen:
                 return "OpenParen";
-            case CloseParen:
+            case TokenType::CloseParen:
                 return "CloseParen";
-            case BinaryOperator:
+            case TokenType::BinaryOperator:
                 return "BinaryOperator";
-            case Let:
+            case TokenType::Let:
                 return "Let";
             default:
                 return "Unknown";
@@ -91,9 +91,9 @@ namespace fling
         }
 
         // Token-Erzeuger
-        Token token(const std::string &value, TokenType type, int line, int colum)
+        Token token(const std::string &value, TokenType type, int line, int column)
         {
-            return Token{value, type, line, colum};
+            return Token{value, type, line, column};
         }
 
         /*

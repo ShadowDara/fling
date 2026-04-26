@@ -72,7 +72,7 @@ void runFile(const std::string& filename)
     );
 
     Parser parser;
-    auto env = std::make_unique<Environment>(nullptr);
+    auto env = std::make_shared<Environment>(nullptr);
     // envirment::setupStandardEnvironment(*env);
 
     Program program = parser.produceAST(content);
@@ -92,7 +92,7 @@ void runREPL()
     Parser parser;
 
     // Define the Envirment for the Language
-    auto env = std::make_unique<Environment>(nullptr);
+    auto env = std::make_shared<Environment>(nullptr);
     // envirment::setupStandardEnvironment(*env);
 
     while (true)
