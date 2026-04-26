@@ -95,7 +95,7 @@ namespace fling::runtime
         std::unordered_map<std::string, std::unique_ptr<RuntimeVal>> properties;
         
         // Native Function Type
-        std::function <RuntimeVal(std::vector<RuntimeVal>, envirment::Environment&)> call;
+        std::function <RuntimeVal(const std::vector<RuntimeVal>&, envirment::Environment&)> call;
 
         // for Function Type
         std::string name;
@@ -131,7 +131,7 @@ namespace fling::runtime
 
         // Make a Native Function
         static RuntimeVal NativeFN(
-            std::function <RuntimeVal(std::vector<RuntimeVal>, envirment::Environment&)> call)
+            std::function <RuntimeVal(const std::vector<RuntimeVal>&, envirment::Environment&)> call)
         {
             auto val = RuntimeVal(call);
             return val;
@@ -168,7 +168,7 @@ namespace fling::runtime
 
         // Native Function Construktor
         RuntimeVal(
-            std::function <RuntimeVal(std::vector<RuntimeVal>, envirment::Environment&)> c)
+            std::function <RuntimeVal(const std::vector<RuntimeVal>&, envirment::Environment&)> c)
             : type(Type::Native_FnValue), call(c) {};
 
         // Function Construktor

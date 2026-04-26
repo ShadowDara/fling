@@ -337,10 +337,10 @@ namespace fling
                      std::vector<std::unique_ptr<fling::ast::Expr>> args) : Expr(ast::NodeType::CallExpr), caller(std::move(c)),
                                                                             agrs(std::move(args)) {}
 
-            /*BinaryExpr(BinaryExpr&&) = default;
-            BinaryExpr& operator=(BinaryExpr&&) = default;
-            BinaryExpr(const BinaryExpr&) = delete;
-            BinaryExpr& operator=(const BinaryExpr&) = delete;*/
+            CallExpr(CallExpr &&) = default;
+            CallExpr &operator=(CallExpr &&) = default;
+            CallExpr(const CallExpr &) = delete;
+            CallExpr &operator=(const CallExpr &) = delete;
 
             std::string toString(int indent = 0) const override
             {
@@ -361,7 +361,17 @@ namespace fling
             // Clone Function
             std::unique_ptr<Stmt> clone() const override
             {
-                return std::make_unique<CallExpr>(*this);
+                std::vector<std::unique_ptr<Expr>> cloned_args;
+                for (const auto &arg : agrs)
+                {
+                    cloned_args.push_back(std::unique_ptr<Expr>(
+                        static_cast<Expr *>(arg->clone().release())));
+                }
+                return std::make_unique<CallExpr>(
+                    caller ? std::unique_ptr<Expr>(
+                                 static_cast<Expr *>(caller->clone().release()))
+                           : nullptr,
+                    std::move(cloned_args));
             }
         };
 
@@ -396,10 +406,11 @@ namespace fling
                        bool c) : Expr(ast::NodeType::MemberExpr),
                                  object(std::move(o)), property(std::move(p)),
                                  computed(c) {}
-            /*BinaryExpr(BinaryExpr&&) = default;
-            BinaryExpr& operator=(BinaryExpr&&) = default;
-            BinaryExpr(const BinaryExpr&) = delete;
-            BinaryExpr& operator=(const BinaryExpr&) = delete;*/
+
+            MemberExpr(MemberExpr &&) = default;
+            MemberExpr &operator=(MemberExpr &&) = default;
+            MemberExpr(const MemberExpr &) = delete;
+            MemberExpr &operator=(const MemberExpr &) = delete;
 
             std::string toString(int indent = 0) const override
             {
@@ -420,7 +431,14 @@ namespace fling
             // Clone Function
             std::unique_ptr<Stmt> clone() const override
             {
-                return std::make_unique<MemberExpr>(*this);
+                return std::make_unique<MemberExpr>(
+                    object ? std::unique_ptr<Expr>(
+                                 static_cast<Expr *>(object->clone().release()))
+                           : nullptr,
+                    property ? std::unique_ptr<Expr>(
+                                   static_cast<Expr *>(property->clone().release()))
+                             : nullptr,
+                    computed);
             }
         };
 
@@ -507,7 +525,12 @@ namespace fling
             // Clone Function
             std::unique_ptr<Stmt> clone() const override
             {
-                return std::make_unique<Property>(*this);
+                auto p = std::make_unique<Property>();
+                p->key = key;
+                p->value = value ? std::unique_ptr<Expr>(
+                                       static_cast<Expr *>(value->clone().release()))
+                                 : nullptr;
+                return p;
             }
         };
 

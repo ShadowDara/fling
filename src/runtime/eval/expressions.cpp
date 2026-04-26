@@ -125,13 +125,36 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_call_expr(
 
     auto fn = evaluate(*expr.caller, env);
 
-    if (fn.type != RuntimeVal::Type::Native_FnValue)
+    if (fn.type == RuntimeVal::Type::Native_FnValue)
     {
-        std::cerr << "Can not call value that is not a Native Function: "
-                  << fn.toString() << std::endl;
-        assert(false);
+        auto result = fn.call(evaluatedArgs, env);
+        return result;
+    }
+    
+    if (fn.type == RuntimeVal::Type::FnValue)
+    {
+        auto func = std::move(fn);
+        auto scope = envirment::Environment(std::move(func.declaration));
+        // Create a new scope for the function call
+        
+        // Create the Variables for the Parameters
+        for (size_t i = 0; i < func.parameters.size(); ++i)
+        {
+            auto paramName = func.parameters[i];
+            RuntimeVal argValue = (i < evaluatedArgs.size()) ? std::move(evaluatedArgs[i]) : RuntimeVal::Null();
+            scope.declareVar(paramName, std::move(argValue), false);
+        }
+
+        std::vector<std::unique_ptr<RuntimeVal>> returnValue = std::make_unique<std::vector<std::unique_ptr<RuntimeVal>>>();
+        for (const auto& stmt : func.body)
+        {
+            returnValue = std::move(evaluate(*stmt, scope));
+        }
+
+        return returnValue;
     }
 
-    auto result = fn.call(evaluatedArgs, env);
-    return result;
+    std::cerr << "Can not call value that is not a Native Function: "
+                  << fn.toString() << std::endl;
+    assert(false);
 }
