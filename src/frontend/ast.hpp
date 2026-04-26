@@ -1,3 +1,28 @@
+/**
+ * @file ast.hpp
+ * @brief Abstract Syntax Tree (AST) Definition for the Fling Language
+ * 
+ * This module defines the structure of the Abstract Syntax Tree, which is an
+ * intermediate representation of the source code created after parsing.
+ * 
+ * COMPILATION PIPELINE:
+ * 1. Source Code ──(Lexer)──> Tokens
+ * 2. Tokens ──(Parser)──> AST ──(This File)
+ * 3. AST ──(Interpreter)──> Runtime Values
+ * 
+ * The AST is a tree-like structure where:
+ * - Each node represents a language construct (statement or expression)
+ * - Child nodes represent components of that construct
+ * - The interpreter walks this tree to execute the program
+ * 
+ * HIERARCHY:
+ * - Stmt (base class for all statements and expressions)
+ *   ├─ Program (root node containing all statements)
+ *   ├─ Expression nodes (NumericLiteral, StringLiteral, Identifier, etc.)
+ *   ├─ Statement nodes (VarDeclaration, FunctionDeclaration, etc.)
+ *   └─ Composite nodes (BinaryExpr, CallExpr, MemberExpr, etc.)
+ */
+
 // ast.hpp
 
 /**
@@ -31,7 +56,35 @@ namespace fling
         }
 
         /**
-         * enum class for the NodeTypes for the Abstract Syntax Tree
+         * @enum NodeType
+         * @brief Enumeration of all possible AST node types in the Fling language
+         * 
+         * Each NodeType represents a different language construct. The type is stored
+         * in every AST node to allow the interpreter to know how to handle it.
+         * 
+         * CATEGORIES:
+         * 
+         * STATEMENTS (Top-level constructs that produce effects):
+         * - Program: Root node, contains all statements in a program
+         * - VarDeclaration: Variable declaration (let/const x = ...)
+         * - FunctionDeclaration: Function definition (fn name(params) { body })
+         * 
+         * EXPRESSIONS (Constructs that evaluate to values):
+         * - Literal Expressions: Values directly in code
+         *   - NumericLiteral: Number like 42, 3.14
+         *   - StringLiteral: Text like "hello"
+         *   - ObjectLiteral: Object {...}
+         *   - ArrayLiteral: Array [...]
+         * 
+         * - Compound Expressions: Combine other values/expressions
+         *   - Identifier: Variable/function reference
+         *   - BinaryExpr: Operation like x + y, a * b
+         *   - CallExpr: Function call like func(args)
+         *   - MemberExpr: Property access like obj.prop or arr[0]
+         *   - AssignmentExpr: Assignment like x = value
+         * 
+         * - Helper Types:
+         *   - Property: Key-value pair in object literals
          */
         enum class NodeType
         {
@@ -59,23 +112,40 @@ namespace fling
         };
 
         /**
-         * Statement a Basestructure for the abstract Syntax Tree
-         *
-         * @param Nodetype
+         * @class Stmt
+         * @brief Base class for all AST nodes (statements and expressions)
+         * 
+         * This is the root of the AST node hierarchy. Every node in the abstract
+         * syntax tree inherits from this class and must implement:
+         * - A NodeType identifier (stored in 'kind')
+         * - toString() method for debugging/printing
+         * - clone() method for deep copying the node
+         * 
+         * USAGE PATTERN:
+         * The interpreter walks the AST by checking the 'kind' field and then
+         * safely casting to the appropriate derived type, knowing it's safe because
+         * the kind matches the actual type.
+         * 
+         * Example in interpreter:
+         *   if (node.kind == NodeType::NumericLiteral) {
+         *       auto& numNode = static_cast<const NumericLiteral&>(node);
+         *       // Now we can safely access numNode.value
+         *   }
          */
         struct Stmt
         {
-            NodeType kind;
+            NodeType kind;  ///< Identifies what type of AST node this is
 
             explicit Stmt(NodeType kind) : kind(kind) {}
             virtual ~Stmt() = default;
 
+            /// @brief Returns a human-readable string representation (for debugging)
             virtual std::string toString(int indent = 0) const
             {
                 return "";
             }
 
-            // Clone Function
+            /// @brief Creates a deep copy of this node and all its children
             virtual std::unique_ptr<Stmt> clone() const = 0;
         };
 
