@@ -82,36 +82,11 @@ namespace fling
                 return eval::evaluate_assignment_expr(assignexpr, env);
             }
 
-            // Member Expression
-            case ast::NodeType::MemberExpr:
+            // Binary Expression
+            case ast::NodeType::BinaryExpr:
             {
-                auto& memExpr = static_cast<const ast::MemberExpr&>(astNode);
-                auto objVal = evaluate(*memExpr.object, env);
-
-                if (objVal.type != RuntimeVal::Type::Object)
-                {
-                    return RuntimeVal::Null();
-                }
-
-                std::string propertyKey;
-                if (memExpr.computed)
-                {
-                    auto propVal = evaluate(*memExpr.property, env);
-                    propertyKey = propVal.toString();
-                }
-                else
-                {
-                    auto propIdent = static_cast<ast::Identifier*>(memExpr.property.get());
-                    propertyKey = propIdent->symbol;
-                }
-
-                auto it = objVal.properties.find(propertyKey);
-                if (it == objVal.properties.end() || !it->second)
-                {
-                    return RuntimeVal::Null();
-                }
-
-                return *it->second;
+                auto& binNode = static_cast<const ast::BinaryExpr&>(astNode);
+                return eval::evaluate_binary_expr(binNode, env);
             }
 
             // Program Node
