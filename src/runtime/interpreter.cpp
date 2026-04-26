@@ -43,45 +43,72 @@ namespace fling
                 return eval::evaluate_object_expr(objNode, env);
 			}
 
+            // Array Literal
+            case ast::NodeType::ArrayLiteral:
+            {
+                auto& arrNode = static_cast<const ast::ArrayLiteral&>(astNode);
+                std::vector<RuntimeVal> elements;
+                for (const auto& elem : arrNode.elements) {
+                    elements.push_back(evaluate(*elem, env));
+                }
+                return RuntimeVal(elements);
+            }
+
             // Member Expression
             case ast::NodeType::MemberExpr:
             {
                 auto& memExpr = static_cast<const ast::MemberExpr&>(astNode);
                 auto objVal = evaluate(*memExpr.object, env);
 
-                if (objVal.type != RuntimeVal::Type::Object)
-                {
-                    return RuntimeVal::Null();
-                }
+                if (objVal.type == RuntimeVal::Type::Array) {
+                    if (memExpr.computed) {
+                        if (!memExpr.property) {
+                            return RuntimeVal::Null();
+                        }
+                        auto indexVal = evaluate(*memExpr.property, env);
+                        if (indexVal.type != RuntimeVal::Type::Number) {
+                            return RuntimeVal::Null();
+                        }
+                        int index = static_cast<int>(indexVal.number);
+                        if (index < 0 || index >= static_cast<int>(objVal.elements.size())) {
+                            return RuntimeVal::Null();
+                        }
+                        return objVal.elements[index];
+                    } else {
+                        auto propIdent = static_cast<ast::Identifier*>(memExpr.property.get());
+                        if (!propIdent) {
+                            return RuntimeVal::Null();
+                        }
+                        if (propIdent->symbol == "length") {
+                            return RuntimeVal(static_cast<float>(objVal.elements.size()));
+                        }
+                        return RuntimeVal::Null();
+                    }
+                } else if (objVal.type == RuntimeVal::Type::Object) {
+                    std::string propertyKey;
+                    if (memExpr.computed) {
+                        if (!memExpr.property) {
+                            return RuntimeVal::Null();
+                        }
+                        auto propVal = evaluate(*memExpr.property, env);
+                        propertyKey = propVal.toString();
+                    } else {
+                        auto propIdent = static_cast<ast::Identifier*>(memExpr.property.get());
+                        if (!propIdent) {
+                            return RuntimeVal::Null();
+                        }
+                        propertyKey = propIdent->symbol;
+                    }
 
-                std::string propertyKey;
-                if (memExpr.computed)
-                {
-                    if (!memExpr.property)
-                    {
+                    auto it = objVal.properties.find(propertyKey);
+                    if (it == objVal.properties.end() || !it->second) {
                         return RuntimeVal::Null();
                     }
 
-                    auto propVal = evaluate(*memExpr.property, env);
-                    propertyKey = propVal.toString();
-                }
-                else
-                {
-                    auto propIdent = static_cast<ast::Identifier*>(memExpr.property.get());
-                    if (!propIdent)
-                    {
-                        return RuntimeVal::Null();
-                    }
-                    propertyKey = propIdent->symbol;
-                }
-
-                auto it = objVal.properties.find(propertyKey);
-                if (it == objVal.properties.end() || !it->second)
-                {
+                    return *it->second;
+                } else {
                     return RuntimeVal::Null();
                 }
-
-                return *it->second;
             }
 
             // Call Expression

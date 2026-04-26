@@ -44,4 +44,4 @@ print(f)
 print(foo)
 
 let arr = [1, 2, 3];
-print(arr)
+print(arr[0])

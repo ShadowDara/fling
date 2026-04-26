@@ -136,8 +136,9 @@ int main()
     std::cout << "\nAll tests passed!\n"
               << std::endl;
 
-    runFile("../../../testcode.txt");
+    // runFile("../../../testcode.txt");
     runFile("testcode.txt");
+    // runFile("test_array.fling");
 
 	//runREPL();
 
