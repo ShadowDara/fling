@@ -29,6 +29,9 @@ void envirment::setupStandardEnvironment(Environment& env)
                     case RuntimeVal::Type::Object:
                         std::cout << "<object> ";
                         break;
+                    case RuntimeVal::Type::Array:
+                        std::cout << "Can not print <array>";
+                        break;
                     default:
                         std::cout << "<unknown> ";
                         break;
