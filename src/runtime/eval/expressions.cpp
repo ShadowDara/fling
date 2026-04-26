@@ -162,4 +162,5 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_call_expr(
     std::cerr << "Can not call value that is not a Native Function: "
                   << fn.toString() << std::endl;
     assert(false);
+    return RuntimeVal::Null();
 }

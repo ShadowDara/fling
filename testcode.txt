@@ -37,5 +37,8 @@ const obj = {
   },
 };
 
-let f = object.complex.bar;
+let f = obj.complex.bar;
 foo = obj.foo + 5
+
+print(f)
+print(foo)
