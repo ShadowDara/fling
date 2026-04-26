@@ -105,7 +105,7 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_object_expr(
         auto key = prop->key;
         auto value = prop->value ? evaluate(*prop->value, env) : env.lookupVar(key);
 
-        objectValue.properties[key] = value;
+        objectValue.properties[key] = std::make_shared(value);
     }
 
     return objectValue;

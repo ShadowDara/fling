@@ -124,7 +124,7 @@ namespace fling::runtime
 		// Make an Object Value
         static RuntimeVal Object()
         {
-            std::unordered_map<std::string, RuntimeVal> properties;
+            std::unordered_map<std::string, std::shared_ptr<RuntimeVal>> properties;
             auto val = RuntimeVal(properties);
             return val;
         }
@@ -164,7 +164,7 @@ namespace fling::runtime
 
         // Object Construktor
         RuntimeVal(std::unordered_map<std::string,
-            RuntimeVal> p) : type(Type::Object), properties(p) {};
+            std::shared_ptr<RuntimeVal>> p) : type(Type::Object), properties(std::move(p)) {};
 
         // Native Function Construktor
         RuntimeVal(
@@ -223,7 +223,7 @@ namespace fling::runtime
                     for (const auto& [key, val] : properties)
                     {
                         if (!first) return_msg += ", ";
-                        return_msg += key + ": " + val.toString();
+                        return_msg += key + ": " + val->toString();
                         first = false;
                     }
 
@@ -250,7 +250,8 @@ namespace fling::runtime
         }
 
         RuntimeVal(RuntimeVal&) = default;
-        RuntimeVal& operator=(RuntimeVal&) = default;
+        //RuntimeVal& operator=(RuntimeVal&) = default;
+        RuntimeVal& operator=(const RuntimeVal&) = default;
     };
 } // namespace fling::runtime
 
