@@ -53,6 +53,9 @@ namespace fling::runtime::envirment {
         // Function to check if the current Envirment has this Variable
         Environment* resolve(const std::string& varName);
 
+        // Function to check whether a variable exists in this scope or any parent
+        bool hasVar(const std::string& varName) const;
+
 
         // Delete Copy Constructor and Assignment Operator
         Environment(const Environment&) = delete;

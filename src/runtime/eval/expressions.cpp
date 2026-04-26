@@ -151,6 +151,11 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_call_expr(
             returnValue = evaluate(*stmt, scope);
         }
 
+        if (returnValue.type == RuntimeVal::Type::Null && scope.hasVar("result"))
+        {
+            return scope.lookupVar("result");
+        }
+
         return returnValue;
     }
 

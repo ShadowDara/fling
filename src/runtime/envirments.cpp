@@ -119,3 +119,18 @@ Environment* Environment::resolve(const std::string& varName)
 
     return this->parent->resolve(varName);
 }
+
+bool Environment::hasVar(const std::string& varName) const
+{
+    if (this->variables.find(varName) != this->variables.end())
+    {
+        return true;
+    }
+
+    if (this->parent == nullptr)
+    {
+        return false;
+    }
+
+    return this->parent->hasVar(varName);
+}

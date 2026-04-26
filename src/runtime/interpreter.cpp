@@ -86,9 +86,7 @@ namespace fling
             case ast::NodeType::BinaryExpr:
             {
                 auto& binNode = static_cast<const ast::BinaryExpr&>(astNode);
-                auto lhs = evaluate(*binNode.left, env);  // dereferenzieren
-                auto rhs = evaluate(*binNode.right, env);
-                return eval::evaluate_numeric_binary_expr(&lhs, &rhs, binNode.callculation_operator, env);
+                return eval::evaluate_binary_expr(binNode, env);
             }
 
             // Program Node

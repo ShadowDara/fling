@@ -39,23 +39,23 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_fn_declaration(
     const ast::FunctionDeclaration& fnDecl,
     runtime::envirment::Environment& env)
 {
-    // // Clone the Body
-    // std::vector<std::unique_ptr<ast::Stmt>> body;
-    // body.reserve(fnDecl.body.size());
+    std::vector<std::unique_ptr<ast::Stmt>> body;
+    body.reserve(fnDecl.body.size());
 
-    // for (const auto& stmt : fnDecl.body)
-    // {
-    //     body.push_back(stmt->clone()); // du brauchst clone()
-    // }
+    for (const auto& stmt : fnDecl.body)
+    {
+        if (stmt)
+        {
+            body.push_back(stmt->clone());
+        }
+    }
 
-    // RuntimeVal fn = RuntimeVal::Function(
-    //     fnDecl.name,
-    //     fnDecl.parameters,
-    //     &env,
-    //     std::move(body)
-    // );
+    RuntimeVal fn = RuntimeVal::Function(
+        fnDecl.name,
+        fnDecl.parameters,
+        &env,
+        std::move(body)
+    );
 
-    // return env.declareVar(fnDecl.name, std::move(fn), true);
-
-    return RuntimeVal::Null(); // Placeholder, implement the actual logic as needed
+    return env.declareVar(fnDecl.name, std::move(fn), true);
 }

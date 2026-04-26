@@ -6,7 +6,7 @@ fn add(x, y) {
 	let result = x + y;
 	print(result)
 
-	return result
+	result
 }
 
 print(add(10, 10))
