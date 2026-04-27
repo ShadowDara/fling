@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <iostream>
 
 #include "lexer.hpp"
 #include "ast.hpp"
@@ -84,6 +85,12 @@ namespace fling
              */
             std::unique_ptr<fling::ast::Expr> parse_expr();
 
+            // &&, ||
+            std::unique_ptr<fling::ast::Expr> parse_logical_expr();
+
+            // <, > == etc
+            std::unique_ptr<fling::ast::Expr> parse_comparison_expr();
+
             /**
              * Function to parse an Assignment Expression
              *
@@ -100,6 +107,9 @@ namespace fling
              * @return an Additive Expression from the current Token
              */
             std::unique_ptr<fling::ast::Expr> parse_additive_expr();
+
+            // Unary Expression !true, -x
+            std::unique_ptr<fling::ast::Expr> parse_unary_expr();
 
             /**
              * Function to parse a multiplicative Expression

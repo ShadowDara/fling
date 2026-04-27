@@ -20,59 +20,6 @@ namespace fling::runtime::envirment {
 
 namespace fling::runtime
 {
-    //// Einfacher Typ f�r Null oder Number
-    //struct RuntimeVal
-    //{
-    //    enum class Type {
-    //        Null,
-    //        Number,
-    //        Boolean
-    //    } type;
-
-    //    float number;
-    //    bool boolean;
-
-    //    // Null Konstruktor
-    //    RuntimeVal() : type(Type::Null), number(0) {};
-
-    //    // float Number Konstruktor
-    //    RuntimeVal(float n) : type(Type::Number), number(n) {}
-
-    //    // Boolean Konstruktor
-    //    //RuntimeVal()
-
-    //    std::string toString() const
-    //    {
-    //        switch (type)
-    //        {
-
-    //        // Null
-    //        case (Type::Null): {
-    //            return "null";
-    //        }
-
-    //        // Number
-    //        case (Type::Number): {
-    //            return std::to_string(number);
-    //        }
-
-    //        // Boolean
-    //        case (Type::Boolean): {
-    //            //return std::to_string(boolean);
-    //        }
-    //        };
-
-    //        /*float asNumber() const
-    //        {
-    //            if (type != Type::Number)
-    //            {
-    //                throw std::runtime_error("Value is not a number");
-    //            }
-    //            return number;
-    //        }*/
-    //    }
-    //};
-
     struct RuntimeVal {
         enum class Type {
             Null,
@@ -374,6 +321,34 @@ namespace fling::runtime
 
         RuntimeVal(RuntimeVal&&) = default;
         RuntimeVal& operator=(RuntimeVal&&) = default;
+
+        // Safety for is Number
+        bool isNumber() const
+        {
+            return type == Type::Number;
+        }
+
+        // For Unary Expressions
+        bool isTruthy() const
+        {
+            switch (type)
+            {
+                case Type::Null:
+                    return false;
+                case Type::Boolean:
+                    return bvalue;
+                case Type::Number:
+                    return number != 0;
+                case Type::String:
+                    return !str.empty();
+                case Type::Array:
+                    return !elements.empty();
+                case Type::Object:
+                    return !properties.empty();
+                default:
+                    return true;
+            }
+        }
     };
 } // namespace fling::runtime
 

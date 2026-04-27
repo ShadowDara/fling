@@ -44,6 +44,12 @@ namespace fling
             return os;
         }
 
+        // peek function
+        bool match(const std::vector<char>& src, size_t i, char expected)
+        {
+            return i < src.size() && src[i] == expected;
+        }
+
         // Check if string is alphabetic
         bool isAlpha(const std::string &src)
         {
@@ -234,12 +240,99 @@ namespace fling
                         TokenType::BinaryOperator, line, column));
                     i++;
                     break;
+                
+                // Smaller
+                case '<':
+                {
+                    if (i + 1 < src.size() && src[i + 1] == '=')
+                    {
+                        tokens.push_back(token("<=", TokenType::BinaryOperator, line, column));
+                        i += 2;
+                    }
+                    else
+                    {
+                        tokens.push_back(token("<", TokenType::BinaryOperator, line, column));
+                        i++;
+                    }
+                    break;
+                }
+
+                // Bigger
+                case '>':
+                {
+                    if (i + 1 < src.size() && src[i + 1] == '=')
+                    {
+                        tokens.push_back(token(">=", TokenType::BinaryOperator, line, column));
+                        i += 2;
+                    }
+                    else
+                    {
+                        tokens.push_back(token(">", TokenType::BinaryOperator, line, column));
+                        i++;
+                    }
+                    break;
+                }
 
                 // Assignment Operator
                 case '=':
-                    tokens.push_back(token("=", TokenType::Equals, line, column));
-                    i++;
+                {
+                    if (i + 1 < src.size() && src[i + 1] == '=')
+                    {
+                        tokens.push_back(token("==", TokenType::BinaryOperator, line, column));
+                        i += 2;
+                    }
+                    else
+                    {
+                        tokens.push_back(token("=", TokenType::Equals, line, column));
+                        i++;
+                    }
                     break;
+                }
+
+                case '!':
+                {
+                    if (i + 1 < src.size() && src[i + 1] == '=')
+                    {
+                        tokens.push_back(token("!=", TokenType::BinaryOperator, line, column));
+                        i += 2;
+                    }
+                    else
+                    {
+                        std::cerr << "Unexpected '!'\n";
+                        i++;
+                    }
+                    break;
+                }
+
+                case '&':
+                {
+                    if (i + 1 < src.size() && src[i + 1] == '&')
+                    {
+                        tokens.push_back(token("&&", TokenType::BinaryOperator, line, column));
+                        i += 2;
+                    }
+                    else
+                    {
+                        std::cerr << "Unexpected '&'\n";
+                        i++;
+                    }
+                    break;
+                }
+
+                case '|':
+                {
+                    if (i + 1 < src.size() && src[i + 1] == '|')
+                    {
+                        tokens.push_back(token("||", TokenType::BinaryOperator, line, column));
+                        i += 2;
+                    }
+                    else
+                    {
+                        std::cerr << "Unexpected '|'\n";
+                        i++;
+                    }
+                    break;
+                }
 
                 // Comma
                 case ',':

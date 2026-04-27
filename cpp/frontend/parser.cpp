@@ -83,14 +83,14 @@ namespace fling
             // Const
             case (lexer::TokenType::Const):
                 return parse_var_declaration();
+            
+            // If
+            case (lexer::TokenType::If):
+                return parse_if_statement();
 
             // Function
             case (lexer::TokenType::Fn):
                 return parse_fn_declaration();
-
-            // If
-            case (lexer::TokenType::If):
-                return parse_if_statement();
 
             // Default
             default:
@@ -235,7 +235,59 @@ namespace fling
         // Funktion to parse an expression
         std::unique_ptr<fling::ast::Expr> Parser::parse_expr()
         {
-            return this->parse_assignment_expr();
+            return this->parse_logical_expr();
+        }
+
+        // &&, ||
+        std::unique_ptr<fling::ast::Expr> Parser::parse_logical_expr()
+        {
+            auto left = this->parse_comparison_expr();
+
+            while (
+                this->at().value == "&&" ||
+                this->at().value == "||"
+            )
+            {
+                std::string op = this->eat().value;
+                auto right = this->parse_comparison_expr();
+
+                auto expr = std::make_unique<fling::ast::BinaryExpr>();
+                expr->left = std::move(left);
+                expr->right = std::move(right);
+                expr->callculation_operator = op;
+
+                left = std::move(expr);
+            }
+
+            return left;
+        }
+
+        // <, > == etc
+        std::unique_ptr<fling::ast::Expr> Parser::parse_comparison_expr()
+        {
+            auto left = this->parse_additive_expr();
+
+            while (
+                this->at().value == "==" ||
+                this->at().value == "!=" ||
+                this->at().value == "<"  ||
+                this->at().value == ">"  ||
+                this->at().value == "<=" ||
+                this->at().value == ">="
+            )
+            {
+                std::string op = this->eat().value;
+                auto right = this->parse_additive_expr();
+
+                auto expr = std::make_unique<fling::ast::BinaryExpr>();
+                expr->left = std::move(left);
+                expr->right = std::move(right);
+                expr->callculation_operator = op;
+
+                left = std::move(expr);
+            }
+
+            return left;
         }
 
         // Function to parse an assignment Expression
@@ -363,7 +415,7 @@ namespace fling
         // Function to parse an multiplicitave Expression
         std::unique_ptr<fling::ast::Expr> Parser::parse_multiplicitave_expr()
         {
-            auto left = parse_call_member_expr();
+            auto left = parse_unary_expr();
 
             // For Division, Multiplication and Modulo
             while (
@@ -372,7 +424,7 @@ namespace fling
                 this->at().value == "%")
             {
                 std::string callculation_operator = this->eat().value;
-                auto right = this->parse_call_member_expr();
+                auto right = this->parse_unary_expr();
 
                 auto leftnew = std::make_unique<fling::ast::BinaryExpr>();
                 leftnew->left = std::move(left);
@@ -383,6 +435,26 @@ namespace fling
             }
 
             return left;
+        }
+
+        // Unary Expression !true, -x
+        std::unique_ptr<fling::ast::Expr> Parser::parse_unary_expr()
+        {
+            if (
+                this->at().value == "!" ||
+                this->at().value == "-"
+            )
+            {
+                std::string op = this->eat().value;
+
+                auto expr = std::make_unique<ast::UnaryExpr>();
+                expr->op = op;
+                expr->operand = this->parse_unary_expr(); // RECURSIVE (wichtig!)
+
+                return expr;
+            }
+
+            return this->parse_call_member_expr();
         }
 
         // Function to parse a Call Member Expression

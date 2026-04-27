@@ -108,7 +108,7 @@ namespace fling
             NumericLiteral,
             Identifier,
             BinaryExpr,
-            // UnaryExpr,
+            UnaryExpr,
         };
 
         /**
@@ -377,6 +377,36 @@ namespace fling
                         static_cast<Expr*>(right->clone().release()));
 
                 return b;
+            }
+        };
+
+        // Unary Expression
+        struct UnaryExpr : Expr
+        {
+            std::string op;                // "!" oder "-"
+            std::unique_ptr<Expr> operand;   // Ausdruck rechts davon
+
+            UnaryExpr() : Expr(NodeType::UnaryExpr) {}
+
+            std::string toString(int indent = 0) const override
+            {
+                std::string out = indentStr(indent) + "UnaryExpr:\n";
+                out += indentStr(indent + 2) + "Operator: " + op + "\n";
+                out += indentStr(indent + 2) + "Right:\n";
+                out += operand ? operand->toString(indent + 4) : "null";
+                return out;
+            }
+
+            std::unique_ptr<Stmt> clone() const override
+            {
+                auto u = std::make_unique<UnaryExpr>();
+                u->op = op;
+
+                if (operand)
+                    u->operand = std::unique_ptr<Expr>(
+                        static_cast<Expr*>(operand->clone().release()));
+
+                return u;
             }
         };
 

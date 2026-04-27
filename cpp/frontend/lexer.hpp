@@ -83,6 +83,9 @@ namespace fling
 
         std::ostream &operator<<(std::ostream &os, const Token &token);
 
+        // peek function
+        bool match(const std::vector<char>& src, size_t i, char expected);
+
         /**
          * Check if a std::string is alphabetic
          *

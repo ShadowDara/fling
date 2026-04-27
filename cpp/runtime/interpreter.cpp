@@ -178,6 +178,29 @@ namespace fling
                 return eval::evaluate_binary_expr(binNode, env);
             }
 
+            // Unary Expression
+            case ast::NodeType::UnaryExpr:
+            {
+                auto &unNode = static_cast<const ast::UnaryExpr &>(astNode);
+
+                auto val = evaluate(*unNode.operand, env);
+
+                if (unNode.op == "-")
+                {
+                    if (val.type != RuntimeVal::Type::Number)
+                        return RuntimeVal::Null();
+
+                    return RuntimeVal(-val.number);
+                }
+
+                if (unNode.op == "!")
+                {
+                    return RuntimeVal(!val.isTruthy());
+                }
+
+                return RuntimeVal::Null();
+            }
+
             // Program Node
             case ast::NodeType::Program:
             {
