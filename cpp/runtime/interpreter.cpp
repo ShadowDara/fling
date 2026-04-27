@@ -20,6 +20,24 @@ namespace fling
         {
             switch (astNode.kind)
             {
+            // If Statement
+            case ast::NodeType::IfStatement:
+            {
+                auto &ifNode = static_cast<const ast::IfStatement &>(astNode);
+                auto condVal = evaluate(*ifNode.condition, env);
+                if (condVal.isTruthy())
+                {
+                    return evaluate(*ifNode.thenBranch, env);
+                }
+                else if (ifNode.elseBranch)
+                {
+                    return evaluate(*ifNode.elseBranch, env);
+                }
+                else
+                {
+                    return RuntimeVal::Null();
+                }
+            }
 
             // Number Value
             case ast::NodeType::NumericLiteral:
@@ -230,11 +248,11 @@ namespace fling
                 cout << "Unknown AST Node Type: "
                      << static_cast<int>(astNode.kind)
                      << endl;
-                
+
                 // Null Value
                 return RuntimeVal::Null();
             }
             }
-            }
-        } // namespace runtime
-    } // namespace fling
+        }
+    } // namespace runtime
+} // namespace fling

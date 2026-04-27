@@ -298,7 +298,7 @@ namespace fling
                     }
                     else
                     {
-                        std::cerr << "Unexpected '!'\n";
+                        tokens.push_back(token("!", TokenType::BinaryOperator, line, column));
                         i++;
                     }
                     break;
