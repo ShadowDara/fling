@@ -33,6 +33,8 @@ void runFile(const std::string& filename)
 
 void runREPL()
 {
+    std::cout << "REPL for fling:" << std::endl;
+
     // Variable for the Source Code
     std::string source;
 

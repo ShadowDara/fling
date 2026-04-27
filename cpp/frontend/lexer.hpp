@@ -34,6 +34,7 @@ namespace fling
             Fn,
             If,
             While,
+            Else,
 
             Semicolon,
             Equals,

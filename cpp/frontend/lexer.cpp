@@ -27,6 +27,8 @@ namespace fling
                 return "Let";
             case TokenType::If:
                 return "If";
+            case TokenType::Else:
+                return "Else";
             case TokenType::While:
                 return "While";
             default:
@@ -115,6 +117,18 @@ namespace fling
             {
                 "fn",
                 TokenType::Fn
+            },
+            {
+                "if",
+                TokenType::If
+            },
+            {
+                "else",
+                TokenType::Else
+            },
+            {
+                "while",
+                TokenType::While
             }
         };
 

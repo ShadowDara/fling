@@ -17,7 +17,7 @@ namespace fling
         bool Parser::not_eof()
         {
             return !tokens.empty() &&
-                tokens[0].type != lexer::TokenType::Eof;
+                   tokens[0].type != lexer::TokenType::Eof;
         }
 
         // Function to get the current token
@@ -39,30 +39,30 @@ namespace fling
         }
 
         // Function to expect a specific Token Type
-        fling::lexer::Token Parser::expect(fling::lexer::TokenType type, const std::string& context)
+        fling::lexer::Token Parser::expect(fling::lexer::TokenType type, const std::string &context)
         {
             lexer::Token tk = at();
 
             if (tk.type != type)
             {
                 std::cerr << "\n=== PARSER ERROR ===\n";
-                
+
                 std::cerr << "Context: " << context << "\n";
-                
+
                 std::cerr << "Expected: " << tokenTypeToString(type)
-                    << " ASCII: "
-                    << (tokenTypeToString(type).empty() ? 0 : int(tokenTypeToString(type)[0]))
-                    << "\n";
-                
+                          << " ASCII: "
+                          << (tokenTypeToString(type).empty() ? 0 : int(tokenTypeToString(type)[0]))
+                          << "\n";
+
                 std::cerr << "Found: " << tokenTypeToString(tk.type)
-                    << " (\"" << tk.value << "\") ASCII: ";
+                          << " (\"" << tk.value << "\") ASCII: ";
                 for (char c : tk.value)
                     std::cerr << int(c) << " ";
                 std::cerr << "\n";
-                
+
                 std::cerr << "Location: line " << tk.line
-                    << ", column " << tk.column << "\n";
-                
+                          << ", column " << tk.column << "\n";
+
                 std::cerr << "====================\n";
 
                 std::exit(1);
@@ -76,32 +76,63 @@ namespace fling
         {
             switch (this->at().type)
             {
-                // Let
-                case (lexer::TokenType::Let):
-                {
-                    return parse_var_declaration();
-                }
+            // Let
+            case (lexer::TokenType::Let):
+                return parse_var_declaration();
 
-                // Const
-                case (lexer::TokenType::Const):
-                {
-                    return parse_var_declaration();
-                }
+            // Const
+            case (lexer::TokenType::Const):
+                return parse_var_declaration();
 
-                // Function
-                case (lexer::TokenType::Fn):
-                {
-                    return parse_fn_declaration();
-                }
+            // Function
+            case (lexer::TokenType::Fn):
+                return parse_fn_declaration();
 
-                // Default
-                default:
-                {
-                    // For now, we only parse expressions (identifiers / literals)
-                    // and wrap them as statements.
-                    return parse_expr();
-                }
+            // If
+            case (lexer::TokenType::If):
+                return parse_if_statement();
+
+            // Default
+            default:
+                // For now, we only parse expressions (identifiers / literals)
+                // and wrap them as statements.
+                return parse_expr();
             }
+        }
+
+        // Parse a block of statements inside {...}
+        std::unique_ptr<fling::ast::Stmt> Parser::parse_stmt_block()
+        {
+            auto block = std::make_unique<fling::ast::Program>();
+            while (this->at().type != lexer::TokenType::CloseCurlyBrace && this->at().type != lexer::TokenType::Eof)
+            {
+                block->body.push_back(this->parse_stmt());
+            }
+            this->expect(lexer::TokenType::CloseCurlyBrace, "Block muss mit '}' geschlossen werden");
+            return block;
+        }
+
+        // Parse if statement: if <expr> { ... } [else { ... }]
+        std::unique_ptr<fling::ast::Stmt> Parser::parse_if_statement()
+        {
+            this->eat(); // eat 'if'
+            // Parse condition (alles bis zur nächsten öffnenden Klammer)
+            auto condition = this->parse_expr();
+            this->expect(lexer::TokenType::OpenCurlyBrace, "Erwarte '{' nach if-Bedingung");
+            auto thenBranch = this->parse_stmt_block();
+
+            std::unique_ptr<fling::ast::Stmt> elseBranch = nullptr;
+            if (this->at().type == lexer::TokenType::Else) {
+                this->eat(); // eat 'else'
+                this->expect(lexer::TokenType::OpenCurlyBrace, "Erwarte '{' nach else");
+                elseBranch = this->parse_stmt_block();
+            }
+
+            auto node = std::make_unique<fling::ast::IfStatement>();
+            node->condition = std::move(condition);
+            node->thenBranch = std::move(thenBranch);
+            node->elseBranch = std::move(elseBranch);
+            return node;
         }
 
         // Function to parse a Function Declaration
@@ -109,11 +140,12 @@ namespace fling
         {
             this->eat(); // eat the fn keyword
             auto name = this->expect(lexer::TokenType::Identifier,
-                "Expected Function name following fn keyword").value;
+                                     "Expected Function name following fn keyword")
+                            .value;
 
             auto args = this->parse_agrs();
             std::vector<std::string> params;
-            for (const auto& arg : args)
+            for (const auto &arg : args)
             {
                 if (arg->kind != ast::NodeType::Identifier)
                 {
@@ -124,23 +156,23 @@ namespace fling
                     return nullptr;
                 }
 
-                auto* ident = static_cast<ast::Identifier*>(arg.get());
+                auto *ident = static_cast<ast::Identifier *>(arg.get());
                 params.push_back(ident->symbol);
             }
 
             this->expect(lexer::TokenType::OpenCurlyBrace,
-                "Expected function body following declaration");
+                         "Expected function body following declaration");
 
             std::vector<std::unique_ptr<ast::Stmt>> body = std::vector<std::unique_ptr<ast::Stmt>>();
             while (this->at().type != lexer::TokenType::Eof &&
-                this->at().type != lexer::TokenType::CloseCurlyBrace)
+                   this->at().type != lexer::TokenType::CloseCurlyBrace)
             {
                 body.push_back(std::move(this->parse_stmt()));
             }
 
             // End of function Body
             this->expect(lexer::TokenType::CloseCurlyBrace,
-                "Cloaing Brace expected inside function declaration");
+                         "Cloaing Brace expected inside function declaration");
 
             auto fn = ast::FunctionDeclaration(name, std::move(body), params);
             std::unique_ptr<ast::FunctionDeclaration> fnr =
@@ -150,29 +182,28 @@ namespace fling
         }
 
         // Function to declare a new Variable
-        // 
+        //
         // (CONST | LET) IDENTIFIER ;
-        // 
+        //
         // (CONST | LET) IDENTIFIER = EXPR ;
-        // 
+        //
         std::unique_ptr<fling::ast::Stmt> Parser::parse_var_declaration()
         {
             bool isConstant =
                 (this->eat().type == lexer::TokenType::Const);
 
             std::string identifier = this->expect(lexer::TokenType::Identifier,
-                "Expected identifier name following let | const keywords").value;
+                                                  "Expected identifier name following let | const keywords")
+                                         .value;
 
             if (this->at().type == lexer::TokenType::Semicolon)
             {
                 this->eat(); // Expect the Semicolon
                 if (isConstant)
                 {
-                    std::cout <<
-                        "Must assigne value to a Constant expression. No value provided."
-                        << std::endl;
-                    
-                        
+                    std::cout << "Must assigne value to a Constant expression. No value provided."
+                              << std::endl;
+
                     // Return Nullpointer
                     return nullptr;
                 }
@@ -187,17 +218,16 @@ namespace fling
             }
 
             this->expect(lexer::TokenType::Equals,
-                "Expected equals Token following identifier in var declaration."
-            );
+                         "Expected equals Token following identifier in var declaration.");
 
             auto declaration = std::make_unique<ast::VarDeclaration>();
 
             declaration->value = this->parse_expr();
             declaration->constant = isConstant;
             declaration->identifier = identifier;
-            
+
             this->expect(lexer::TokenType::Semicolon,
-                "Variable declaration statement must end with semicolon.");
+                         "Variable declaration statement must end with semicolon.");
 
             return declaration;
         }
@@ -205,10 +235,10 @@ namespace fling
         // Funktion to parse an expression
         std::unique_ptr<fling::ast::Expr> Parser::parse_expr()
         {
-			return this->parse_assignment_expr();
+            return this->parse_assignment_expr();
         }
 
-		// Function to parse an assignment Expression
+        // Function to parse an assignment Expression
         std::unique_ptr<fling::ast::Expr> Parser::parse_assignment_expr()
         {
             auto left = this->parse_object_expr();
@@ -258,9 +288,10 @@ namespace fling
                 }
 
                 std::string key = this->expect(lexer::TokenType::Identifier,
-					"Expected identifier as key in object literal").value;
+                                               "Expected identifier as key in object literal")
+                                      .value;
 
-				if (this->at().type == lexer::TokenType::Colon)
+                if (this->at().type == lexer::TokenType::Colon)
                 {
                     this->eat(); // eat the colon
                     auto value = this->parse_expr();
@@ -270,9 +301,9 @@ namespace fling
                     properties.push_back(std::move(property));
                     continue;
                 }
-				else if (this->at().type == lexer::TokenType::Comma)
+                else if (this->at().type == lexer::TokenType::Comma)
                 {
-					this->eat(); // eat the comma
+                    this->eat(); // eat the comma
                     // Shorthand Property: { key }
                     auto property = std::make_unique<ast::Property>();
                     property->key = key;
@@ -282,9 +313,9 @@ namespace fling
                 }
 
                 // { key: value }
-				this->expect(lexer::TokenType::Colon,
-                    "Missing colon ':' after key in object literal");
-				auto value = this->parse_expr();
+                this->expect(lexer::TokenType::Colon,
+                             "Missing colon ':' after key in object literal");
+                auto value = this->parse_expr();
 
                 auto property = std::make_unique<ast::Property>();
                 property->key = key;
@@ -294,15 +325,15 @@ namespace fling
                 if (this->at().type != lexer::TokenType::CloseCurlyBrace)
                 {
                     this->expect(lexer::TokenType::Comma,
-                        "Expected Comma or Closing Bracket following property");
+                                 "Expected Comma or Closing Bracket following property");
                 }
             }
 
             this->expect(lexer::TokenType::CloseCurlyBrace,
-                "Object Literal Closing Brace { missing!");
+                         "Object Literal Closing Brace { missing!");
 
-			auto objLiteral = std::make_unique<ast::ObjectLiteral>();
-			objLiteral->properties = std::move(properties);
+            auto objLiteral = std::make_unique<ast::ObjectLiteral>();
+            objLiteral->properties = std::move(properties);
 
             return objLiteral;
         }
@@ -357,14 +388,14 @@ namespace fling
         // Function to parse a Call Member Expression
         std::unique_ptr<fling::ast::Expr> Parser::parse_call_member_expr()
         {
-			auto member = parse_member_expr();
+            auto member = parse_member_expr();
 
             if (this->at().type == lexer::TokenType::OpenParen)
             {
                 return parse_call_expr(std::move(member));
             }
 
-			return member;
+            return member;
         }
 
         // Function to parse a Call Expression
@@ -373,10 +404,10 @@ namespace fling
         {
             auto callExpr = std::make_unique<ast::CallExpr>(std::move(caller), parse_agrs());
 
-			if (at().type == lexer::TokenType::OpenParen)
+            if (at().type == lexer::TokenType::OpenParen)
             {
                 auto callExpr2 = std::move(parse_call_expr(std::move(callExpr)));
-				return callExpr2;
+                return callExpr2;
             }
 
             return callExpr;
@@ -386,8 +417,8 @@ namespace fling
         std::vector<std::unique_ptr<fling::ast::Expr>> Parser::parse_agrs()
         {
             // This call is not required to tbh
-			expect(lexer::TokenType::OpenParen,
-                "Expected opening parenthesis for function call arguments");
+            expect(lexer::TokenType::OpenParen,
+                   "Expected opening parenthesis for function call arguments");
 
             auto agrs = std::vector<std::unique_ptr<ast::Expr>>();
 
@@ -397,7 +428,7 @@ namespace fling
             }
 
             expect(lexer::TokenType::CloseParen,
-				"Expected closing parenthesis after function call arguments");
+                   "Expected closing parenthesis after function call arguments");
 
             return agrs;
         }
@@ -405,10 +436,10 @@ namespace fling
         // Function to parse the Argument List
         std::vector<std::unique_ptr<fling::ast::Expr>> Parser::parse_argument_list()
         {
-			std::vector<std::unique_ptr<ast::Expr>> agrs;
-			agrs.push_back(std::move(parse_assignment_expr()));
+            std::vector<std::unique_ptr<ast::Expr>> agrs;
+            agrs.push_back(std::move(parse_assignment_expr()));
 
-			while (this->at().type == lexer::TokenType::Comma)
+            while (this->at().type == lexer::TokenType::Comma)
             {
                 this->eat(); // eat the comma
                 auto expr = parse_assignment_expr();
@@ -423,13 +454,12 @@ namespace fling
         {
             auto object = parse_primary_expr();
 
-            while (at().type == lexer::TokenType::Dot
-                || at().type == lexer::TokenType::OpenSquaredBrace)
+            while (at().type == lexer::TokenType::Dot || at().type == lexer::TokenType::OpenSquaredBrace)
             {
                 auto theoperator = eat();
                 std::unique_ptr<ast::Expr> property;
                 bool computed = false;
-                
+
                 if (theoperator.type == lexer::TokenType::Dot)
                 {
                     computed = false;
@@ -450,13 +480,13 @@ namespace fling
                     computed = true;
                     property = std::move(parse_expr());
                     expect(lexer::TokenType::CloseSquaredBrace,
-                        "Missing closing Squared Brace in computed value");
+                           "Missing closing Squared Brace in computed value");
                 }
 
                 object = std::make_unique<ast::MemberExpr>(std::move(object), std::move(property), computed);
             }
 
-            return object;  // Rückgabe nicht vergessen!
+            return object; // Rückgabe nicht vergessen!
         }
 
         // Function to parse a float Value
@@ -548,7 +578,7 @@ namespace fling
             {
                 cout << "Unexpected Token found during Parsing: "
                      << this->at() << endl;
-                
+
                 // Return Nullpointer
                 return nullptr;
             }

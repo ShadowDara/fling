@@ -63,6 +63,12 @@ namespace fling
              */
             std::unique_ptr<fling::ast::Stmt> parse_stmt();
 
+            // Parse a statement between { }
+            std::unique_ptr<fling::ast::Stmt> parse_stmt_block();
+
+            // Parse if Statement
+            std::unique_ptr<fling::ast::Stmt> parse_if_statement();
+
             // Function to parse a Function Declaration
             std::unique_ptr<fling::ast::Stmt> parse_fn_declaration();
 
