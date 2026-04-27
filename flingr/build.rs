@@ -19,7 +19,8 @@ fn main() {
         .file("cpp/runtime/eval/statements.cpp")
         .file("cpp/runtime/eval/expressions.cpp")
         .include("cpp")
-        .flag_if_supported("-std=c++20")
+        .flag_if_supported("/std:c++20")   // MSVC
+        .flag_if_supported("-std=c++20")   // GCC/Clang fallback
         .compile("flingr");
 
     println!("cargo:rerun-if-changed=src/bridge.rs");
