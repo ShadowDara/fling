@@ -92,6 +92,8 @@ namespace fling
             Program,
             VarDeclaration,
             FunctionDeckaration,
+            IfStatement,
+            WhileStatement,
 
             // EXPRESSIONS
             AssignmentExpr,
@@ -536,6 +538,35 @@ namespace fling
             std::unique_ptr<Stmt> clone() const override
             {
                 return std::make_unique<Identifier>(*this);
+            }
+        };
+
+        // If Statement
+        struct IfStatement : Stmt {
+            std::unique_ptr<Expr> condition;
+            std::unique_ptr<Stmt> thenBranch;
+            std::unique_ptr<Stmt> elseBranch; // optional, kann nullptr sein
+
+            IfStatement()
+                : Stmt(NodeType::IfStatement) {}
+
+            std::string toString(int indent = 0) const override {
+                std::string out = indentStr(indent) + "IfStatement:\n";
+                out += indentStr(indent + 2) + "Condition:\n";
+                out += condition ? condition->toString(indent + 4) + "\n" : indentStr(indent + 4) + "null\n";
+                out += indentStr(indent + 2) + "Then:\n";
+                out += thenBranch ? thenBranch->toString(indent + 4) + "\n" : indentStr(indent + 4) + "null\n";
+                out += indentStr(indent + 2) + "Else:\n";
+                out += elseBranch ? elseBranch->toString(indent + 4) : indentStr(indent + 4) + "null";
+                return out;
+            }
+
+            std::unique_ptr<Stmt> clone() const override {
+                auto node = std::make_unique<IfStatement>();
+                node->condition = condition ? std::unique_ptr<Expr>(static_cast<Expr*>(condition->clone().release())) : nullptr;
+                node->thenBranch = thenBranch ? thenBranch->clone() : nullptr;
+                node->elseBranch = elseBranch ? elseBranch->clone() : nullptr;
+                return node;
             }
         };
 
