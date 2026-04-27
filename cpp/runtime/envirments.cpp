@@ -118,8 +118,7 @@ Environment* Environment::resolve(const std::string& varName)
         
         std::cout << error_msg << std::endl;
 
-        //return nullptr;
-        
+        // Return Null
         return nullptr;
     }
 

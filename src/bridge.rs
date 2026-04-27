@@ -5,4 +5,10 @@ pub mod ffi {
 
         pub fn run_file(filename: &str);
     }
+
+    unsafe extern "C++" {
+        include!("rustffi/ffi.hpp");
+
+        pub fn runREPL();
+    }
 }

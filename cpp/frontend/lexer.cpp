@@ -25,6 +25,10 @@ namespace fling
                 return "BinaryOperator";
             case TokenType::Let:
                 return "Let";
+            case TokenType::If:
+                return "If";
+            case TokenType::While:
+                return "While";
             default:
                 return "Unknown";
             }
@@ -303,6 +307,8 @@ namespace fling
                     {
                         std::cout << "Unrecognized character in source: "
                             << current << " ASCII: " << (int)current << std::endl;
+                        
+                        // Return empty Vector
                         return {};
                     }
 

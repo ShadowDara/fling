@@ -35,6 +35,8 @@ namespace fling
             Let,
             Const,
             Fn,
+            If,
+            While,
 
             Semicolon,
             Equals,

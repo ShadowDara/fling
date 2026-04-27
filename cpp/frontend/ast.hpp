@@ -106,9 +106,7 @@ namespace fling
             NumericLiteral,
             Identifier,
             BinaryExpr,
-            // CallExpr,
             // UnaryExpr,
-            // FunctionDeclaration
         };
 
         /**

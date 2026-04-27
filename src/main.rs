@@ -5,4 +5,6 @@ fn main() {
     let file = "test.txt";
     
     bridge::ffi::run_file(&file);
+
+    bridge::ffi::runREPL();
 }
