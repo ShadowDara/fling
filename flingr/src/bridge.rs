@@ -1,8 +1,8 @@
 #[cxx::bridge]
-mod ffi {
+pub mod ffi {
     unsafe extern "C++" {
-        include!("ffi.hpp");
+        include!("rustffi/ffi.hpp");
 
-        fn run_file(filename: &CxxString);
+        pub fn run_file(filename: &str);
     }
 }

@@ -171,7 +171,7 @@ namespace fling
                     std::cout <<
                         "Must assigne value to a Constant expression. No value provided."
                         << std::endl;
-                    dcorelib::Exit(1);
+                    return nullptr;
                 }
 
                 auto var = std::make_unique<ast::VarDeclaration>();
@@ -229,9 +229,6 @@ namespace fling
         {
             if (this->at().type != lexer::TokenType::OpenCurlyBrace)
             {
-                /*cout << "Expected opening parenthesis '[' for object literal, found: "
-                     << this->at().value << endl;
-                dcorelib::Exit(1);*/
                 return parse_additive_expr();
             }
 
@@ -545,7 +542,7 @@ namespace fling
             {
                 cout << "Unexpected Token found during Parsing: "
                      << this->at() << endl;
-                dcorelib::Exit(1);
+                return nullptr;
             }
             }
 

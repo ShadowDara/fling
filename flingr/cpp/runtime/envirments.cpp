@@ -120,7 +120,7 @@ Environment* Environment::resolve(const std::string& varName)
 
         //return nullptr;
         
-        dcorelib::Exit(1);
+        return nullptr;
     }
 
     return this->parent->resolve(varName);

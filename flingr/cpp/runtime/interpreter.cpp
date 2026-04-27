@@ -207,8 +207,7 @@ namespace fling
                 cout << "Unknown AST Node Type: "
                      << static_cast<int>(astNode.kind)
                      << endl;
-                dcorelib::Exit(1);
-                return RuntimeVal();
+                return RuntimeVal::Null();
             }
             }
             }

@@ -11,7 +11,7 @@
 fn main() {
     cxx_build::bridge("src/bridge.rs")
         .file("cpp/util.cpp")
-        .file("cpp/ffi.cpp")
+        .file("cpp/rustffi/ffi.cpp")
         .file("cpp/frontend/lexer.cpp")
         .file("cpp/frontend/parser.cpp")
         .file("cpp/runtime/interpreter.cpp")
@@ -25,8 +25,8 @@ fn main() {
     println!("cargo:rerun-if-changed=src/bridge.rs");
     println!("cargo:rerun-if-changed=cpp/util.cpp");
     println!("cargo:rerun-if-changed=cpp/util.hpp");
-    println!("cargo:rerun-if-changed=cpp/ffi.cpp");
-    println!("cargo:rerun-if-changed=cpp/ffi.hpp");
+    println!("cargo:rerun-if-changed=cpp/rustffi/ffi.cpp");
+    println!("cargo:rerun-if-changed=cpp/rustffi/ffi.hpp");
     println!("cargo:rerun-if-changed=cpp/frontend/lexer.cpp");
     println!("cargo:rerun-if-changed=cpp/frontend/lexer.hpp");
     println!("cargo:rerun-if-changed=cpp/frontend/parser.cpp");

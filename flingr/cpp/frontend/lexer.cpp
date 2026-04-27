@@ -303,7 +303,7 @@ namespace fling
                     {
                         std::cout << "Unrecognized character in source: "
                             << current << " ASCII: " << (int)current << std::endl;
-                        dcorelib::Abort();
+                        return {};
                     }
 
                     break;

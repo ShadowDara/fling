@@ -1,6 +1,8 @@
 mod bridge;
 
 fn main() {
-    let file = std::ffi::CString::new("test.txt").unwrap();
+    //let file = std::env::args().nth(1).unwrap();
+    let file = "test.txt";
+    
     bridge::ffi::run_file(&file);
 }
