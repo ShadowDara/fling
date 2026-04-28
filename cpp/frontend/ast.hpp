@@ -111,6 +111,9 @@ namespace fling
             UnaryExpr,
         };
 
+        // Nodetype toString
+        std::string toString(NodeType type);
+
         /**
          * @class Stmt
          * @brief Base class for all AST nodes (statements and expressions)
@@ -596,6 +599,47 @@ namespace fling
                 node->condition = condition ? std::unique_ptr<Expr>(static_cast<Expr*>(condition->clone().release())) : nullptr;
                 node->thenBranch = thenBranch ? thenBranch->clone() : nullptr;
                 node->elseBranch = elseBranch ? elseBranch->clone() : nullptr;
+                return node;
+            }
+        };
+
+        // While Statement
+        struct WhileStatement : Stmt
+        {
+            std::unique_ptr<Expr> condition;
+            std::unique_ptr<Stmt> body;
+
+            WhileStatement()
+                : Stmt(NodeType::WhileStatement) {}
+
+            std::string toString(int indent = 0) const override {
+                std::string out = indentStr(indent) + "WhileStatement:\n";
+
+                out += indentStr(indent + 2) + "Condition:\n";
+                out += condition
+                    ? condition->toString(indent + 4) + "\n"
+                    : indentStr(indent + 4) + "null\n";
+
+                out += indentStr(indent + 2) + "Body:\n";
+                out += body
+                    ? body->toString(indent + 4)
+                    : indentStr(indent + 4) + "null";
+
+                return out;
+            }
+
+            std::unique_ptr<Stmt> clone() const override {
+                auto node = std::make_unique<WhileStatement>();
+
+                node->condition = condition
+                    ? std::unique_ptr<Expr>(
+                        static_cast<Expr*>(condition->clone().release()))
+                    : nullptr;
+
+                node->body = body
+                    ? body->clone()
+                    : nullptr;
+
                 return node;
             }
         };

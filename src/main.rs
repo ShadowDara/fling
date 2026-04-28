@@ -8,5 +8,7 @@ fn main() {
 
     bridge::ffi::run_file("test_operators.fling");
 
+    bridge::ffi::run_file("while.test");
+
     bridge::ffi::runREPL();
 }

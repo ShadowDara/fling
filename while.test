@@ -1,0 +1,12 @@
+let x = 5;
+
+if x == 4 {
+    print(8)
+} else {
+    print("Else Block")
+    print(4)
+}
+
+while x == 5 {
+    print(5)
+}

@@ -87,6 +87,10 @@ namespace fling
             // If
             case (lexer::TokenType::If):
                 return parse_if_statement();
+            
+            // While
+            case (lexer::TokenType::While):
+                return parse_while_statement();
 
             // Function
             case (lexer::TokenType::Fn):
@@ -132,6 +136,29 @@ namespace fling
             node->condition = std::move(condition);
             node->thenBranch = std::move(thenBranch);
             node->elseBranch = std::move(elseBranch);
+            return node;
+        }
+
+        // Parse While Statement
+        std::unique_ptr<fling::ast::Stmt> Parser::parse_while_statement()
+        {
+            this->eat(); // eat 'while'
+
+            // condition
+            auto condition = this->parse_expr();
+
+            // body
+            this->expect(
+                lexer::TokenType::OpenCurlyBrace,
+                "Expected '{' after while condition"
+            );
+
+            auto body = this->parse_stmt_block();
+
+            auto node = std::make_unique<fling::ast::WhileStatement>();
+            node->condition = std::move(condition);
+            node->body = std::move(body);
+
             return node;
         }
 
@@ -649,6 +676,9 @@ namespace fling
             {
                 cout << "Unexpected Token found during Parsing: "
                      << this->at() << endl;
+                
+                // Remove the Error
+                this->eat();
 
                 // Return Nullpointer
                 return nullptr;

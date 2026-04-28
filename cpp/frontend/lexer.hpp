@@ -33,8 +33,8 @@ namespace fling
             Const,
             Fn,
             If,
-            While,
             Else,
+            While,
 
             Semicolon,
             Equals,

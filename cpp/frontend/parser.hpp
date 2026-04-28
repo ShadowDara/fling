@@ -70,6 +70,9 @@ namespace fling
             // Parse if Statement
             std::unique_ptr<fling::ast::Stmt> parse_if_statement();
 
+            // Parse While statement
+            std::unique_ptr<fling::ast::Stmt> parse_while_statement();
+
             // Function to parse a Function Declaration
             std::unique_ptr<fling::ast::Stmt> parse_fn_declaration();
 

@@ -14,6 +14,7 @@ fn main() {
         .file("cpp/rustffi/ffi.cpp")
         .file("cpp/frontend/lexer.cpp")
         .file("cpp/frontend/parser.cpp")
+        .file("cpp/frontend/ast.cpp")
         .file("cpp/runtime/interpreter.cpp")
         .file("cpp/runtime/envirments.cpp")
         .file("cpp/runtime/eval/statements.cpp")
@@ -33,6 +34,7 @@ fn main() {
     println!("cargo:rerun-if-changed=cpp/frontend/parser.cpp");
     println!("cargo:rerun-if-changed=cpp/frontend/parser.hpp");
     println!("cargo:rerun-if-changed=cpp/frontend/ast.hpp");
+    println!("cargo:rerun-if-changed=cpp/frontend/ast.cpp");
     println!("cargo:rerun-if-changed=cpp/runtime/interpreter.cpp");
     println!("cargo:rerun-if-changed=cpp/runtime/interpreter.hpp");
     println!("cargo:rerun-if-changed=cpp/runtime/envirments.cpp");

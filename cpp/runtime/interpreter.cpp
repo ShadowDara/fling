@@ -245,9 +245,8 @@ namespace fling
             // Error Fallback
             default:
             {
-                cout << "Unknown AST Node Type: "
-                     << static_cast<int>(astNode.kind)
-                     << endl;
+                cout << "Statement has not been setup for Interpretation: "
+                     << ast::toString(astNode.kind) << endl;
 
                 // Null Value
                 return RuntimeVal::Null();
