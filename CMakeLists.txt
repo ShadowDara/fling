@@ -30,6 +30,7 @@ add_executable (
     "main.cpp"
     
     "cpp/frontend/ast.hpp"
+    "cpp/frontend/ast.cpp"
 
     "cpp/frontend/lexer.cpp"
     "cpp/frontend/lexer.hpp"

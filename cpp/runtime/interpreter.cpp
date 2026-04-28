@@ -44,11 +44,9 @@ namespace fling
             {
                 auto &whileNode = static_cast<const ast::WhileStatement &>(astNode);
 
-                // Loop solange Condition true ist
                 while (true)
                 {
                     auto condVal = evaluate(*whileNode.condition, env);
-
                     if (!condVal.isTruthy())
                         break;
 

@@ -10,5 +10,7 @@ fn main() {
 
     bridge::ffi::run_file("while.test");
 
+    bridge::ffi::run_file("prime.txt");
+
     bridge::ffi::runREPL();
 }
