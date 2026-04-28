@@ -80,6 +80,10 @@ RuntimeVal Environment::assignVar(
     std::string varName, RuntimeVal value)
 {
     auto env = this->resolve(varName);
+    if (!env) {
+        std::cout << "Variable not found: " << varName << std::endl;
+        return RuntimeVal();
+    }
 
 	// Can not assign to a variable that is declared as constant
 	if (env->constants.find(varName) != env->constants.end())
@@ -99,6 +103,12 @@ RuntimeVal Environment::assignVar(
 RuntimeVal Environment::lookupVar(std::string varName)
 {
     auto env = this->resolve(varName);
+
+    if (!env) {
+        std::cout << "Variable not found: " << varName << std::endl;
+        return RuntimeVal();
+    }
+
     return env->variables[varName];
 }
 
@@ -122,7 +132,14 @@ Environment* Environment::resolve(const std::string& varName)
         return nullptr;
     }
 
-    return this->parent->resolve(varName);
+    auto var = this->parent->resolve(varName);
+
+    if (!var) {
+        std::cout << "Variable not found: " << varName << std::endl;
+        return nullptr;
+    }
+
+    return var;
 }
 
 bool Environment::hasVar(const std::string& varName) const

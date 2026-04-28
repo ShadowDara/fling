@@ -7,6 +7,7 @@ using namespace fling;
 using namespace fling::util;
 using namespace fling::ast;
 using namespace fling::runtime;
+using namespace fling::runtime::envirment;
 // using namespace fling::runtime::eval;
 
 namespace fling
