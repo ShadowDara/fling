@@ -58,6 +58,60 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_binary_expr(
     auto lhs = evaluate(*binop.left, env);
     auto rhs = evaluate(*binop.right, env);
 
+    // // Handle comparison operators
+    // if (binop.callculation_operator == "==")
+    // {
+    //     // Type-safe equality comparison
+    //     if (lhs.type != rhs.type)
+    //         return RuntimeVal::Boolean(false);
+        
+    //     switch (lhs.type)
+    //     {
+    //         case RuntimeVal::Type::Null:
+    //             return RuntimeVal::Boolean(true);
+    //         case RuntimeVal::Type::Number:
+    //             return RuntimeVal::Boolean(lhs.number == rhs.number);
+    //         case RuntimeVal::Type::String:
+    //             return RuntimeVal::Boolean(lhs.str == rhs.str);
+    //         case RuntimeVal::Type::Boolean:
+    //             return RuntimeVal::Boolean(lhs.bvalue == rhs.bvalue);
+    //         default:
+    //             return RuntimeVal::Boolean(false);
+    //     }
+    // }
+    
+    // if (binop.callculation_operator == "!=")
+    // {
+    //     // Type-safe inequality comparison
+    //     if (lhs.type != rhs.type)
+    //         return RuntimeVal::Boolean(true);
+        
+    //     switch (lhs.type)
+    //     {
+    //         case RuntimeVal::Type::Null:
+    //             return RuntimeVal::Boolean(false);
+    //         case RuntimeVal::Type::Number:
+    //             return RuntimeVal::Boolean(lhs.number != rhs.number);
+    //         case RuntimeVal::Type::String:
+    //             return RuntimeVal::Boolean(lhs.str != rhs.str);
+    //         case RuntimeVal::Type::Boolean:
+    //             return RuntimeVal::Boolean(lhs.bvalue != rhs.bvalue);
+    //         default:
+    //             return RuntimeVal::Boolean(true);
+    //     }
+    // }
+    
+    // // Handle logical operators
+    // if (binop.callculation_operator == "&&")
+    // {
+    //     return RuntimeVal::Boolean(lhs.isTruthy() && rhs.isTruthy());
+    // }
+    
+    // if (binop.callculation_operator == "||")
+    // {
+    //     return RuntimeVal::Boolean(lhs.isTruthy() || rhs.isTruthy());
+    // }
+
     if (lhs.type == runtime::RuntimeVal::Type::Number && rhs.type == runtime::RuntimeVal::Type::Number)
     {
         return evaluate_numeric_binary_expr(

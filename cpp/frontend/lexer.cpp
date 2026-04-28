@@ -50,6 +50,11 @@ namespace fling
             return i < src.size() && src[i] == expected;
         }
 
+        bool isAlphaNumeric(char c)
+        {
+            return std::isalnum(static_cast<unsigned char>(c));
+        }
+
         // Check if string is alphabetic
         bool isAlpha(const std::string &src)
         {
@@ -226,13 +231,47 @@ namespace fling
                         TokenType::BinaryOperator, line, column));
                     i++;
                     break;
+                
+                // # for Comments
+                case '#':
+                {
+                    // Kommentar erkennen
+                    
+                    // Skip "#"
+                    i++;
+
+                    // Alles bis Zeilenende überspringen
+                    while (i < src.size() && !isNewline(src[i]))
+                    {
+                        i++;
+                    }
+
+                    break; // nichts tokenizen!
+                }
 
                 // Division Operator
                 case '/':
-                    tokens.push_back(token(std::string(1, current),
-                        TokenType::BinaryOperator, line, column));
+                {
+                    // Kommentar erkennen
+                    if (i + 1 < src.size() && src[i + 1] == '/')
+                    {
+                        // Skip "//"
+                        i += 2;
+
+                        // Alles bis Zeilenende überspringen
+                        while (i < src.size() && !isNewline(src[i]))
+                        {
+                            i++;
+                        }
+
+                        break; // nichts tokenizen!
+                    }
+
+                    // Normaler Division-Operator
+                    tokens.push_back(token("/", TokenType::BinaryOperator, line, column));
                     i++;
                     break;
+                }
 
                 // Modulo Operator
                 case '%':
@@ -390,17 +429,24 @@ namespace fling
                         }
                         tokens.push_back(token(num, TokenType::Number, line, column));
                     }
+
                     // Identifier aufbauen
                     else if (isAlpha(current))
                     {
                         std::string ident;
-                        while (i < src.size() && isAlpha(src[i]))
+
+                        // erstes Zeichen MUSS Buchstabe sein
+                        ident += current;
+                        i++;
+
+                        // danach Buchstaben ODER Zahlen
+                        while (i < src.size() && isAlphaNumeric(src[i]))
                         {
                             ident += src[i];
                             i++;
                         }
 
-                        // Check if its in the Keyword List
+                        // Keyword check bleibt gleich
                         if (KEYWORDS.find(ident) != KEYWORDS.end())
                         {
                             tokens.push_back(token(ident, KEYWORDS[ident], line, column));
@@ -410,6 +456,7 @@ namespace fling
                             tokens.push_back(token(ident, TokenType::Identifier, line, column));
                         }
                     }
+
                     else
                     {
                         std::cout << "Unrecognized character in source: "

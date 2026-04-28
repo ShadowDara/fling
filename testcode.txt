@@ -1,3 +1,5 @@
+# Coment
+
 print(45) 
 print(true)
 print(66, 420, 13)
@@ -50,3 +52,8 @@ let hallo = "Hallo";
 print(hallo)
 
 print(8)
+
+
+let hh = 6;
+hh = hh + 1
+print(hh)

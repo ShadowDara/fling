@@ -235,7 +235,7 @@ namespace fling
         // Funktion to parse an expression
         std::unique_ptr<fling::ast::Expr> Parser::parse_expr()
         {
-            return this->parse_logical_expr();
+            return this->parse_assignment_expr();
         }
 
         // &&, ||
@@ -293,7 +293,7 @@ namespace fling
         // Function to parse an assignment Expression
         std::unique_ptr<fling::ast::Expr> Parser::parse_assignment_expr()
         {
-            auto left = this->parse_object_expr();
+            auto left = this->parse_logical_expr();
             // switch this out with object Expression
 
             if (this->at().type == lexer::TokenType::Equals)
@@ -312,16 +312,9 @@ namespace fling
         // Function to parse an Object Expression
         std::unique_ptr<fling::ast::Expr> Parser::parse_object_expr()
         {
-            if (this->at().type != lexer::TokenType::OpenCurlyBrace)
-            {
-                /*cout << "Expected opening parenthesis '[' for object literal, found: "
-                     << this->at().value << endl;
-                dcorelib::Exit(1);*/
-                return parse_additive_expr();
-            }
+            // Wird NUR aufgerufen wenn wir sicher '{' haben
+            this->expect(lexer::TokenType::OpenCurlyBrace, "Expected '{' to start object literal");
 
-            // Eat the [
-            this->eat();
             std::vector<std::unique_ptr<ast::Property>> properties;
 
             while (this->not_eof() && this->at().type != lexer::TokenType::CloseCurlyBrace)
@@ -643,6 +636,12 @@ namespace fling
                     fling::lexer::TokenType::CloseParen,
                     "Unexpected Token found inside parenthesised expression. Expected closing parenthesis"); // Eat the closing Parenthesis
                 return expr;                                                                                 // Return the inner Expression
+            }
+
+            // Open Curly Brace {
+            case fling::lexer::TokenType::OpenCurlyBrace:
+            {
+                return this->parse_object_expr();
             }
 
             // Default Type for Unexpected Tokens

@@ -86,6 +86,9 @@ namespace fling
         // peek function
         bool match(const std::vector<char>& src, size_t i, char expected);
 
+        // for numbers and ABC
+        bool isAlphaNumeric(char c);
+
         /**
          * Check if a std::string is alphabetic
          *
