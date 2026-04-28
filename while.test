@@ -7,6 +7,11 @@ if x == 4 {
     print(4)
 }
 
+if x == 5 {
+    print("If")
+}
+
 while x == 5 {
     print(5)
+    x = 6
 }

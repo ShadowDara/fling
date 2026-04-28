@@ -39,6 +39,25 @@ namespace fling
                 }
             }
 
+            // While Statement
+            case ast::NodeType::WhileStatement:
+            {
+                auto &whileNode = static_cast<const ast::WhileStatement &>(astNode);
+
+                // Loop solange Condition true ist
+                while (true)
+                {
+                    auto condVal = evaluate(*whileNode.condition, env);
+
+                    if (!condVal.isTruthy())
+                        break;
+
+                    evaluate(*whileNode.body, env);
+                }
+
+                return RuntimeVal::Null();
+            }
+
             // Number Value
             case ast::NodeType::NumericLiteral:
             {

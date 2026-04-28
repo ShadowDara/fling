@@ -1,6 +1,6 @@
 #include "ast.hpp"
 
-// Nodetype toString
+// AST Nodetype toString
 std::string fling::ast::toString(NodeType type)
 {
     switch (type)
