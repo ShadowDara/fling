@@ -62,6 +62,17 @@ namespace fling::runtime::envirment {
 
         Environment(Environment&&) = default;
         Environment& operator=(Environment&&) = default;
+
+        // Clone function
+        inline std::shared_ptr<Environment> clone() const
+        {
+            auto env = std::make_shared<Environment>(parent);
+
+            env->variables = variables;
+            env->constants = constants;
+
+            return env;
+        }
     };
 }
 

@@ -94,8 +94,7 @@ RuntimeVal Environment::assignVar(
         return RuntimeVal();
     }
 
-    env->variables[varName] = std::move(value);
-
+    env->variables[varName] = value;
     return value;
 }
 

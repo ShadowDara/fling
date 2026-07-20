@@ -51,7 +51,9 @@ namespace fling
                     if (!condVal.isTruthy())
                         break;
 
-                    evaluate(*whileNode.body, env);
+                    auto iterationEnv = Environment(env.shared_from_this());
+
+                    evaluate(*whileNode.body, iterationEnv);
                 }
 
                 return RuntimeVal::Null();

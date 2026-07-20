@@ -1,10 +1,10 @@
 // main.cpp
 
-#include "src/frontend/lexer.hpp"
-#include "src/frontend/parser.hpp"
-#include "src/frontend/ast.hpp"
-#include "src/runtime/interpreter.hpp"
-#include "src/runtime/envirments.hpp"
+#include "cpp/frontend/lexer.hpp"
+#include "cpp/frontend/parser.hpp"
+#include "cpp/frontend/ast.hpp"
+#include "cpp/runtime/interpreter.hpp"
+#include "cpp/runtime/envirments.hpp"
 
 #include <iostream>
 #include <string>
@@ -136,8 +136,8 @@ int main()
     std::cout << "\nAll tests passed!\n"
               << std::endl;
 
-    runFile("../testcode.txt");
-    runFile("testcode.txt");
+    runFile("../../../testcode.txt");
+    runFile("../../../while.test");
 
 	//runREPL();
 
