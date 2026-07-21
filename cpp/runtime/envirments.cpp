@@ -14,7 +14,8 @@ void envirment::setupStandardEnvironment(Environment& env)
     // Define Print Function
     env.declareVar(
         "print",
-        RuntimeVal::NativeFN([](const std::vector<RuntimeVal>& args, fling::runtime::envirment::Environment&) -> RuntimeVal {
+        RuntimeVal::NativeFN([](const std::vector<RuntimeVal>& args,
+            std::shared_ptr<runtime::envirment::Environment> env) -> RuntimeVal {
             for (const auto& arg : args) {
                 switch (arg.type) {
                     case RuntimeVal::Type::Number:

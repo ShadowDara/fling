@@ -17,7 +17,7 @@ namespace fling
         // Function to evaluate Source Code
         runtime::RuntimeVal evaluate(
             const ast::Stmt &astNode,
-            runtime::envirment::Environment &env)
+            std::shared_ptr<runtime::envirment::Environment> env)
         {
             switch (astNode.kind)
             {
@@ -56,7 +56,7 @@ namespace fling
                     if (!condVal.isTruthy())
                         break;
 
-                    auto iterationEnv = Environment(env.shared_from_this());
+                    auto iterationEnv = std::make_shared<envirment::Environment>(env);
 
                     evaluate(*whileNode.body, iterationEnv);
                 }
@@ -75,7 +75,7 @@ namespace fling
             case ast::NodeType::Identifier:
             {
                 auto &identNode = static_cast<const ast::Identifier &>(astNode);
-                return env.lookupVar(identNode.symbol);
+                return env->lookupVar(identNode.symbol);
             }
 
             // Object Literal
@@ -218,6 +218,14 @@ namespace fling
             case ast::NodeType::BinaryExpr:
             {
                 auto &binNode = static_cast<const ast::BinaryExpr &>(astNode);
+
+                // Null Check
+                assert(binNode.left != nullptr);
+                assert(binNode.right != nullptr);
+
+                // BinNode Right is null here, but why
+                // IDK
+
                 return eval::evaluate_binary_expr(binNode, env);
             }
 

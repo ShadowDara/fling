@@ -78,7 +78,7 @@ void runFile(const std::string& filename)
     Program program = parser.produceAST(content);
 	//std::cout << "Print Program: " << program.toString() << "\n";
 
-    auto result = evaluate(program, *env);
+    auto result = evaluate(program, env);
     //std::cout << result.toString() << "\n";
 }
 
@@ -102,7 +102,7 @@ void runREPL()
         // Produce AST from source Code
         Program program = parser.produceAST(source);
 
-        RuntimeVal result = evaluate(program, *env);
+        RuntimeVal result = evaluate(program, env);
         cout << result.toString() << endl;
     }
 }

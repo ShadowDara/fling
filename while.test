@@ -11,10 +11,10 @@ if x == 5 {
     print("If")
 }
 
-while x == 5 {
+while x <= 10 {
     print(5)
     print("rip while")
-    x = 6
+    x = x + 1
 }
 
 print(7)

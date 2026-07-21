@@ -6,6 +6,7 @@
 #include <vector>
 #include <memory>
 #include <iostream>
+#include <cassert>
 
 #include "lexer.hpp"
 #include "ast.hpp"

@@ -14,31 +14,31 @@ namespace fling::runtime::eval {
 		const fling::runtime::RuntimeVal &lhs,
 		const fling::runtime::RuntimeVal &rhs,
 		std::string callculation_operator,
-		fling::runtime::envirment::Environment& env
+		std::shared_ptr<runtime::envirment::Environment> env
 	);
 
     // Function to evaluate a Binary Expression
 		fling::runtime::RuntimeVal evaluate_binary_expr(
 			const ast::BinaryExpr& binop,
-			fling::runtime::envirment::Environment& env);
+			std::shared_ptr<runtime::envirment::Environment> env);
 
 		// Function to evaluate an Identifier
 		fling::runtime::RuntimeVal evaluate_identifier(
 			const ast::Identifier& ident,
-			fling::runtime::envirment::Environment& env);
+			std::shared_ptr<runtime::envirment::Environment> env);
 
 		// Function to evaluate an Assignment Expression
 		fling::runtime::RuntimeVal evaluate_assignment_expr(
 			const ast::AssignmentExpr& node,
-			fling::runtime::envirment::Environment& env);
+			std::shared_ptr<runtime::envirment::Environment> env);
 
 		// Function to evaluate an Object Literal
 		fling::runtime::RuntimeVal evaluate_object_expr(
 			const ast::ObjectLiteral& node,
-			fling::runtime::envirment::Environment& env);
+			std::shared_ptr<runtime::envirment::Environment> env);
 		
 		// Function to evaluate a Call Expression
 		fling::runtime::RuntimeVal evaluate_call_expr(
             const ast::CallExpr& expr,
-            fling::runtime::envirment::Environment& env);
+			std::shared_ptr<runtime::envirment::Environment> env);
 }

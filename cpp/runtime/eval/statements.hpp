@@ -13,15 +13,15 @@ namespace fling::runtime::eval {
     // Function to evaluate a Program Node
 	fling::runtime::RuntimeVal evaluate_program(
 		const ast::Program& program,
-        fling::runtime::envirment::Environment& env);
+		std::shared_ptr<runtime::envirment::Environment> env);
 
     // Function to evaluate a Variable Declaration
 	fling::runtime::RuntimeVal evaluate_var_declaration(
 		const ast::VarDeclaration& varDecl,
-		runtime::envirment::Environment& env);
+		std::shared_ptr<runtime::envirment::Environment> env);
 
 	// Function to evalua a Function Declaration
 	fling::runtime::RuntimeVal evaluate_fn_declaration(
 		const ast::FunctionDeclaration& fnDecl,
-		runtime::envirment::Environment& env);
+		std::shared_ptr<runtime::envirment::Environment> env);
 }

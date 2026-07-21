@@ -415,11 +415,17 @@ namespace fling
         {
             auto left = parse_multiplicitave_expr();
 
+            // Null Check
+            assert(left != nullptr);
+
             // For Addition and Subtraction
             while (this->at().value == "+" || this->at().value == "-")
             {
                 std::string callculation_operator = this->eat().value;
-                auto right = this->parse_multiplicitave_expr();
+                auto right = parse_multiplicitave_expr();
+
+                // Null Check
+                assert(right != nullptr);
 
                 auto leftnew = std::make_unique<fling::ast::BinaryExpr>();
                 leftnew->left = std::move(left);
@@ -437,6 +443,9 @@ namespace fling
         {
             auto left = parse_unary_expr();
 
+            // Null Check
+            assert(left != nullptr);
+
             // For Division, Multiplication and Modulo
             while (
                 this->at().value == "/" ||
@@ -446,12 +455,18 @@ namespace fling
                 std::string callculation_operator = this->eat().value;
                 auto right = this->parse_unary_expr();
 
+                // Null Check
+                assert(right != nullptr);
+
                 auto leftnew = std::make_unique<fling::ast::BinaryExpr>();
                 leftnew->left = std::move(left);
                 leftnew->right = std::move(right);
                 leftnew->callculation_operator = callculation_operator;
 
                 left = std::move(leftnew);
+
+                // Null Check
+                assert(left != nullptr);
             }
 
             return left;
@@ -468,19 +483,31 @@ namespace fling
                 std::string op = this->eat().value;
 
                 auto expr = std::make_unique<ast::UnaryExpr>();
+
+                // Null Check
+                assert(expr != nullptr);
+
                 expr->op = op;
                 expr->operand = this->parse_unary_expr(); // RECURSIVE (wichtig!)
 
                 return expr;
             }
 
-            return this->parse_call_member_expr();
+            auto r = this->parse_call_member_expr();
+
+            // Null Check
+            assert(r != nullptr);
+
+            return r;
         }
 
         // Function to parse a Call Member Expression
         std::unique_ptr<fling::ast::Expr> Parser::parse_call_member_expr()
         {
             auto member = parse_member_expr();
+
+            // Null Check
+            assert(member != nullptr);
 
             if (this->at().type == lexer::TokenType::OpenParen)
             {
@@ -545,6 +572,9 @@ namespace fling
         std::unique_ptr<fling::ast::Expr> Parser::parse_member_expr()
         {
             auto object = parse_primary_expr();
+
+            // Null Check
+            assert(object != nullptr);
 
             while (at().type == lexer::TokenType::Dot || at().type == lexer::TokenType::OpenSquaredBrace)
             {
@@ -625,6 +655,10 @@ namespace fling
             case fling::lexer::TokenType::String:
             {
                 auto str = std::make_unique<fling::ast::StringLiteral>(this->eat().value);
+
+                // Null Check
+                assert(str != nullptr);
+
                 return str;
             }
 
@@ -659,9 +693,14 @@ namespace fling
             {
                 this->eat(); // Eat the opening Token
                 auto expr = this->parse_expr();
+
                 this->expect(
                     fling::lexer::TokenType::CloseParen,
                     "Unexpected Token found inside parenthesised expression. Expected closing parenthesis"); // Eat the closing Parenthesis
+                
+                // Null Check
+                assert(expr != nullptr);
+
                 return expr;                                                                                 // Return the inner Expression
             }
 

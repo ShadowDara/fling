@@ -30,6 +30,6 @@ namespace fling
 		// Function to evaluate source Code
 		fling::runtime::RuntimeVal evaluate(
 			const ast::Stmt& astNode,
-			fling::runtime::envirment::Environment& env);
+			std::shared_ptr<runtime::envirment::Environment> env);
 	} // namespace fling
 } // namespace fling

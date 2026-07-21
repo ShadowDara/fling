@@ -47,7 +47,7 @@ namespace fling::runtime
         std::vector<RuntimeVal> elements;
         
         // Native Function Type
-        std::function <RuntimeVal(const std::vector<RuntimeVal>&, envirment::Environment&)> call;
+        std::function <RuntimeVal(const std::vector<RuntimeVal>&, std::shared_ptr<runtime::envirment::Environment> env)> call;
 
         // for Function Type
         std::string name;
@@ -98,7 +98,8 @@ namespace fling::runtime
 
         // Make a Native Function
         static RuntimeVal NativeFN(
-            std::function <RuntimeVal(const std::vector<RuntimeVal>&, envirment::Environment&)> call)
+            std::function <RuntimeVal(const std::vector<RuntimeVal>&,
+                std::shared_ptr<runtime::envirment::Environment> env)> call)
         {
             auto val = RuntimeVal(call);
             return val;
@@ -140,7 +141,8 @@ namespace fling::runtime
 
         // Native Function Construktor
         RuntimeVal(
-            std::function <RuntimeVal(const std::vector<RuntimeVal>&, envirment::Environment&)> c)
+            std::function <RuntimeVal(const std::vector<RuntimeVal>&,
+                std::shared_ptr<runtime::envirment::Environment> env)> c)
             : type(Type::Native_FnValue), call(c) {};
 
         // Function Construktor

@@ -9,7 +9,7 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_numeric_binary_expr(
     const RuntimeVal& lhs,
     const RuntimeVal& rhs,
     std::string callculation_operator,
-    runtime::envirment::Environment &env)
+    std::shared_ptr<runtime::envirment::Environment> env)
 {
     float result = 0.0f;
 
@@ -52,8 +52,12 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_numeric_binary_expr(
 // Function to evaluate a Binary Expression
 runtime::RuntimeVal fling::runtime::eval::evaluate_binary_expr(
     const ast::BinaryExpr &binop,
-    runtime::envirment::Environment &env)
+    std::shared_ptr<runtime::envirment::Environment> env)
 {
+    // They should not be null
+    assert(binop.right != nullptr);
+    assert(binop.left != nullptr);
+
     // Referrencing them!
     auto lhs = evaluate(*binop.left, env);
     auto rhs = evaluate(*binop.right, env);
@@ -137,15 +141,15 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_binary_expr(
 // Function to evaluate an Identifier
 runtime::RuntimeVal fling::runtime::eval::evaluate_identifier(
     const ast::Identifier &ident,
-    runtime::envirment::Environment &env)
+    std::shared_ptr<runtime::envirment::Environment> env)
 {
-    return env.lookupVar(ident.symbol);
+    return env->lookupVar(ident.symbol);
 }
 
 // Function to evaluate an Assignment Expression
 runtime::RuntimeVal fling::runtime::eval::evaluate_assignment_expr(
     const ast::AssignmentExpr &node,
-    runtime::envirment::Environment &env)
+    std::shared_ptr<runtime::envirment::Environment> env)
 {
     if (node.assignme->kind != ast::NodeType::Identifier)
     {
@@ -156,20 +160,20 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_assignment_expr(
     auto varName = static_cast<ast::Identifier *>(node.assignme.get())->symbol;
 
     // Use a Reference instead of a unique Pointer
-    return env.assignVar(varName, evaluate(*node.value, env));
+    return env->assignVar(varName, evaluate(*node.value, env));
 }
 
 // Function to evaluate an Object Literal
 runtime::RuntimeVal fling::runtime::eval::evaluate_object_expr(
     const ast::ObjectLiteral &node,
-    runtime::envirment::Environment &env)
+    std::shared_ptr<runtime::envirment::Environment> env)
 {
     auto objectValue = runtime::RuntimeVal::Object();
 
     for (const auto &prop : node.properties)
     {
         auto key = prop->key;
-        auto value = prop->value ? evaluate(*prop->value, env) : env.lookupVar(key);
+        auto value = prop->value ? evaluate(*prop->value, env) : env->lookupVar(key);
 
         objectValue.properties[key] = std::make_unique<RuntimeVal>(std::move(value));
     }
@@ -179,7 +183,7 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_object_expr(
 
 runtime::RuntimeVal fling::runtime::eval::evaluate_call_expr(
     const ast::CallExpr &expr,
-    runtime::envirment::Environment &env)
+    std::shared_ptr<runtime::envirment::Environment> env)
 {
     std::vector<RuntimeVal> evaluatedArgs;
     evaluatedArgs.reserve(expr.agrs.size()); // optional, spart Reallocs
@@ -214,7 +218,7 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_call_expr(
         RuntimeVal returnValue = RuntimeVal::Null();
         for (const auto& stmt : func.body)
         {
-            returnValue = evaluate(*stmt, *scope);
+            returnValue = evaluate(*stmt, scope);
         }
 
         if (returnValue.type == RuntimeVal::Type::Null && scope->hasVar("result"))
