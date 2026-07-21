@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef STATEMENTS_H
-#define STATEMENTS_H
-
 #include <memory>
 
 #include "../interpreter.hpp"
@@ -28,5 +25,3 @@ namespace fling::runtime::eval {
 		const ast::FunctionDeclaration& fnDecl,
 		runtime::envirment::Environment& env);
 }
-
-#endif // STATEMENTS_H

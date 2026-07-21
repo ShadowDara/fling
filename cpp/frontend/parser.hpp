@@ -2,9 +2,6 @@
 
 #pragma once
 
-#ifndef PARSER_HPP
-#define PARSER_HPP
-
 #include <string>
 #include <vector>
 #include <memory>
@@ -164,5 +161,3 @@ namespace fling
 
     } // namespace parser
 } // namespace fling
-
-#endif // PARSER_HPP

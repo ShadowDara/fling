@@ -41,6 +41,11 @@ namespace fling
             }
 
             // While Statement
+            // 
+            // The Difficult Part is that every while iteration needs a new subenvirment
+            // from the parent envirment so that a variable which is declared in the while
+            // will be undeclared after the while loop.
+            //
             case ast::NodeType::WhileStatement:
             {
                 auto &whileNode = static_cast<const ast::WhileStatement &>(astNode);

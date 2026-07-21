@@ -138,6 +138,7 @@ int main()
 
     runFile("../../../testcode.txt");
     runFile("../../../while.test");
+    runFile("../../../prime.txt");
 
 	//runREPL();
 

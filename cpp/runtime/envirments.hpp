@@ -2,9 +2,6 @@
 
 #pragma once
 
-#ifndef ENVIRMENT_H
-#define ENVIRMENT_H
-
 #include <unordered_map>
 #include <string>
 #include <set>
@@ -75,5 +72,3 @@ namespace fling::runtime::envirment {
         }
     };
 }
-
-#endif //ENVIRMENT_H

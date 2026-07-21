@@ -2,9 +2,6 @@
 
 #pragma once
 
-#ifndef LEXER_HPP
-#define LEXER_HPP
-
 #include <string_view>
 #include <string>
 #include <vector>
@@ -156,5 +153,3 @@ namespace fling
         extern std::unordered_map<std::string, TokenType> KEYWORDS;
     } // namespace lexer
 } // namespace fling
-
-#endif // LEXER_HPP

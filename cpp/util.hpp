@@ -4,15 +4,18 @@
 
 #pragma once
 
-#ifndef UTIL_H
-#define UTIL_H
-
 #include <memory>
+#include <iostream>
+
+
+// Error Macro
+#define ERROR(msg) \
+    std::cerr << std::format("[{}:{}] {}(): {}\n", \
+        __FILE__, __LINE__, __func__, msg)
+
 
 namespace fling::util
 {
 	// Convert a float to an Integer
 	int toInt(float number);
 }
-
-#endif // UTIL_H

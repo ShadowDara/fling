@@ -2,9 +2,6 @@
 
 #pragma once
 
-#ifndef VALUES_HPP
-#define VALUES_HPP
-
 #include <string>
 #include <memory>
 #include <unordered_map>
@@ -351,5 +348,3 @@ namespace fling::runtime
         }
     };
 } // namespace fling::runtime
-
-#endif // VALUES_HPP

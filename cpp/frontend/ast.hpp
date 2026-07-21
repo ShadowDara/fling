@@ -31,9 +31,6 @@
 
 #pragma once
 
-#ifndef AST_HPP
-#define AST_HPP
-
 #include <string_view>
 #include <vector>
 #include <string>
@@ -837,5 +834,3 @@ namespace fling
 
     } // namespace ast
 } // namespace fling
-
-#endif // AST_HPP

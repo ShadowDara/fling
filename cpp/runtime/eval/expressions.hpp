@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef EXPRESSIONS_HPP
-#define EXPRESSIONS_HPP
-
 #include <memory>
 
 #include "../interpreter.hpp"
@@ -45,5 +42,3 @@ namespace fling::runtime::eval {
             const ast::CallExpr& expr,
             fling::runtime::envirment::Environment& env);
 }
-
-#endif // EXPRESSIONS_HPP

@@ -2,9 +2,6 @@
 
 #pragma once
 
-#ifndef INTERPRETER_HPP
-#define INTERPRETER_HPP
-
 #include <iostream>
 #include <memory>
 #include <cassert>
@@ -36,5 +33,3 @@ namespace fling
 			fling::runtime::envirment::Environment& env);
 	} // namespace fling
 } // namespace fling
-
-#endif // INTERPRETER_HPP
