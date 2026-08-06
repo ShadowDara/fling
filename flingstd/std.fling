@@ -1,0 +1,6 @@
+// Fling standard Lib
+
+// Stuff which will be in there
+//
+// - type checker functions (is_string, is_int, etc) which will return a boolean
+
