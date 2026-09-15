@@ -1,0 +1,14 @@
+#pragma once
+
+// C ABI for fling
+
+// fling C
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+#ifdef __cplusplus
+}
+#endif

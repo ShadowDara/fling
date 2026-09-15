@@ -1,9 +1,15 @@
 # Fling – Sprachspezifikation & Feature-Dokument
 ### Grundlage für die Entwicklung eines Language Server Protocol (LSP)
 
-**Quelle:** Analyse des vollständigen C++-Referenzinterpreters (`cpp.zip`)
+**Quelle:** Analyse des C++-Referenzinterpreters im Workspace (`cpp/`)
 **Sprachname im Code:** `fling` (Namespace `fling::lexer`, `fling::ast`, `fling::parser`, `fling::runtime`)
 **Analysierte Module:** `frontend/lexer.*`, `frontend/ast.*`, `frontend/parser.*`, `runtime/*`, `runtime/eval/*`, `rustffi/ffi.*`, `util.*`
+**Stand:** 2026-09-15 (gegen den aktuellen Quellcode verifiziert)
+
+> **Änderungen seit der ursprünglichen Analyse:** Zwei frühere „Bugs" sind im aktuellen Code **behoben**:
+> - **B1** – `%`-Operator: `a % b` berechnet jetzt korrekt `a mod b` (vorher waren die Operanden vertauscht). Siehe 6.6 und 9.
+> - **B3** – `+`-Operator: `"a" + "b"` ergibt jetzt `"ab"` (String-Konkatenation). Siehe 6.6 und 9.
+> Das Beispielprogramm in Abschnitt 13 wurde an B14 angepasst (keine Semikola nach Ausdrucks-Statements).
 
 ---
 
@@ -283,9 +289,8 @@ Null | Number | String | Boolean | Object | Array | Native_FnValue | FnValue
 **Arithmetik (`+ - * / %`)** – nur für `Number op Number` definiert:
 - `+`, `-`, `*`: Standard.
 - `/`: **Division durch 0 liefert `0.0`** statt Fehler/`Infinity`/`NaN`.
-- `%`: ⚠️ **Bug – Operandenreihenfolge vertauscht!** Implementiert als `toInt(rhs) % toInt(lhs)`, also **`a % b` berechnet tatsächlich `b % a`**. Beispiel: `5 % 2` ergibt im Referenzinterpreter `2 % 5 = 2`, nicht die erwarteten `1`. **Für Hover/Diagnostics unbedingt dokumentieren, da dies vom mathematisch erwarteten Verhalten abweicht.**
-- `toInt()` (für `%`) truncatet einfach via impliziter `float→int`-Konvertierung (Richtung Null).
-- ⚠️ **Kein `+` für Strings (keine Konkatenation).** `"a" + "b"` fällt durch alle Prüfungen (nur `Number`-Typen werden für `evaluate_numeric_binary_expr` akzeptiert) und ergibt `Null`.
+- `%`: Implementiert als `toInt(lhs) % toInt(rhs)` – **Operandenreihenfolge ist korrekt** (`a % b` = `a mod b`). `toInt()` truncatet via impliziter `float→int`-Konvertierung (Richtung Null). ⚠️ Eine *ältere Version* der Implementierung hatte die Operanden vertauscht (`b % a`); das ist im aktuellen Code **behoben**.
+- `+` für Strings: **String-Konkatenation ist implementiert.** `"a" + "b"` ergibt `"ab"`. Alle anderen String-Operationen (`-`, `*`, `/`, `%`) ergeben `Null`.
 - Arithmetik zwischen inkompatiblen Typen (z. B. `Number + String`, `Object + Object`) ergibt still `Null` (kein Fehler).
 
 **Vergleich (`== != < > <= >=`):**
@@ -354,9 +359,9 @@ Zwei fundamental unterschiedliche Fehlerklassen – wichtig für die Unterscheid
 
 | # | Bug/Verhalten | Auswirkung |
 |---|---|---|
-| B1 | `%`-Operator vertauscht Operanden (`a % b` = `b % a`) | Falsche Ergebnisse bei Modulo |
+| B1 | ~~`%`-Operator vertauscht Operanden~~ — **BEHOBEN**: aktueller Code berechnet `toInt(lhs) % toInt(rhs)` | `5 % 2` → `1` |
 | B2 | Keine Fließkomma-Literale im Lexer (`3.14` bricht Parsing ab) | Praktisch keine Dezimalzahlen im Quelltext möglich |
-| B3 | `+` konkateniert keine Strings | `"a"+"b"` → `Null` |
+| B3 | ~~`+` konkateniert keine Strings~~ — **BEHOBEN**: `String + String` wird konkateniert | `"a"+"b"` → `"ab"` |
 | B4 | Computed Object-Access `obj[key]` faktisch defekt (Debug-String als Key) | Liefert praktisch immer `Null` |
 | B5 | `string[index]` verursacht UB (falscher Cast) | Nicht verwenden |
 | B6 | Zuweisung an `MemberExpr` (`obj.x = ...`, `arr[0] = ...`) syntaktisch erlaubt, aber UB zur Laufzeit | Sollte vom LSP als Fehler markiert werden |
@@ -408,8 +413,8 @@ Basierend auf obiger Analyse – konkrete Empfehlungen, was der LSP leisten soll
 - Zuweisung an Nicht-Identifier-Ziel (B6) → Fehler, da UB im Interpreter
 - Verwendung von `_` in Identifiern → Syntaxfehler (Lexer-Regel)
 - Dezimalpunkt-Literale (`3.14`) → Fehler/Warnung (B2)
-- String-Konkatenation mit `+` → Warnung „wird zu `Null` ausgewertet" (B3)
-- `%`-Nutzung → Hinweis auf vertauschte Operandenreihenfolge (B1), evtl. nur als Hover statt Diagnostic
+- ~~String-Konkatenation mit `+`~~ – **entfällt**, funktioniert jetzt (B3 behoben)
+- ~~`%`-Nutzung → Hinweis auf vertauschte Operandenreihenfolge~~ – **entfällt**, Reihenfolge korrekt (B1 behoben)
 - Computed Object-Access `obj[...]` → Warnung „funktioniert im Referenzinterpreter nicht zuverlässig" (B4)
 - `string[index]` → Fehler (B5)
 - Falsche Anzahl Funktionsargumente → optionale Warnung (Sprache selbst prüft nicht, aber sinnvoll für Nutzer)
@@ -419,7 +424,7 @@ Basierend auf obiger Analyse – konkrete Empfehlungen, was der LSP leisten soll
 - `else if` als Kette (nicht existent) → ggf. Hinweistext mit Verweis auf `else { if ... }`
 
 ### 11.2 Hover
-- Für Operatoren `%`, `/`, `+`: tatsächliches Laufzeitverhalten anzeigen (inkl. B1/B12/B3-Hinweise)
+- Für Operatoren `/`, `%`, `+`: tatsächliches Laufzeitverhalten anzeigen (inkl. B12-Hinweis: Division durch 0 → `0.0`)
 - Für Identifier: aufgelöster Typ (best-effort, da dynamisch typisiert) + Deklarationsort + `const`/`let`
 - Für Funktionen: Parameterliste, Hinweis auf implizite Return-Regel (letztes Statement oder `result`-Variable)
 
@@ -470,32 +475,32 @@ fn add(a, b) {
 }
 
 if x < y {
-    print("x ist kleiner als y", x, y);
+    print("x ist kleiner als y", x, y)
 } else {
-    print("x ist groesser oder gleich y");
+    print("x ist groesser oder gleich y")
 }
 
 let i = 0;
 while i < 3 {
-    print("i =", i);
-    i = i + 1;
+    print("i =", i)
+    i = i + 1
 }
 
 let liste = [1, 2, 3,];
-print(liste.length);
+print(liste.length)
 
 let obj = { name: "Fling", version: 1 };
-print(obj.name);
+print(obj.name)
 
 let ergebnis = add(x, y);
-print(ergebnis);
+print(ergebnis)
 ```
 
 **Nicht gültig (zur Abgrenzung):**
 ```fling
 let z = 3.14;        // FEHLER: keine Dezimalliterale im Lexer
 let my_var = 5;       // FEHLER: '_' nicht erlaubt in Identifiern
-print("hi");;         // zweites ';' ist ein Fehler (kein Semikolon nach Ausdruck erlaubt)
+print("hi");          // FEHLER: kein Semikolon nach Ausdrucks-Statement erlaubt (B14)
 obj["name"] = "x";     // Parsebar, aber Zuweisung an MemberExpr ist UB
 foo().bar;             // FEHLER: Member-Zugriff nach Call nicht unterstützt
 if x > 0 { } else if y > 0 { }   // FEHLER: 'else if' existiert nicht, nur 'else { if ... }'
@@ -507,7 +512,7 @@ if x > 0 { } else if y > 0 { }   // FEHLER: 'else if' existiert nicht, nur 'else
 
 1. **Phase 1 – Tokenizer/Parser 1:1 nachbauen** (idealerweise in Rust, passend zur bestehenden FFI-Anbindung) inkl. exakter Fehlerpositionen.
 2. **Phase 2 – Statische Scope-/Symbol-Analyse** (Environment-Modell nachbilden, inkl. der Besonderheit, dass `if`/`else` kein eigenes Scope hat).
-3. **Phase 3 – Diagnostics-Regelwerk** gemäß Abschnitt 11.1, priorisiert nach den in Abschnitt 9 gelisteten Bugs (B1–B17), da diese die häufigsten Quellen für „stilles Fehlverhalten" sind, das ein Nutzer ohne LSP nur schwer bemerkt.
+3. **Phase 3 – Diagnostics-Regelwerk** gemäß Abschnitt 11.1, priorisiert nach den in Abschnitt 9 gelisteten Bugs (B1–B17; B1 und B3 sind seit dem Stand 2026-09-15 behoben), da diese die häufigsten Quellen für „stilles Fehlverhalten" sind, das ein Nutzer ohne LSP nur schwer bemerkt.
 4. **Phase 4 – Hover/Completion/Go-to-Definition** auf Basis des Symbol-Modells.
 5. **Phase 5 – Optional:** Formatter/Codeaktionen (z. B. automatischer Fix für `else if`-Ketten → `else { if ... }`-Umschreibung, Entfernen überflüssiger Semikola).
 
