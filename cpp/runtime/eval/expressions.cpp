@@ -37,7 +37,7 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_numeric_binary_expr(
     // Module
     else if (callculation_operator == "%")
     {
-        result = static_cast<float>(toInt(rhs.number) % toInt(lhs.number));
+        result = static_cast<float>(toInt(lhs.number) % toInt(rhs.number));
     }
     // Error
     else
@@ -132,6 +132,14 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_binary_expr(
     {
         return evaluate_numeric_binary_expr(
             lhs, rhs, binop.callculation_operator, env);
+    }
+
+    // String concatenation
+    if (lhs.type == RuntimeVal::Type::String && rhs.type == RuntimeVal::Type::String)
+    {
+        if (binop.callculation_operator == "+")
+            return RuntimeVal::String(lhs.str + rhs.str);
+        return RuntimeVal::Null();
     }
 
     // One or both are Null

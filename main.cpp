@@ -5,6 +5,7 @@
 #include "cpp/frontend/ast.hpp"
 #include "cpp/runtime/interpreter.hpp"
 #include "cpp/runtime/envirments.hpp"
+#include "cpp/fling.hpp"
 
 #include <iostream>
 #include <string>
@@ -57,57 +58,6 @@ void runTests()
 }
 
 
-// Function to run a File
-void runFile(const std::string& filename)
-{
-    std::ifstream file{ filename };
-    if (!file)
-    {
-        std::cerr << "Could not open file" << "\n";
-        return;
-    }
-
-    std::string content(
-        (std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>()
-    );
-
-    Parser parser;
-    auto env = std::make_shared<Environment>(nullptr);
-    // envirment::setupStandardEnvironment(*env);
-
-    Program program = parser.produceAST(content);
-	//std::cout << "Print Program: " << program.toString() << "\n";
-
-    auto result = evaluate(program, env);
-    //std::cout << result.toString() << "\n";
-}
-
-
-void runREPL()
-{
-    // Variable for the Source Code
-    std::string source;
-
-    // Parser for the source
-    Parser parser;
-
-    // Define the Envirment for the Language
-    auto env = std::make_shared<Environment>(nullptr);
-    // envirment::setupStandardEnvironment(*env);
-
-    while (true)
-    {
-        std::getline(std::cin, source);
-
-        // Produce AST from source Code
-        Program program = parser.produceAST(source);
-
-        RuntimeVal result = evaluate(program, env);
-        cout << result.toString() << endl;
-    }
-}
-
-
 // Main function
 int main()
 {
@@ -140,7 +90,7 @@ int main()
     runFile("../../../while.test");
     runFile("../../../prime.txt");
 
-	//runREPL();
+	runREPL();
 
     return 0;
 }

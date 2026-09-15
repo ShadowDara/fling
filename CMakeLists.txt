@@ -29,6 +29,7 @@ set(FLING_SOURCES
     cpp/runtime/eval/expressions.cpp
 
     cpp/util.cpp
+    cpp/fling.cpp
 )
 
 # Library erstellen
@@ -40,6 +41,8 @@ add_library(fling STATIC
     cpp/frontend/parser.hpp
     cpp/runtime/values.hpp
     cpp/runtime/interpreter.hpp
+    cpp/fling.hpp
+    cpp/util.hpp
 )
 
 target_include_directories(fling PUBLIC
