@@ -54,11 +54,19 @@ void fling::runREPL()
     {
         std::getline(std::cin, source);
 
-        // Produce AST from source Code
-        Program program = parser.produceAST(source);
+        try
+        {
+            // Produce AST from source Code
+            Program program = parser.produceAST(source);
 
-        RuntimeVal result = evaluate(program, env);
-        cout << result.toString() << endl;
+            RuntimeVal result = evaluate(program, env);
+            cout << result.toString() << endl;
+        }
+        catch (const std::exception& e)
+        {
+            std::cerr << "Error: " << e.what() << std::endl;
+            continue;
+        }
     }
 }
 

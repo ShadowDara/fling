@@ -33,8 +33,8 @@ namespace fling
             Else,
             While,
 
-            Semicolon,
-            Equals,
+            Semicolon, // ;
+            Equals, // =
 
             Comma,   // ,
             Colon,   // :

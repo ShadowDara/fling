@@ -300,7 +300,9 @@ namespace fling
                 this->at().value == "<"  ||
                 this->at().value == ">"  ||
                 this->at().value == "<=" ||
-                this->at().value == ">="
+                this->at().value == ">=" ||
+				this->at().value == "=<" ||
+				this->at().value == "=>"
             )
             {
                 std::string op = this->eat().value;
@@ -726,6 +728,15 @@ namespace fling
                 }
                 break;
             }
+
+			// Equals Type
+            case fling::lexer::TokenType::Equals:
+            {
+                std::cerr << "Equasl token lol "
+                          << this->at() << std::endl;
+                this->eat(); // Remove the Error
+                return nullptr;
+			}
 
             // Default Type for Unexpected Tokens
             default:

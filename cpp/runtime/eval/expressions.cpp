@@ -128,6 +128,12 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_binary_expr(
     if (binop.callculation_operator == ">=")
         return RuntimeVal::Boolean(lhs.number >= rhs.number);
 
+    if (binop.callculation_operator == "=<")
+        return RuntimeVal::Boolean(lhs.number <= rhs.number);
+
+    if (binop.callculation_operator == "=>")
+        return RuntimeVal::Boolean(lhs.number >= rhs.number);
+
     if (lhs.type == runtime::RuntimeVal::Type::Number && rhs.type == runtime::RuntimeVal::Type::Number)
     {
         return evaluate_numeric_binary_expr(

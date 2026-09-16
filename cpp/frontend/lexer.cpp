@@ -320,6 +320,16 @@ namespace fling
                         tokens.push_back(token("==", TokenType::BinaryOperator, line, column));
                         i += 2;
                     }
+                    else if (i + 1 < src.size() && src[i + 1] == '<')
+                    {
+                        tokens.push_back(token("=<", TokenType::BinaryOperator, line, column));
+                        i += 2;
+                    }
+                    else if (i + 1 < src.size() && src[i + 1] == '>')
+                    {
+                        tokens.push_back(token("=>", TokenType::BinaryOperator, line, column));
+                        i += 2;
+                    }
                     else
                     {
                         tokens.push_back(token("=", TokenType::Equals, line, column));
