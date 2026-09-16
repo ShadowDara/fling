@@ -1,0 +1,39 @@
+{
+  "name": "fling-lang",
+  "version": "0.1.2",
+  "description": "Fling – an interpreted scripting language, compiled to WebAssembly. Run Fling code from JavaScript / TypeScript.",
+  "keywords": [
+    "fling",
+    "language",
+    "interpreter",
+    "wasm",
+    "webassembly",
+    "scripting"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "index.js",
+  "module": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js"
+    }
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "dist/fling.js",
+    "dist/fling.wasm",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "node build.mjs",
+    "build:debug": "node build.mjs --debug",
+    "test": "node test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -321,7 +321,7 @@ namespace fling
         std::unique_ptr<fling::ast::Expr> Parser::parse_assignment_expr()
         {
             auto left = this->parse_logical_expr();
-            // switch this out with object Expression
+
 
             if (this->at().type == lexer::TokenType::Equals)
             {
@@ -576,6 +576,14 @@ namespace fling
             // Null Check
             assert(object != nullptr);
 
+            // Object literals are not member accesses.
+            // Return them immediately, otherwise the member loop would
+            // consume the '=' of assignments or '{' after an identifier.
+            if (object->kind == ast::NodeType::ObjectLiteral)
+            {
+                return object;
+            }
+
             while (at().type == lexer::TokenType::Dot || at().type == lexer::TokenType::OpenSquaredBrace)
             {
                 auto theoperator = eat();
@@ -707,7 +715,16 @@ namespace fling
             // Open Curly Brace {
             case fling::lexer::TokenType::OpenCurlyBrace:
             {
-                return this->parse_object_expr();
+                // parse_object_expr() returns non-null on success.
+                // If the object literal is unterminated, fall through to the
+                // default case (which reports the error and skips the token)
+                // instead of returning a null pointer.
+                auto obj = this->parse_object_expr();
+                if (obj)
+                {
+                    return obj;
+                }
+                break;
             }
 
             // Default Type for Unexpected Tokens
