@@ -13,6 +13,7 @@
 #include <string>
 #include <cassert> // Für assert()
 #include <fstream>
+#include <memory> // Für std::shared_ptr
 
 namespace fling
 {
@@ -22,7 +23,13 @@ namespace fling
 
     void runREPL();
 
-
     // Function to run Code
     void runCode(const std::string& code);
+
+    // Function to create a new Envirment
+    std::shared_ptr<fling::runtime::envirment::Environment> createEnvirment();
+
+    // Function to run fling in this envirment
+    void runCodeInEnvirment(const std::string& code,
+        std::shared_ptr<fling::runtime::envirment::Environment> env);
 }

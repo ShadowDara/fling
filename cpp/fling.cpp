@@ -76,3 +76,19 @@ void fling::runCode(const std::string& code)
     auto result = evaluate(program, env);
     //std::cout << result.toString() << "\n";
 }
+
+std::shared_ptr<Environment> fling::createEnvirment()
+{
+    auto env = std::make_shared<Environment>(nullptr);
+    
+    return std::move(env);
+}
+
+void fling::runCodeInEnvirment(const std::string& code, std::shared_ptr<Environment> env)
+{
+    Parser parser;
+    Program program = parser.produceAST(code);
+    //std::cout << "Print Program: " << program.toString() << "\n";
+    auto result = evaluate(program, env);
+    //std::cout << result.toString() << "\n";
+}

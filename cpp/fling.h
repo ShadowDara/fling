@@ -8,6 +8,7 @@
 extern "C" {
 #endif
 
+	void runCodeC(const char* code);
 
 #ifdef __cplusplus
 }
