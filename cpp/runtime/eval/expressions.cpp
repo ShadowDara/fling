@@ -18,6 +18,12 @@ runtime::RuntimeVal fling::runtime::eval::evaluate_numeric_binary_expr(
     {
         result = lhs.number + rhs.number;
     }
+    // Additon +=
+    /*if (callculation_operator == "+=")
+    {
+        result = lhs.number + rhs.number;
+	}*/
+
     // Subtraction
     else if (callculation_operator == "-")
     {

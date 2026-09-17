@@ -213,23 +213,50 @@ namespace fling
 
                 // Addition Operator
                 case '+':
-                    tokens.push_back(token(std::string(1, current),
-                        TokenType::BinaryOperator, line, column));
-                    i++;
+					// += Operator
+                    if (i + 1 < src.size() && src[i + 1] == '=')
+                    {
+                        tokens.push_back(token("+=", TokenType::BinaryOperator, line, column));
+                        i += 2;
+                    }
+                    else
+                    {
+                        tokens.push_back(token(std::string(1, current),
+                            TokenType::BinaryOperator, line, column));
+                        i++;
+                    }
                     break;
 
                 // Subtraction Operator
                 case '-':
-                    tokens.push_back(token(std::string(1, current),
-                        TokenType::BinaryOperator, line, column));
-                    i++;
+                    // -= Operator
+                    if (i + 1 < src.size() && src[i + 1] == '=')
+                    {
+                        tokens.push_back(token("-=", TokenType::BinaryOperator, line, column));
+                        i += 2;
+                    }
+                    else
+                    {
+                        tokens.push_back(token(std::string(1, current),
+                            TokenType::BinaryOperator, line, column));
+                        i++;
+                    }
                     break;
 
                 // Multiplication Operator
                 case '*':
-                    tokens.push_back(token(std::string(1, current),
-                        TokenType::BinaryOperator, line, column));
-                    i++;
+					// *= Operator
+                    if (i + 1 < src.size() && src[i + 1] == '=')
+                    {
+                        tokens.push_back(token("*=", TokenType::BinaryOperator, line, column));
+                        i += 2;
+                    }
+                    else
+                    {
+                        tokens.push_back(token(std::string(1, current),
+                            TokenType::BinaryOperator, line, column));
+                        i++;
+                    }
                     break;
                 
                 // # for Comments
@@ -267,9 +294,18 @@ namespace fling
                         break; // nichts tokenizen!
                     }
 
-                    // Normaler Division-Operator
-                    tokens.push_back(token("/", TokenType::BinaryOperator, line, column));
-                    i++;
+                    if (i + 1 < src.size() && src[i + 1] == '=')
+                    {
+						// /= Operator
+                        tokens.push_back(token("/=", TokenType::BinaryOperator, line, column));
+                        i += 2;
+                    }
+                    else
+                    {
+                        // Normaler Division-Operator
+                        tokens.push_back(token("/", TokenType::BinaryOperator, line, column));
+                        i++;
+                    }
                     break;
                 }
 
